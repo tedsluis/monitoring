@@ -1,0 +1,25 @@
+groups:
+  - name: application_logs
+    rules:
+      # Voorbeeld 1: Alarmeer direct bij kritieke fouten
+      - alert: CriticalErrorInLogs
+        # Tel het aantal regels met "panic" of "fatal" per minuut. Als > 0, dan alarm.
+        expr: count_over_time({job="podman-containers"} |= "panic" [1m]) > 0
+        for: 0m # Direct vuren
+        labels:
+          severity: critical
+        annotations:
+          summary: "Panic gedetecteerd in {{ $labels.container_name }}"
+          description: "De container {{ $labels.container_name }} logt panics/crashes."
+
+      # Voorbeeld 2: Alarmeer bij veel errors (High Error Rate)
+      - alert: HighErrorRate
+        # Als er meer dan 10 errors per minuut zijn
+        # (?i) maakt het hoofdletterongevoelig (Error, error, ERROR)
+        expr: count_over_time({job="podman-containers"} |~ "(?i)error" [1m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Veel errors in {{ $labels.container_name }}"
+          description: "Meer dan 10 errors per minuut gedetecteerd in de logs."

@@ -1,0 +1,96 @@
+// ==============================================================================
+// OUTPUT: LOKI
+// ==============================================================================
+loki.write "local_loki" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+
+// ==============================================================================
+// STROOM 1: CONTAINER LOGS (VIA PODMAN SOCKET)
+// Dit zorgt voor rijke metadata zoals pod_name
+// ==============================================================================
+
+// 1. Ontdek alle containers via de socket
+discovery.docker "podman_containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+// 2. Verrijk de metadata (Hier halen we de Pod Naam op)
+discovery.relabel "podman_metadata" {
+  targets = discovery.docker.podman_containers.targets
+
+  // Container Naam: Haal de slash (/) weg die docker API toevoegt (bv /mijn-app -> mijn-app)
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container_name"
+  }
+
+  // POD NAAM: Podman zet de pod naam in het label 'io.kubernetes.pod.name'
+  rule {
+    source_labels = ["__meta_docker_container_label_io_kubernetes_pod_name"]
+    target_label  = "pod_name"
+  }
+  
+  // Alternatieve Pod Naam (sommige versies gebruiken io.podman.pod.name)
+  rule {
+    source_labels = ["__meta_docker_container_label_io_podman_pod_name"]
+    target_label  = "pod_name"
+  }
+
+  // Docker Compose Project (als je geen pods gebruikt, maar compose groepen)
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_project"]
+    target_label  = "project"
+  }
+}
+
+// 3. Lees de logs van de containers
+loki.source.docker "podman_stream" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.relabel.podman_metadata.output
+  forward_to = [loki.write.local_loki.receiver]
+  
+  labels = {
+    job = "podman-containers",
+  }
+}
+
+// ==============================================================================
+// STROOM 2: HOST LOGS (VIA JOURNALD)
+// ==============================================================================
+
+// Processor voor Journald logs
+loki.relabel "journal_relabel" {
+  forward_to = [loki.write.local_loki.receiver]
+
+  // Rule: Haal Systemd Unit naam op
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+
+  // BELANGRIJK: Filter duplicaten!
+  // Omdat Podman óók naar Journald schrijft, zouden we logs dubbel krijgen.
+  // We gooien hier alles weg dat een container ID heeft (want dat pakt Stroom 1 al op).
+  rule {
+    source_labels = ["__journal_container_id"]
+    regex         = ".+"     // Als er iets in staat...
+    action        = "drop"   // ...gooi weg uit deze stroom.
+  }
+}
+
+// Source: Lees de journal files van de host
+loki.source.journal "read_host_journal" {
+  max_age = "12h"
+  path    = "/var/log/journal"
+  
+  labels = {
+    job      = "fedora-journal",
+    nodename = "workstation",
+  }
+
+  forward_to = [loki.relabel.journal_relabel.receiver]
+}

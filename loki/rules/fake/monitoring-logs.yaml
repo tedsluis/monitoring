@@ -1,0 +1,34 @@
+groups:
+  - name: monitoring_log_alerts
+    rules:
+      # --- GENERIEKE ERROR CATCHER ---
+      # Dit kijkt naar ALLE containers in de monitoring stack
+      - alert: MonitoringStackErrors
+        expr: |
+          count_over_time({container_name=~"prometheus|loki|grafana|alertmanager|alloy"} |~ "(?i)error" [2m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Veel errors in monitoring stack: {{ $labels.container_name }}"
+          description: "Container {{ $labels.container_name }} logt meer dan 10 errors per 2 minuten."
+
+      # --- SPECIFIEKE LOKI ERROR ---
+      - alert: LokiIngestionError
+        # Check specifiek op fouten bij het wegschrijven van chunks
+        expr: count_over_time({container_name="loki"} |= "failed to flush" [1m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Loki kan data niet wegschrijven"
+          description: "Loki logt 'failed to flush'. Check disk ruimte of permissies!"
+
+      # --- SPECIFIEKE ALLOY ERROR ---
+      - alert: AlloyPipelineBlocked
+        expr: count_over_time({container_name="alloy"} |= "component evaluation failed" [1m]) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alloy Pipeline Fout"
+          description: "Een onderdeel van de Alloy pipeline werkt niet goed."

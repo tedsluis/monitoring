@@ -1,0 +1,246 @@
+version: '3.8'
+
+services:
+  # ---------------------------------------------------------
+  # node-exporter (Host Metrics)
+  # ---------------------------------------------------------
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.10.0
+    container_name: node-exporter
+    command:
+      - '--path.rootfs=/host'
+    pid: host
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+
+  # ---------------------------------------------------------
+  # podman-exporter (Container Metrics)
+  # ---------------------------------------------------------
+  podman-exporter:
+    image: quay.io/navidys/prometheus-podman-exporter:latest
+    container_name: podman-exporter
+    # -----------------------------------------------------------
+    # CRUCIAAL: Draai als root IN de container.
+    # Rootless podman mapt dit naar UID 1000 op de host.
+    # Hierdoor heeft de container dezelfde rechten als jij op de socket.
+    # -----------------------------------------------------------
+    user: "0:0"
+    environment:
+      - CONTAINER_HOST=unix:///run/podman/podman.sock
+    ports:
+      - 9882:9882
+    restart: unless-stopped
+    # SELinux uitschakelen voor deze container is nodig voor socket access
+    security_opt:
+      - label=disable
+    volumes:
+      # Let op: gebruik :ro (read-only) voor veiligheid
+      - /run/user/1000/podman/podman.sock:/run/podman/podman.sock:ro
+
+  # ---------------------------------------------------------
+  # Prometheus (Metrics Database)
+  # ---------------------------------------------------------
+  prometheus:
+    image: quay.io/prometheus/prometheus:v3.9.0
+    container_name: prometheus
+    user: "65534:65534"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:Z
+      - ./prometheus/alert.rules.yml:/etc/prometheus/alert.rules.yml:Z  # <-- NIEUW
+      - prometheus-data:/prometheus:Z
+    extra_hosts:
+      - "host.containers.internal:host-gateway" 
+
+  # ---------------------------------------------------------
+  # Alertmanager (Alert Management)
+  # ---------------------------------------------------------
+  alertmanager:
+    image: quay.io/prometheus/alertmanager:v0.28.0
+    container_name: alertmanager
+    user: "65534:65534"
+    ports:
+      - 9093:9093
+    restart: unless-stopped
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:Z
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+
+  # ---------------------------------------------------------
+  # Grafana (Dashboarding)
+  # ---------------------------------------------------------
+  grafana:
+    image: grafana/grafana:12.3.0
+    container_name: grafana
+    user: "472:472"
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      # --> NIEUW: Stuur Grafana's eigen traces naar OTel Collector
+      - GF_TRACING_ENABLED=true
+      - GF_TRACING_PROVIDER=opentelemetry
+      - GF_TRACING_OPENTELEMETRY_OTLP_ADDRESS=otel-collector:4317
+      - GF_TRACING_OPENTELEMETRY_OTLP_PROTOCOL=grpc
+    volumes:
+      - grafana-data:/var/lib/grafana:Z
+      - ./grafana-provisioning:/etc/grafana/provisioning:Z
+
+  # ---------------------------------------------------------
+  # Karma (Alertmanager UI)
+  # ---------------------------------------------------------
+  karma:
+    image: ghcr.io/prymitive/karma:latest
+    container_name: karma
+    ports:
+      - 8080:8080
+    environment:
+      # Vertel Karma waar Alertmanager draait (interne container naam)
+      - ALERTMANAGER_URI=http://alertmanager:9093
+      # Optioneel: Stel de naam in die in de UI verschijnt
+      - ALERTMANAGER_NAME=Fedora-Alerts
+      # Optioneel: Interval voor verversen (standaard is 30s)
+      - ALERTMANAGER_INTERVAL=15s
+    restart: unless-stopped
+    depends_on:
+      - alertmanager
+
+  # ---------------------------------------------------------
+  # Loki (Log Database)
+  # ---------------------------------------------------------
+  loki:
+    depends_on:
+      - minio
+    image: grafana/loki:3.3.2
+    container_name: loki
+    user: "0:0" # Draai als root om permissiegedoe op volumes te voorkomen in rootless setup
+    command: -config.file=/etc/loki/loki-config.yaml
+    ports:
+      - 3100:3100
+    restart: unless-stopped
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml:Z
+      - loki-data:/loki:Z
+      - ./loki/rules:/loki/rules:Z
+
+  # ---------------------------------------------------------
+  # Alloy (Log Collector)
+  # ---------------------------------------------------------
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    user: "0:0"
+    command: 
+      - run 
+      - --server.http.listen-addr=0.0.0.0:12345 
+      - /etc/alloy/config.alloy
+    ports:
+      - 12345:12345
+    restart: unless-stopped
+    security_opt:
+      - label=disable
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/log/journal:/var/log/journal:ro
+      - /run/log/journal:/run/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      # --- NIEUW: Toegang tot de Podman Socket ---
+      # Pas 1000 aan naar jouw UID indien nodig
+      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
+
+  # ---------------------------------------------------------
+  # NIEUW: Blackbox Exporter (Health Checks)
+  # ---------------------------------------------------------
+  blackbox-exporter:
+    image: quay.io/prometheus/blackbox-exporter:latest
+    container_name: blackbox-exporter
+    ports:
+      - 9115:9115
+    restart: unless-stopped
+    volumes:
+      - ./blackbox/blackbox.yml:/config/blackbox.yml:Z
+    command:
+      - '--config.file=/config/blackbox.yml'
+
+  
+  # ---------------------------------------------------------
+  # Grafana Tempo (Tracing Backend)
+  # ---------------------------------------------------------
+  tempo:
+    depends_on:
+      - minio
+    image: grafana/tempo:2.6.1
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    user: "0:0"
+    volumes:
+      - ./tempo/tempo.yaml:/etc/tempo.yaml:Z
+      - tempo-data:/var/tempo:Z
+    ports:
+      - "3200:3200" # Metrics & Admin
+      - "4317"      # OTLP gRPC (intern gebruik)
+    restart: unless-stopped
+    depends_on:
+      - alertmanager
+
+  # ---------------------------------------------------------
+  # OpenTelemetry Collector (Trace Proxy)
+  # ---------------------------------------------------------
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.119.0
+    container_name: otel-collector
+    command: ["--config=/etc/otel-config.yaml"]
+    volumes:
+      - ./otel/otel-config.yaml:/etc/otel-config.yaml:Z
+    ports:
+      - "4317:4317" # OTLP gRPC Receiver
+      - "4318:4318" # OTLP HTTP Receiver
+      - "8888:8888" # Metrics van de collector zelf
+    restart: unless-stopped
+    depends_on:
+      - tempo
+
+  # ---------------------------------------------------------
+  # Minio (S3 Compatible Storage)
+  # ---------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    user: "0:0"
+    ports:
+      - "9000:9000" # S3 API (Intern & Extern bereikbaar voor tools)
+      - "9001:9001" # Web Console
+    environment:
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio123
+      - MINIO_PROMETHEUS_AUTH_TYPE=public
+    volumes:
+      - minio-data:/data:Z
+    entrypoint:
+      - sh
+      - -euc
+      # Maak buckets aan door mappen te maken en start daarna de server
+      - |
+        mkdir -p /data/loki /data/tempo && \
+        minio server /data --console-address ':9001'
+    restart: unless-stopped
+
+volumes:
+  prometheus-data:
+  grafana-data:
+  loki-data:
+  tempo-data:
+  minio-data:

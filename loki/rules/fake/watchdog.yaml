@@ -1,0 +1,26 @@
+groups:
+  - name: loki_watchdog
+    rules:
+      # 1. De Standaard Watchdog
+      # Deze alert is ALTIJD 'Firing'.
+      # Doel: Bewijzen dat Loki Ruler draait en met Alertmanager kan praten.
+      - alert: LokiWatchdog
+        expr: vector(1)
+        labels:
+          severity: none
+        annotations:
+          summary: "Loki Watchdog (Heartbeat)"
+          description: "Deze alert moet altijd zichtbaar zijn. Als hij ontbreekt, werkt de Loki alerting pipeline niet meer."
+
+      # 2. BONUS: Ingestion Watchdog
+      # Deze alert gaat af als er HELEMAAL GEEN logs meer binnenkomen.
+      # Dit is anders dan de Watchdog hierboven; dit test of Alloy/Promtail nog data stuurt.
+      - alert: LokiNoLogsIngested
+        # Checkt of de totale rate van logs (over alle jobs) 0 is.
+        expr: sum(rate({job=~".+"}[2m])) == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Loki ontvangt geen logs meer"
+          description: "Er zijn al 5 minuten lang 0 logregels binnengekomen in Loki. Check Alloy of Disk Space."
