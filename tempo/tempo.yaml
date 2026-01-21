@@ -24,16 +24,20 @@ compactor:
 
 storage:
   trace:
-    backend: local
+    # HIER IS DE WIJZIGING NAAR S3
+    backend: s3
+    s3:
+      bucket: tempo-data
+      endpoint: minio:9000
+      access_key: minio
+      secret_key: minio123
+      insecure: true
     wal:
       path: /var/tempo/wal
-    local:
-      path: /var/tempo/blocks
 
 overrides:
   defaults:
     metrics_generator:
-      # Hier zetten we de processor aan die metrics maakt van traces
       processors: [service-graphs, span-metrics]
 
 metrics_generator:
@@ -44,10 +48,5 @@ metrics_generator:
   storage:
     path: /var/tempo/generator/wal
     remote_write:
-      # Stuur de metrics direct door naar Prometheus
       - url: http://prometheus:9090/api/v1/write
         send_exemplars: true
-
-# --- RULER VERWIJDERD ---
-# De ruler veroorzaakte de crash. We gebruiken nu Prometheus
-# voor alerting op basis van de metrics die hierboven gegenereerd worden.

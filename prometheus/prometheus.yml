@@ -2,11 +2,11 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
-# --> NIEUW: Koppel de regels
+# Koppel de regels
 rule_files:
   - "alert.rules.yml"
 
-# --> NIEUW: Koppel Alertmanager
+# Koppel Alertmanager
 alerting:
   alertmanagers:
     - static_configs:
@@ -74,6 +74,8 @@ scrape_configs:
         - http://tempo:3200/ready
         # OTel Collector
         - http://otel-collector:8888/metrics
+        # MinIO
+        - http://minio:9000/minio/health/ready
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -86,12 +88,16 @@ scrape_configs:
     static_configs:
       - targets: ['blackbox-exporter:9115']
 
-  # --> Monitor Tempo internals
   - job_name: 'tempo'
     static_configs:
       - targets: ['tempo:3200']
 
-  # --> Monitor OTel Collector internals
   - job_name: 'otel-collector'
     static_configs:
       - targets: ['otel-collector:8888']
+
+  - job_name: 'minio'
+    metrics_path: /minio/v2/metrics/cluster
+    scheme: http
+    static_configs:
+      - targets: ['minio:9000']

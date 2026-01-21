@@ -737,3 +737,35 @@ groups:
         annotations:
           summary: OpenTelemetry Collector OTLP receiver errors (instance {{ $labels.instance }})
           description: "OpenTelemetry Collector OTLP receiver is completely failing - all spans are being refused\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+  - name: minio_alerts
+    rules:
+      - alert: MinioClusterOffline
+        expr: minio_cluster_nodes_offline_total > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MinIO Node Offline"
+          description: "Een node in het MinIO cluster is offline."
+
+      - alert: MinioDiskOffline
+        expr: minio_cluster_disk_offline_total > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "MinIO Disk Offline"
+          description: "Een disk in MinIO is niet bereikbaar."
+
+  - name: tempo_alerts
+    rules:
+      - alert: HighSpanLatency
+        # Alarmeer als 95e percentiel latency > 2s
+        expr: histogram_quantile(0.95, sum(rate(traces_spanmetrics_latency_bucket[5m])) by (le, service)) > 2
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Service {{ $labels.service }} is traag"
+          description: "De 95e percentiel latency van traces is hoger dan 2s."

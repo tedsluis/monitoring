@@ -2,6 +2,53 @@ version: '3.8'
 
 services:
   # ---------------------------------------------------------
+  # Minio (S3 Compatible Storage)
+  # ---------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    # -----------------------------------------------------------
+    # FIX: Draai als root binnen de container.
+    # Dit mapt naar jouw user (UID 1000) buiten de container,
+    # waardoor schrijfrechten op het volume gegarandeerd zijn.
+    # -----------------------------------------------------------
+    user: "0:0"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio123
+      - MINIO_PROMETHEUS_AUTH_TYPE=public
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data:Z
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # ---------------------------------------------------------
+  # MinIO Init (Maakt buckets automatisch aan)
+  # ---------------------------------------------------------
+  minio-init:
+    image: minio/mc
+    container_name: minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      until mc alias set myminio http://minio:9000 minio minio123; do echo '...waiting for minio...'; sleep 1; done;
+      mc mb myminio/loki-data --ignore-existing;
+      mc mb myminio/tempo-data --ignore-existing;
+      echo 'Buckets created';
+      exit 0;
+      "
+
+  # ---------------------------------------------------------
   # node-exporter (Host Metrics)
   # ---------------------------------------------------------
   node-exporter:
@@ -122,19 +169,22 @@ services:
   # Loki (Log Database)
   # ---------------------------------------------------------
   loki:
-    depends_on:
-      - minio
     image: grafana/loki:3.3.2
     container_name: loki
-    user: "0:0" # Draai als root om permissiegedoe op volumes te voorkomen in rootless setup
+    user: "0:0"
     command: -config.file=/etc/loki/loki-config.yaml
     ports:
       - 3100:3100
     restart: unless-stopped
+    depends_on:
+      minio:
+        condition: service_healthy
     volumes:
       - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml:Z
-      - loki-data:/loki:Z
       - ./loki/rules:/loki/rules:Z
+      # We hebben geen loki-data volume meer nodig voor chunks, alles gaat naar S3!
+      # Wel voor de WAL (Write Ahead Log) die lokaal blijft voor performance.
+      - loki-wal:/loki/wal:Z
 
   # ---------------------------------------------------------
   # Alloy (Log Collector)
@@ -180,21 +230,21 @@ services:
   # Grafana Tempo (Tracing Backend)
   # ---------------------------------------------------------
   tempo:
-    depends_on:
-      - minio
     image: grafana/tempo:2.6.1
     container_name: tempo
     command: [ "-config.file=/etc/tempo.yaml" ]
     user: "0:0"
-    volumes:
-      - ./tempo/tempo.yaml:/etc/tempo.yaml:Z
-      - tempo-data:/var/tempo:Z
     ports:
-      - "3200:3200" # Metrics & Admin
-      - "4317"      # OTLP gRPC (intern gebruik)
+      - "3200:3200"
+      - "4317"
     restart: unless-stopped
     depends_on:
       - alertmanager
+      - minio
+    volumes:
+      - ./tempo/tempo.yaml:/etc/tempo.yaml:Z
+      # Tempo WAL blijft lokaal
+      - tempo-wal:/var/tempo/wal:Z
 
   # ---------------------------------------------------------
   # OpenTelemetry Collector (Trace Proxy)
@@ -213,34 +263,9 @@ services:
     depends_on:
       - tempo
 
-  # ---------------------------------------------------------
-  # Minio (S3 Compatible Storage)
-  # ---------------------------------------------------------
-  minio:
-    image: minio/minio:latest
-    container_name: minio
-    user: "0:0"
-    ports:
-      - "9000:9000" # S3 API (Intern & Extern bereikbaar voor tools)
-      - "9001:9001" # Web Console
-    environment:
-      - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio123
-      - MINIO_PROMETHEUS_AUTH_TYPE=public
-    volumes:
-      - minio-data:/data:Z
-    entrypoint:
-      - sh
-      - -euc
-      # Maak buckets aan door mappen te maken en start daarna de server
-      - |
-        mkdir -p /data/loki /data/tempo && \
-        minio server /data --console-address ':9001'
-    restart: unless-stopped
-
 volumes:
   prometheus-data:
   grafana-data:
-  loki-data:
-  tempo-data:
+  loki-wal:
+  tempo-wal:
   minio-data:
