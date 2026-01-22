@@ -19,18 +19,21 @@ Deze repository bevat een complete, Cloud Native Observability Stack die speciaa
 
 De stack bestaat uit de volgende services:
 
-| Service       | Poort | Beschrijving                                | 
-|---------------|-------|---------------------------------------------|
-| Grafana       | 3000  | Dashboard en visualisatie.                  |
-| Prometheus    | 9090  | Time-series database voor metrics.          |
-| Alertmanager  | 9093  | Verwerkt en routeert alerts.                |
-| Karma         | 8080  | UI Dashboard voor Alertmanager meldingen.   |
-| Loki          | 3100  | Log aggregatie (via MinIO S3).              |
-| Tempo         | 3200  | Distributed Tracing backend (via MinIO S3). |
-| MinIO         | 9000  | S3 Object Storage API.                      |
-| MinIO Console | 9001  | Webinterface voor storage beheer.           |
-| Alloy         | 12345 | Collector voor logs (journald) en traces (OTEL). |
-| Blackbox      | 9115  | Uitvoeren van HTTP/TCP health probes.       |
+| Service         | Poort | Beschrijving                                     | 
+|-----------------|-------|--------------------------------------------------|
+| Grafana         | 3000  | Dashboard en visualisatie.                       |
+| Prometheus      | 9090  | Time-series database voor metrics.               |
+| Alertmanager    | 9093  | Verwerkt en routeert alerts.                     |
+| Karma           | 8080  | UI Dashboard voor Alertmanager meldingen.        |
+| Loki            | 3100  | Log aggregatie (via MinIO S3).                   |
+| Tempo           | 3200  | Distributed Tracing backend (via MinIO S3).      |
+| MinIO           | 9000  | S3 Object Storage API.                           |
+| MinIO Console   | 9001  | Webinterface voor storage beheer.                |
+| Alloy           | 12345 | Collector voor logs (journald) en traces (OTEL). |
+| Blackbox        | 9115  | Uitvoeren van HTTP/TCP health probes.            |
+| Node-exporter   | 9100  | Host metrics collector.                          |
+| podman-exporter | 9882  | podman metrics collector.                        |
+| OpenTelemetry   | 8888  | Open Telemetry Collector.                        |
 
 ## Prerequisites
 
@@ -57,7 +60,8 @@ systemctl --user enable --now podman.socket
 ```bash
     podman-compose up -d
 ```
-    De eerste keer zal de `minio-init` container automatisch de benodigde buckets (loki-data en tempo-data) aanmaken.
+    
+De eerste keer zal de `minio-init` container automatisch de benodigde buckets (`loki-data` en `tempo-data`) aanmaken.
 
 3.  Controleer de status:
 ```bash
