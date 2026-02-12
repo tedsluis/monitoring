@@ -13,4 +13,4 @@ receivers:
     # Hier kun je later E-mail, Slack, Discord, PagerDuty etc toevoegen.
     # Voor nu logging we het alleen in de container logs of sturen we niks.
     webhook_configs:
-      - url: 'http://127.0.0.1:5001/' # Dummy URL
+      - url: 'http://webhook-tester:8080/39059f52-f3eb-4472-951a-69cf20b89ee8'

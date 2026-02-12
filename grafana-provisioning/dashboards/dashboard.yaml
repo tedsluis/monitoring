@@ -3,7 +3,7 @@ apiVersion: 1
 providers:
   - name: 'Default'
     orgId: 1
-    folder: 'General'
+    folder: 'Dashboards'
     type: file
     disableDeletion: false
     updateIntervalSeconds: 10 # Handig voor dev: pakt wijzigingen in JSON direct op

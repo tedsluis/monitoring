@@ -8,7 +8,7 @@ services:
     image: minio/minio:latest
     container_name: minio
     # -----------------------------------------------------------
-    # FIX: Draai als root binnen de container.
+    # Draai als root binnen de container.
     # Dit mapt naar jouw user (UID 1000) buiten de container,
     # waardoor schrijfrechten op het volume gegarandeerd zijn.
     # -----------------------------------------------------------
@@ -24,11 +24,16 @@ services:
     volumes:
       - minio-data:/data:Z
     restart: unless-stopped
+    # -----------------------------------------------------------
+    # Healthcheck
+    # Zorgt dat afhankelijke services (Loki/Tempo) pas starten
+    # als de S3 storage daadwerkelijk up is.
+    # -----------------------------------------------------------
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # ---------------------------------------------------------
   # MinIO Init (Maakt buckets automatisch aan)
@@ -38,7 +43,7 @@ services:
     container_name: minio-init
     depends_on:
       minio:
-        condition: service_healthy
+        condition: service_healthy # Wacht tot MinIO echt klaar is
     entrypoint: >
       /bin/sh -c "
       until mc alias set myminio http://minio:9000 minio minio123; do echo '...waiting for minio...'; sleep 1; done;
@@ -56,6 +61,11 @@ services:
     container_name: node-exporter
     command:
       - '--path.rootfs=/host'
+    # -----------------------------------------------------------
+    # CRUCIAAL: pid en network mode host
+    # Nodig om de échte host metrics (CPU, RAM, Disk) te zien
+    # in plaats van die van de container zelf.
+    # -----------------------------------------------------------
     pid: host
     network_mode: host
     restart: unless-stopped
@@ -92,19 +102,21 @@ services:
   prometheus:
     image: quay.io/prometheus/prometheus:v3.9.0
     container_name: prometheus
-    user: "65534:65534"
+    user: "65534:65534" # Draait als 'nobody' user (security best practice)
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle' # Maakt hot-reload mogelijk via API
     ports:
       - 9090:9090
     restart: unless-stopped
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:Z
-      - ./prometheus/alert.rules.yml:/etc/prometheus/alert.rules.yml:Z  # <-- NIEUW
+      - ./prometheus/alert.rules.yml:/etc/prometheus/alert.rules.yml:Z
       - prometheus-data:/prometheus:Z
     extra_hosts:
+      # Maakt de host bereikbaar vanuit de container via deze DNS naam
       - "host.containers.internal:host-gateway" 
 
   # ---------------------------------------------------------
@@ -129,21 +141,32 @@ services:
   grafana:
     image: grafana/grafana:12.3.0
     container_name: grafana
-    user: "472:472"
+    user: "472:472" # Grafana user ID
     ports:
       - 3000:3000
     restart: unless-stopped
+    depends_on:
+      - prometheus
+      - loki
+      - tempo
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
-      # --> NIEUW: Stuur Grafana's eigen traces naar OTel Collector
+      # Stuur Grafana's eigen traces naar OTel Collector
       - GF_TRACING_ENABLED=true
       - GF_TRACING_PROVIDER=opentelemetry
       - GF_TRACING_OPENTELEMETRY_OTLP_ADDRESS=otel-collector:4317
       - GF_TRACING_OPENTELEMETRY_OTLP_PROTOCOL=grpc
     volumes:
       - grafana-data:/var/lib/grafana:Z
+      # -----------------------------------------------------------
+      # Provisioning Mount
+      # Zorg dat de mappenstructuur op de host als volgt is:
+      # ./grafana-provisioning/datasources/datasources.yaml
+      # ./grafana-provisioning/dashboards/dashboard.yaml
+      # ./grafana-provisioning/dashboards/json/*.json
+      # -----------------------------------------------------------
       - ./grafana-provisioning:/etc/grafana/provisioning:Z
 
   # ---------------------------------------------------------
@@ -157,9 +180,7 @@ services:
     environment:
       # Vertel Karma waar Alertmanager draait (interne container naam)
       - ALERTMANAGER_URI=http://alertmanager:9093
-      # Optioneel: Stel de naam in die in de UI verschijnt
       - ALERTMANAGER_NAME=Fedora-Alerts
-      # Optioneel: Interval voor verversen (standaard is 30s)
       - ALERTMANAGER_INTERVAL=15s
     restart: unless-stopped
     depends_on:
@@ -178,7 +199,7 @@ services:
     restart: unless-stopped
     depends_on:
       minio:
-        condition: service_healthy
+        condition: service_healthy # Wacht op S3
     volumes:
       - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml:Z
       - ./loki/rules:/loki/rules:Z
@@ -196,6 +217,8 @@ services:
     command: 
       - run 
       - --server.http.listen-addr=0.0.0.0:12345 
+      # Persistence voor Alloy zelf (voorkomt dataverlies bij restart)
+      - --storage.path=/var/lib/alloy/data
       - /etc/alloy/config.alloy
     ports:
       - 12345:12345
@@ -207,12 +230,12 @@ services:
       - /var/log/journal:/var/log/journal:ro
       - /run/log/journal:/run/log/journal:ro
       - /etc/machine-id:/etc/machine-id:ro
-      # --- NIEUW: Toegang tot de Podman Socket ---
+      # Toegang tot de Podman Socket ---
       # Pas 1000 aan naar jouw UID indien nodig
       - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
 
   # ---------------------------------------------------------
-  # NIEUW: Blackbox Exporter (Health Checks)
+  # Blackbox Exporter (Health Checks)
   # ---------------------------------------------------------
   blackbox-exporter:
     image: quay.io/prometheus/blackbox-exporter:latest
@@ -225,7 +248,6 @@ services:
     command:
       - '--config.file=/config/blackbox.yml'
 
-  
   # ---------------------------------------------------------
   # Grafana Tempo (Tracing Backend)
   # ---------------------------------------------------------
@@ -239,8 +261,8 @@ services:
       - "4317"
     restart: unless-stopped
     depends_on:
-      - alertmanager
-      - minio
+      minio:
+        condition: service_healthy # Wacht op S3
     volumes:
       - ./tempo/tempo.yaml:/etc/tempo.yaml:Z
       # Tempo WAL blijft lokaal
@@ -262,6 +284,13 @@ services:
     restart: unless-stopped
     depends_on:
       - tempo
+
+  webhook-tester:
+    image: tarampampam/webhook-tester:latest
+    container_name: webhook-tester
+    ports:
+      - "5001:8080" # UI bereikbaar op localhost:5001
+    restart: unless-stopped
 
 volumes:
   prometheus-data:

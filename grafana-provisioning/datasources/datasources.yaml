@@ -2,7 +2,7 @@ apiVersion: 1
 
 datasources:
   # Prometheus Datasource
-  - name: Prometheus
+  - name: prometheus
     type: prometheus
     uid: prometheus
     url: http://prometheus:9090
@@ -10,7 +10,7 @@ datasources:
     editable: true
 
   # Loki Datasource
-  - name: Loki
+  - name: loki
     type: loki
     uid: loki
     url: http://loki:3100
@@ -24,7 +24,7 @@ datasources:
           url: "$${__value.raw}"
 
   # Tempo Datasource
-  - name: Tempo
+  - name: tempo
     type: tempo
     uid: tempo
     url: http://tempo:3200
