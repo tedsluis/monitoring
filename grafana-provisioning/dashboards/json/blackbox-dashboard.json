@@ -44,7 +44,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -131,7 +131,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(probe_http_duration_seconds{project=~\"$project\", app=~\"$app\"}) by (instance)",
@@ -159,7 +159,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -212,7 +212,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "count(probe_success{project=~\"$project\", app=~\"$app\"})",
           "refId": "A"
@@ -224,7 +224,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -299,7 +299,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -316,7 +316,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -604,7 +604,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "probe_http_status_code{project=~\"$project\", app=~\"$app\"}",
@@ -616,7 +616,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "probe_ssl_earliest_cert_expiry{project=~\"$project\", app=~\"$app\"} - time()",
@@ -628,7 +628,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "probe_ssl_earliest_cert_expiry{project=~\"$project\", app=~\"$app\"} * 1000",
@@ -640,7 +640,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(probe_http_duration_seconds{project=~\"$project\", app=~\"$app\"}) by (instance)",
@@ -652,7 +652,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "probe_dns_lookup_time_seconds{project=~\"$project\", app=~\"$app\"}",
@@ -713,7 +713,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -845,7 +845,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -860,7 +860,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -888,7 +888,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -999,7 +999,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "cfa6bf6y1kr9cb"
+                "uid": "prometheus"
               },
               "exemplar": true,
               "expr": "probe_ssl_earliest_cert_expiry{project=~\"$project\", app=~\"$app\"} - time() < (3600 * 24 * 30)",
@@ -1063,7 +1063,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -1148,7 +1148,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "probe_http_status_code{project=~\"$project\", app=~\"$app\"}",
@@ -1180,7 +1180,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "cfa6bf6y1kr9cb"
+          "uid": "prometheus"
         },
         "definition": "label_values(probe_http_status_code, project)",
         "includeAll": true,
@@ -1203,7 +1203,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "cfa6bf6y1kr9cb"
+          "uid": "prometheus"
         },
         "definition": "label_values(app)",
         "includeAll": true,

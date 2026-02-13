@@ -53,7 +53,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -102,7 +102,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "loki_build_info",
@@ -119,7 +119,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -168,7 +168,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(loki_log_messages_total)",
@@ -184,7 +184,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -237,7 +237,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "prometheus_notifications_alertmanagers_discovered",
@@ -254,7 +254,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -307,7 +307,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "prometheus_notifications_sent_total",
@@ -324,7 +324,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -373,7 +373,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "sum(loki_ingester_chunk_stored_bytes_total)",
           "instant": true,
@@ -388,7 +388,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -441,7 +441,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(prometheus_rule_group_rules)",
@@ -458,7 +458,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -507,7 +507,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "loki_panic_total",
@@ -523,7 +523,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -610,7 +610,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(irate(loki_log_messages_total[1m])) by (level)",
@@ -626,7 +626,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -713,7 +713,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.95, sum(rate(loki_request_duration_seconds_bucket[5m])) by (le,operation))",
@@ -729,7 +729,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -817,7 +817,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "histogram_quantile(0.95, sum(rate(loki_request_duration_seconds_bucket[5m])) by (le,route))",
           "interval": "",
@@ -844,7 +844,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -902,7 +902,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "prometheus_rule_evaluations_total",
@@ -916,7 +916,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "prometheus_notifications_sent_total",
@@ -932,7 +932,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -1019,7 +1019,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(rate(prometheus_notifications_latency_seconds[5m]))  by (quantile)",
@@ -1035,7 +1035,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -1122,7 +1122,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(rate(prometheus_rule_evaluation_duration_seconds[5m]))  by (quantile)",
@@ -1151,7 +1151,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -1238,7 +1238,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.95, sum(rate(loki_cache_request_duration_seconds_bucket[5m])) by (le,name,method))",
@@ -1254,7 +1254,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -1341,7 +1341,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.95, sum(rate(loki_cache_value_size_bytes_bucket[5m])) by (le,name,method))",
@@ -1357,7 +1357,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -1437,7 +1437,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "rate(loki_cache_hits[5m])",
@@ -1453,7 +1453,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -1534,7 +1534,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "loki_cache_background_queue_length",
@@ -1550,7 +1550,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -1630,7 +1630,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "loki_cache_fetched_keys",
@@ -1659,7 +1659,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -1740,7 +1740,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.95, sum(rate(loki_chunk_store_chunks_per_query_bucket[5m])) by (le))",
@@ -1769,7 +1769,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -1847,7 +1847,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "sum by (tenant) (rate(loki_distributor_lines_received_total[5m]))",
           "interval": "",
@@ -1861,7 +1861,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -1939,7 +1939,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "sum(rate(loki_distributor_bytes_received_total[5m])) by (tenant)",
           "interval": "",
@@ -1953,7 +1953,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -2033,7 +2033,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "rate(loki_distributor_ingester_appends_total[5m])",
           "interval": "",
@@ -2043,7 +2043,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "loki_distributor_ingester_append_failures_total",
           "interval": "",
@@ -2070,7 +2070,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -2151,7 +2151,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "histogram_quantile(0.95, sum(rate(loki_ingester_blocks_per_chunk_bucket[5m])) by (le))",
           "interval": "",
@@ -2165,7 +2165,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -2246,7 +2246,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "histogram_quantile(0.95, sum(rate(loki_ingester_chunk_size_bytes_bucket[5m])) by (le))",
           "interval": "",
@@ -2260,7 +2260,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -2341,7 +2341,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "histogram_quantile(0.95, sum(rate(loki_ingester_chunk_age_seconds_bucket[5m])) by (le))",
           "interval": "",
@@ -2355,7 +2355,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -2436,7 +2436,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "histogram_quantile(0.95, sum(rate(loki_ingester_chunk_compression_ratio_bucket[5m])) by (le))",
           "interval": "",
@@ -2450,7 +2450,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -2531,7 +2531,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "histogram_quantile(0.95, sum(rate(loki_ingester_chunk_encode_time_seconds_bucket[5m])) by (le))",
           "interval": "",
@@ -2545,7 +2545,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -2626,7 +2626,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "histogram_quantile(0.95, sum(rate(loki_ingester_chunk_entries_bucket[5m])) by (le))",
           "interval": "",
@@ -2640,7 +2640,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -2720,7 +2720,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "rate(loki_ingester_chunks_created_total[5m])",
           "interval": "",
@@ -2730,7 +2730,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "sum by (reason) (rate(loki_ingester_chunks_flushed_total[5m]))",
           "interval": "",
@@ -2740,7 +2740,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "sum by (fake) (rate(loki_ingester_chunks_stored_total[5m]))",
           "interval": "",
@@ -2750,7 +2750,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "",
           "interval": "",
@@ -2764,7 +2764,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -2844,7 +2844,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "loki_ingester_memory_chunks",
           "interval": "",
@@ -2858,7 +2858,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -2938,7 +2938,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "sum by (tenan) (loki_ingester_memory_streams)",
           "interval": "",
@@ -2952,7 +2952,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cfa6bf6y1kr9cb"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -3032,7 +3032,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "rate(loki_ingester_streams_created_total[5m])",
           "interval": "",
@@ -3042,7 +3042,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cfa6bf6y1kr9cb"
+            "uid": "prometheus"
           },
           "expr": "rate(loki_ingester_streams_removed_total[5m])",
           "interval": "",

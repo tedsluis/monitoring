@@ -46,7 +46,7 @@
     {
       "datasource": {
         "type": "loki",
-        "uid": "cfafa9cyb02kgb"
+        "uid": "loki"
       },
       "fieldConfig": {
         "defaults": {
@@ -131,7 +131,7 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "cfafa9cyb02kgb"
+            "uid": "loki"
           },
           "expr": "sum(count_over_time({job=\"$app\"} |= \"$search\" [$__interval]))",
           "legendFormat": "",
@@ -144,7 +144,7 @@
     {
       "datasource": {
         "type": "loki",
-        "uid": "cfafa9cyb02kgb"
+        "uid": "loki"
       },
       "fieldConfig": {
         "defaults": {},
@@ -173,7 +173,7 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "cfafa9cyb02kgb"
+            "uid": "loki"
           },
           "expr": "{job=\"$app\"} |= \"$search\" | logfmt",
           "hide": false,
@@ -197,7 +197,7 @@
           "text": "fedora-journal",
           "value": "fedora-journal"
         },
-        "datasource": "cfafa9cyb02kgb",
+        "datasource": "loki",
         "definition": "label_values(job)",
         "includeAll": false,
         "label": "App",
