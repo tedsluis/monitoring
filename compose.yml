@@ -285,6 +285,9 @@ services:
     depends_on:
       - tempo
 
+  # ---------------------------------------------------------
+  # Webhook Tester (Voor het testen van Alertmanager webhooks)
+  # ---------------------------------------------------------
   webhook-tester:
     image: tarampampam/webhook-tester:latest
     container_name: webhook-tester

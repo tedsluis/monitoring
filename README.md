@@ -105,6 +105,7 @@ De configuratie is opgedeeld in mappen per component. Dankzij Grafana Provisioni
 
 Ga naar http://localhost:3000.
 
+
 #### Dashboards
 
 [./monitoring/grafana-provisioning/dashboards/json/](./grafana-provisioning/dashboards/json/)
@@ -112,30 +113,33 @@ Ga naar http://localhost:3000.
 
 #### Explore
 
-Loki explore
-![](/images/explore-loki.png)
+Loki logs explore
+![Loki-explore](/images/explore-loki.png)
 
-Metrics explore
-![](/images/explore-metrics.png)
+Prometheus metrics explore
+![prometheus-explore](/images/explore-metrics.png)
 
-Tracing explore
-![](/images/explore-tracing.png)
+Tempo tracing explore
+![tempo-explore](/images/explore-tracing.png)
 
 #### Drildown
 
 Metrics drilldown
-![](/images/drildown-metrics.png)
+![Metrics-drilldown](/images/drildown-metrics.png)
 
 Loki drildown
-![](/images/drildown-log.png)
+![loki-drilldown](/images/drildown-log.png)
 
 #### Grafana alerts
 
-![](/images/grafana-alerting.png)
+Grafana Alerting
+![grafana-alerting](/images/grafana-alerting.png)
 
 #### Grafana datasources
 
 [./monitoring/grafana-provisioning/dashboards/dashboard.yaml](./grafana-provisioning/datasources/datasources.yaml)
+
+![grafana-datasources](./images/grafana-datasource.png)
 
 ### 2. Prometheus Metrics
 
@@ -146,13 +150,21 @@ Ga naar http://localhost:9090
 - `/targets`: status van de scrape targets.
 - `/config`: volledige prometheus configuratie.
 
+Prometheus UI - rules
 ![prometheus-rules](images/prometheus-rules.png)
+
+Prometheus dashboard
+![prometheus-dashboard](./images/prometheus.png)
 
 ### 3. Alertmanager
 
 Ga naar http://localhost:9093
 
+Alertmanager UI
 ![alertmanager](/images/alertmanager.png)
+
+Alertmanager dashboard
+![alertmanager-dashboard](./images/alertmanager-dashboard.png)
 
 - Overzicht van actuele alerts
 - Mogelijkheid om alerts te dempen.
@@ -163,13 +175,24 @@ Ga naar http://localhost:8080.
 
 Hier zie je een overzicht van alle actieve waarschuwingen (bijv. "Disk bijna vol", "Container down" of "Health Check Failed").
 
+Karma UI
 ![karma](images/karma.png)
 
 ### 5. Storage (MinIO)
 
 Ga naar http://localhost:9001.
 
+Minio UI - login
 ![minio](images/minio.png)
+
+Minio UI - object browser
+![minio-ui](./images/minio-ui.png)
+
+Minio dashboard overview
+![minio](./images/minio-dashboard.png)
+
+Minio dashboard bucket
+![minio-bucket](./images/minio-bucket-dashboard.png)
 
 Hier kun je zien hoeveel data Loki en Tempo verbruiken in hun buckets.
 
@@ -177,33 +200,40 @@ Hier kun je zien hoeveel data Loki en Tempo verbruiken in hun buckets.
 
 Alertmanager stuurt de alert door naar de webhook-tester
 
-![](/images/webook-tester.png)
+Webhook-tester UI
+![webhook-tester-ui](/images/webook-tester.png)
 
 ### 7. Alloy exporter
 
 http://localhost:12345/
+
+Alloy UI
+![alloy-ui](./images/alloy-uit.png)
 
 ### 8. Blackbox exporter
 
 http://localhost:9115/
 
 Blackbox dashboard
-![](/images/blackbox.png)
+![blackbox-dahboard](/images/blackbox.png)
 
 ### 9. Loki
 
 Loki dashboard
-![](/images/loki.png)
+![loki-dashboard](/images/loki.png)
+
+Loki logging dashboard
+![loki-logs-dashboard](./images/loki-logs-dashboard.png)
 
 ### 10. node-exporter
 
 nodes-exporter-full
-![](/images/node-exporter-full.png)
+![nodes-exporter-full-dashboard](/images/node-exporter-full.png)
 
 ### 11. podman-exporter
 
 podman-exporter
-![](/images/podman-exporter.png)
+![podman-exporter-dashboard](/images/podman-exporter.png)
 
 
 ## Troubleshooting

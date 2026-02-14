@@ -24,7 +24,7 @@ compactor:
 
 storage:
   trace:
-    # HIER IS DE WIJZIGING NAAR S3
+    # HIER IS DE WIJZIGING NAAR minio S3 storage.
     backend: s3
     s3:
       bucket: tempo-data
