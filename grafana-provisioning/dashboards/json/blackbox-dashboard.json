@@ -1228,7 +1228,7 @@
     "nowDelay": ""
   },
   "timezone": "",
-  "title": "blackbox_exporter-http-Dashboards-english",
-  "uid": "iKcj6tXnq",
+  "title": "Blackbox Dashboard",
+  "uid": "blackbox-dashboard",
   "version": 4
 }

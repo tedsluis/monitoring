@@ -245,7 +245,7 @@
     ]
   },
   "timezone": "",
-  "title": "Loki Logs",
-  "uid": "sadlil-loki-apps-dashboard",
+  "title": "Loki Logs Dashboard",
+  "uid": "loki-logs-dashboard",
   "version": 2
 }

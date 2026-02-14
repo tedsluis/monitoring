@@ -3069,7 +3069,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Loki2.0 Global Metrics",
-  "uid": "MQHVDmtWkas",
+  "title": "Loki Global Metrics Dashboard",
+  "uid": "loki-global-metrics-dashboard",
   "version": 1
 }

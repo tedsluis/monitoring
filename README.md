@@ -1,4 +1,5 @@
-# Monitoring Stack (Fedora Workstation & Podman Rootless)
+# Full Stack monitoring met Prometheus, Loki, Tempo en Grafana
+## Fedora Workstation & Podman Rootless
 
 Deze repository bevat een complete, Cloud Native Observability Stack die speciaal is geoptimaliseerd voor Fedora Workstation met Rootless Podman. De stack combineert metrics, logs en traces in één geïntegreerde omgeving met Grafana.
 
@@ -7,10 +8,11 @@ Deze repository bevat een complete, Cloud Native Observability Stack die speciaa
 -   Metrics: Prometheus (v3.9) met Node Exporter & Podman Exporter.
 -   Logs: Grafana Loki (v3.3) met opslag op MinIO (S3).
 -   Traces: Grafana Tempo (v2.6) met OpenTelemetry ondersteuning.
--   Collection: Grafana Alloy (vervangt Promtail) voor het verzamelen van journald logs.
+-   Grafana: (v12.3) als frontend voor metrics, logging en tracing. Grafana Dashboards en Datasources worden automatisch geladen (IaC).
+-   Collection: Grafana Alloy en Opentelemetry collector voor het verzamelen van journald logs.
 -   Storage: MinIO (S3 compatible) voor langdurige, efficiënte opslag van logs en traces.
 -   Alerting: Prometheus Alertmanager gekoppeld aan Karma (dashboard) en Blackbox Exporter (health checks).
--   Automation: Dashboards en Datasources worden automatisch geladen (IaC).
+-   Karma: Dashboard voor alerts.
 -   Security: Volledig compatible met SELinux en draait Rootless (met specifieke fixes voor socket-toegang).
 -   webhook-tester: ontvangt alerts van alertmanager voor inspectie.
 
@@ -105,17 +107,8 @@ Ga naar http://localhost:3000.
 
 #### Dashboards
 
-Blackbox
-![](/images/blackbox.png)
+[./monitoring/grafana-provisioning/dashboards/json/](./grafana-provisioning/dashboards/json/)
 
-Loki
-![](/images/loki.png)
-
-nodes-exporter-full
-![](/images/node-exporter-full.png)
-
-podman-exporter
-![](/images/podman-exporter.png)
 
 #### Explore
 
@@ -136,11 +129,15 @@ Metrics drilldown
 Loki drildown
 ![](/images/drildown-log.png)
 
-### Grafana alerts
+#### Grafana alerts
 
 ![](/images/grafana-alerting.png)
 
-## 2. Metrics (Prometheus)
+#### Grafana datasources
+
+[./monitoring/grafana-provisioning/dashboards/dashboard.yaml](./grafana-provisioning/datasources/datasources.yaml)
+
+### 2. Prometheus Metrics
 
 Ga naar http://localhost:9090
 
@@ -151,7 +148,7 @@ Ga naar http://localhost:9090
 
 ![prometheus-rules](images/prometheus-rules.png)
 
-## 3. Alerts (Alertmanager)
+### 3. Alertmanager
 
 Ga naar http://localhost:9093
 
@@ -160,7 +157,7 @@ Ga naar http://localhost:9093
 - Overzicht van actuele alerts
 - Mogelijkheid om alerts te dempen.
 
-### 4. Alerts (Karma)
+### 4. Karma Alert Dashboard
 
 Ga naar http://localhost:8080.
 
@@ -181,6 +178,33 @@ Hier kun je zien hoeveel data Loki en Tempo verbruiken in hun buckets.
 Alertmanager stuurt de alert door naar de webhook-tester
 
 ![](/images/webook-tester.png)
+
+### 7. Alloy exporter
+
+http://localhost:12345/
+
+### 8. Blackbox exporter
+
+http://localhost:9115/
+
+Blackbox dashboard
+![](/images/blackbox.png)
+
+### 9. Loki
+
+Loki dashboard
+![](/images/loki.png)
+
+### 10. node-exporter
+
+nodes-exporter-full
+![](/images/node-exporter-full.png)
+
+### 11. podman-exporter
+
+podman-exporter
+![](/images/podman-exporter.png)
+
 
 ## Troubleshooting
 

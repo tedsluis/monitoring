@@ -18,6 +18,7 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
+  # node-exporter draait op het host netwerk, dus we gebruiken 'host.containers.internal' om er toegang toe te krijgen vanuit de container.
   - job_name: 'fedora-workstation'
     static_configs:
       - targets: ['host.containers.internal:9100']
@@ -46,6 +47,7 @@ scrape_configs:
     static_configs:
       - targets: ['karma:8080']
 
+  # http probes voor de verschillende services. We gebruiken de blackbox exporter om deze probes uit te voeren.
   - job_name: 'blackbox-http'
     metrics_path: /probe
     params:
@@ -96,8 +98,21 @@ scrape_configs:
     static_configs:
       - targets: ['otel-collector:8888']
 
+  # MinIO heeft verschillende metrics endpoints, dus we definiëren meerdere jobs voor elk type metric.
   - job_name: 'minio'
     metrics_path: /minio/v2/metrics/cluster
     scheme: http
     static_configs:
       - targets: ['minio:9000']
+  - job_name: minio-job-bucket
+    metrics_path: /minio/v2/metrics/bucket
+    static_configs:
+    - targets: ['minio:9000']
+  - job_name: minio-job-node
+    metrics_path: /minio/v2/metrics/node
+    static_configs:
+    - targets: ['minio:9000']
+  - job_name: minio-job-resource
+    metrics_path: /minio/v2/metrics/resource
+    static_configs:
+    - targets: ['minio:9000']
