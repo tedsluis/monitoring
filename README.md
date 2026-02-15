@@ -1,17 +1,18 @@
 # Full Stack monitoring met Prometheus, Loki, Tempo en Grafana
 ## Fedora Workstation & Podman Rootless
 
-Deze repository bevat een complete, Cloud Native Observability Stack die speciaal is geoptimaliseerd voor Fedora Workstation met Rootless Podman. De stack combineert metrics, logs en traces in één geïntegreerde omgeving met Grafana.
+Deze repository bevat een complete Observability, geoptimaliseerd voor Fedora Workstation met Rootless Podman. De stack combineert metrics, logs en traces in één geïntegreerde omgeving met Grafana als frontend.
 
 ## Features
 
 -   Metrics: Prometheus (v3.9) met Node Exporter & Podman Exporter.
 -   Logs: Grafana Loki (v3.3) met opslag op MinIO (S3).
--   Traces: Grafana Tempo (v2.6) met OpenTelemetry ondersteuning.
--   Grafana: (v12.3) als frontend voor metrics, logging en tracing. Grafana Dashboards en Datasources worden automatisch geladen (IaC).
--   Collection: Grafana Alloy en Opentelemetry collector voor het verzamelen van journald logs.
+-   Traces: Grafana Tempo (v2.6) in combinatie met OpenTelemetry.
+-   Grafana: (v12.3) als frontend voor metrics, logging en tracing. 
+-   Grafana Dashboards en Datasources worden automatisch geladen (IaC).
+-   Collection: Alloy en Opentelemetry collector voor het verzamelen van container en journald logs.
 -   Storage: MinIO (S3 compatible) voor langdurige, efficiënte opslag van logs en traces.
--   Alerting: Prometheus Alertmanager gekoppeld aan Karma (dashboard) en Blackbox Exporter (health checks).
+-   Alerting: Prometheus Alertmanager gekoppeld aan Karma (alert dashboard) en Blackbox Exporter (health checks).
 -   Karma: Dashboard voor alerts.
 -   Security: Volledig compatible met SELinux en draait Rootless (met specifieke fixes voor socket-toegang).
 -   webhook-tester: ontvangt alerts van alertmanager voor inspectie.
@@ -36,6 +37,9 @@ De stack bestaat uit de volgende services:
 | podman-exporter | 9882  | podman metrics collector.                        |
 | OpenTelemetry   | 8888  | Open Telemetry Collector.                        |
 | webhook-tester  | 5001  | Webhooks inspectie.                              |
+
+Diagram
+![diagram](./images/diagram.png)
 
 ## Prerequisites
 
@@ -103,26 +107,38 @@ De configuratie is opgedeeld in mappen per component. Dankzij Grafana Provisioni
 
 ### 1. Dashboards (Grafana)
 
-Ga naar http://localhost:3000.
+Ga naar http://localhost:3000
 
+Grafana vormt het centrale, visuele hart van deze observability stack en fungeert als 'single pane of glass' voor al je data. Het open-source platform verbindt naadloos met Prometheus (metrics), Loki (logs) en Tempo (traces), waardoor je via interactieve dashboards en de krachtige Explore-modus diepgaand inzicht krijgt in de prestaties van je systeem. Dankzij de geautomatiseerde provisioning worden de datasources en dashboards direct bij het opstarten ingeladen, zodat je zonder handmatige configuratie direct aan de slag kunt met het analyseren en correleren van je monitoringgegevens.
 
 #### Dashboards
 
-[./monitoring/grafana-provisioning/dashboards/json/](./grafana-provisioning/dashboards/json/)
+Deze repo bevat een aantal grafana dashboarden die opgeslagen zijn in [./grafana-provisioning/dashboards/json/](./grafana-provisioning/dashboards/json/) in json formaat.
 
+Grafana Dashboarden
+![grafana-dashboarden](./images/grafana-dashboarden.png)
 
 #### Explore
 
-Loki logs explore
+De Explore-modus biedt een geavanceerde interface voor ad-hoc analyse en troubleshooting, waarbij gebruikers direct query's kunnen uitvoeren. Hiermee faciliteert Explore snelle incidentdiagnose en root-cause analyse, zonder de noodzaak om vooraf gedefinieerde dashboards te configureren.
+
+**Loki logs explore**
+
+ De Loki-datasource in combinatie met LogQ maakt het mogelijk om logstromen efficiënt te filteren op labels, specifieke tekstpatronen of reguliere expressies te doorzoeken en logvolumes visueel weer te geven naast de ruwe logregels. 
 ![Loki-explore](/images/explore-loki.png)
 
-Prometheus metrics explore
+**Prometheus metrics explore**
+
+De Prometheus-datasource biedt in combinatie met PromQL-queries de mogelijk om het iteratief onderzoeken van time-series data, het visualiseren van trends en het vergelijken van metrieken via split-view functionaliteit.
 ![prometheus-explore](/images/explore-metrics.png)
 
-Tempo tracing explore
+**Tempo tracing explore**
+De Tempo-datasource in combinatie TraceQL biedt een gedetailleerde visualisatie van de levenscyclus van requests door de gedistribueerde architectuur. Via de waterfall-weergave kunnen gebruikers de latency per component analyseren, waardoor performance-bottlenecks en fouten binnen specifieke spans nauwkeurig kunnen worden geïsoleerd. De integratie met TraceQL maakt gerichte filtering van traces mogelijk, wat in combinatie met gecorreleerde logs en metrics zorgt voor een efficiënte analyse van de hoofdoorzaak bij incidenten. Het kan bijvoorbeeld interesant zijn om te filteren op request niet een http status code van 4xx of 5xx hebben. Of request die langer duren dan 500ms.
 ![tempo-explore](/images/explore-tracing.png)
 
 #### Drildown
+
+De drill-down functionaliteit binnen Grafana biedt de mogelijkheid om diepgaande foutanalyse door metrics, logs en traces contextueel met elkaar te verbinden. Vanuit een anomalie in een metrics-dashboard kan je direct navigeren naar de gecorreleerde logregels in Loki, om vervolgens via automatisch gedetecteerde trace-ID's door te schakelen naar gedetailleerde request-spans in Tempo. Deze integratie elimineert de noodzaak om handmatig tijdstippen en identifiers te synchroniseren tussen verschillende datasources, wat de efficiëntie van root cause analysis en performance-optimalisatie aanzienlijk verhoogt.
 
 Metrics drilldown
 ![Metrics-drilldown](/images/drildown-metrics.png)
@@ -132,14 +148,18 @@ Loki drildown
 
 #### Grafana alerts
 
+Grafana Alerting biedt een centrale interface voor het monitoren van alerts. Deze module aggregeert alert rules vanuit zowel Prometheus (voor metrics) als Loki (voor logdata), waardoor een overzicht ontstaat van de operationele status. Je kunt via dit dashboard de realtime status van alerts (‘Pending’ of ‘Firing’) analyseren, de onderliggende query-definities bekijken en inzicht verkrijgen in de evaluatiecriteria die de stabiliteit en beschikbaarheid van het platform bewaken.
+
 Grafana Alerting
 ![grafana-alerting](/images/grafana-alerting.png)
 
 #### Grafana datasources
 
-[./monitoring/grafana-provisioning/dashboards/dashboard.yaml](./grafana-provisioning/datasources/datasources.yaml)
-
+Datasources vormen binnen Grafana de technische interface naar de onderliggende data-opslagsystemen, waardoor de applicatie in staat is gegevens op te halen zonder deze zelf te persisteren. In deze configuratie zijn Prometheus, Loki en Tempo gedefinieerd als primaire bronnen voor het ontsluiten van respectievelijk metrics, logbestanden en distributed traces. 
 ![grafana-datasources](./images/grafana-datasource.png)
+
+De datasources voor Prometheus, Loki en Tempo zijn geconfigureerd in [./grafana-provisioning/dashboards/dashboard.yaml](./grafana-provisioning/datasources/datasources.yaml)
+
 
 ### 2. Prometheus Metrics
 
@@ -150,7 +170,7 @@ Ga naar http://localhost:9090
 - `/targets`: status van de scrape targets.
 - `/config`: volledige prometheus configuratie.
 
-Prometheus UI - rules
+Prometheus UI - alert rules overzich
 ![prometheus-rules](images/prometheus-rules.png)
 
 Prometheus dashboard
@@ -198,7 +218,7 @@ Hier kun je zien hoeveel data Loki en Tempo verbruiken in hun buckets.
 
 ### 6. webhook-tester
 
-Alertmanager stuurt de alert door naar de webhook-tester
+Alertmanager stuurt de alerts door naar de webhook-tester
 
 Webhook-tester UI
 ![webhook-tester-ui](/images/webook-tester.png)
@@ -225,12 +245,17 @@ Loki dashboard
 Loki logging dashboard
 ![loki-logs-dashboard](./images/loki-logs-dashboard.png)
 
-### 10. node-exporter
+### 10. Tempo
+
+Tempo dashboard
+![tempo-dashboard](/images/tempo-dashboard.png)
+
+### 11. node-exporter
 
 nodes-exporter-full
 ![nodes-exporter-full-dashboard](/images/node-exporter-full.png)
 
-### 11. podman-exporter
+### 12. podman-exporter
 
 podman-exporter
 ![podman-exporter-dashboard](/images/podman-exporter.png)
