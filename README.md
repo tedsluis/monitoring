@@ -133,18 +133,19 @@ De Prometheus-datasource biedt in combinatie met PromQL-queries de mogelijk om h
 ![prometheus-explore](/images/explore-metrics.png)
 
 **Tempo tracing explore**
+
 De Tempo-datasource in combinatie TraceQL biedt een gedetailleerde visualisatie van de levenscyclus van requests door de gedistribueerde architectuur. Via de waterfall-weergave kunnen gebruikers de latency per component analyseren, waardoor performance-bottlenecks en fouten binnen specifieke spans nauwkeurig kunnen worden geïsoleerd. De integratie met TraceQL maakt gerichte filtering van traces mogelijk, wat in combinatie met gecorreleerde logs en metrics zorgt voor een efficiënte analyse van de hoofdoorzaak bij incidenten. Het kan bijvoorbeeld interesant zijn om te filteren op request niet een http status code van 4xx of 5xx hebben. Of request die langer duren dan 500ms.
 ![tempo-explore](/images/explore-tracing.png)
 
-#### Drildown
+#### Drilldown
 
 De drill-down functionaliteit binnen Grafana biedt de mogelijkheid om diepgaande foutanalyse door metrics, logs en traces contextueel met elkaar te verbinden. Vanuit een anomalie in een metrics-dashboard kan je direct navigeren naar de gecorreleerde logregels in Loki, om vervolgens via automatisch gedetecteerde trace-ID's door te schakelen naar gedetailleerde request-spans in Tempo. Deze integratie elimineert de noodzaak om handmatig tijdstippen en identifiers te synchroniseren tussen verschillende datasources, wat de efficiëntie van root cause analysis en performance-optimalisatie aanzienlijk verhoogt.
 
 Metrics drilldown
-![Metrics-drilldown](/images/drildown-metrics.png)
+![Metrics-drilldown](/images/drilldown-metrics.png)
 
-Loki drildown
-![loki-drilldown](/images/drildown-log.png)
+Loki drilldown
+![loki-drilldown](/images/drilldown-log.png)
 
 #### Grafana alerts
 
