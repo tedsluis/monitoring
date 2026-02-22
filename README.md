@@ -1,7 +1,7 @@
 # Full Stack monitoring met Prometheus, Loki, Tempo en Grafana
 ## Fedora Workstation & Podman Rootless
 
-Deze repository bevat een complete Observability, geoptimaliseerd voor Fedora Workstation met Rootless Podman. De stack combineert metrics, logs en traces in één geïntegreerde omgeving met Grafana als frontend.
+Deze repository bevat een complete observability stack, geoptimaliseerd voor Fedora Workstation met rootless Podman. De stack combineert metrics, logs en traces in één geïntegreerde omgeving met Grafana als frontend.
 
 ## Features
 
@@ -14,7 +14,7 @@ Deze repository bevat een complete Observability, geoptimaliseerd voor Fedora Wo
 -   Storage: MinIO (S3 compatible) voor langdurige, efficiënte opslag van logs en traces.
 -   Alerting: Prometheus Alertmanager gekoppeld aan Karma (alert dashboard) en Blackbox Exporter (health checks).
 -   Karma: Dashboard voor alerts.
--   Reverse proxy met TSL: Treafik proxy met self signed certificaat.
+-   Reverse proxy met TSL encryptie: Treafik proxy met self signed certificaat.
 -   Static webpage: NGINX.
 -   Security: Volledig compatible met SELinux en draait Rootless (met specifieke fixes voor socket-toegang).
 -   webhook-tester: ontvangt alerts van alertmanager voor inspectie.
@@ -82,7 +82,7 @@ net.ipv4.ip_unprivileged_port_start=80
 ```
 De eerste keer zal de `minio-init` container automatisch de benodigde buckets (`loki-data` en `tempo-data`) aanmaken.
 
-3. certificaat maken en CA trusten
+3. Certificaat maken en CA trusten:
 ```bash
 $ ./renew-certs.sh 
 === Start Certificaat Vernieuwing (Versie 3.2) ===
@@ -135,14 +135,19 @@ note: De minio-init container draait alleen bij het starten van minio.
 ## Stoppen, starten of herstart
 
 ```bash
+# alle containers stoppen
 podman-compose down
 
+# alle containers starten
 podman-compose up -d
 
+# alle containers herstarten
 podman-compose down && podman-compose up -d
 
+# een specifieke container herstarten en de wijzigingen van compose.yaml meenemen
 podman-compose up -d --force-recreate webhook-tester
 
+# een specifieke container herstarten zonder wijziging van compose.yaml mee te nemen
 podman restart webhook-tester
 ```
 
@@ -158,10 +163,14 @@ De configuratie is opgedeeld in mappen per component. Dankzij Grafana Provisioni
 -   `grafana-provisioning/`: Koppelt Prometheus, Loki en Tempo automatisch aan Grafana.
 -   `grafana-provisioning/dashboards/json`: grafana dashboarden.
 -   `grafana-provisioning/datasources`: automatisch datasource configiratie.
+-   `landing-page/`: index.html en nginx config.
 -   `loki/`: Configuratie voor Loki (S3 backend) en recording rules.
 -   `otel`: opentelemetry configuratie.
 -   `prometheus/`: prometheus.yml en alert.rules.yml.
 -   `tempo/`: Configuratie voor Tempo (S3 backend).
+-   `traefik/`: traefik.yaml
+-   `traefik/certs`: certificaten.
+-   `traefik/dynamic`: dynamische traefik configuratie.
 
 ### Inloggegevens (Defaults)
 
@@ -172,11 +181,27 @@ De configuratie is opgedeeld in mappen per component. Dankzij Grafana Provisioni
 
 ## Gebruik
 
-### 1. Dashboards (Grafana)
+### 1. Start pagina
+
+Ga naar https://localhost
+
+
+![startpagina1](./images/startpagina1.png)
+
+
+![startpagina2](./images/startpagina2.png)
+
+
+![startpagina3](./images/startpagina3.png)
+
+
+![startpagina4](./images/startpagina4.png)
+
+### 2. Dashboards (Grafana)
 
 Ga naar https://grafana.localhost
 
-Grafana vormt het centrale, visuele hart van deze observability stack en fungeert als 'single pane of glass' voor al je data. Het open-source platform verbindt naadloos met Prometheus (metrics), Loki (logs) en Tempo (traces), waardoor je via interactieve dashboards en de krachtige Explore-modus diepgaand inzicht krijgt in de prestaties van je systeem. Dankzij de geautomatiseerde provisioning worden de datasources en dashboards direct bij het opstarten ingeladen, zodat je zonder handmatige configuratie direct aan de slag kunt met het analyseren en correleren van je monitoringgegevens.
+Grafana vormt het centrale, visuele hart van deze stack en fungeert als 'single pane of glass' voor alle data. Het open-source platform verbindt met Prometheus (metrics), Loki (logs) en Tempo (traces), waardoor via dashboards en de Explore-modus diepgaand inzicht in de prestaties van het systeem onstaat. Dankzij de geautomatiseerde provisioning worden de datasources en dashboards direct bij het opstarten ingeladen, zodat alles werkt zonder handmatige configuratie.
 
 #### Dashboards
 
@@ -229,7 +254,7 @@ Datasources vormen binnen Grafana de technische interface naar de onderliggende 
 De datasources voor Prometheus, Loki en Tempo zijn geconfigureerd in [./grafana-provisioning/dashboards/dashboard.yaml](./grafana-provisioning/datasources/datasources.yaml)
 
 
-### 2. Prometheus Metrics
+### 3. Prometheus Metrics
 
 Ga naar https://prometheus.localhost
 
@@ -244,7 +269,7 @@ Prometheus UI - alert rules overzich
 Prometheus dashboard
 ![prometheus-dashboard](./images/prometheus.png)
 
-### 3. Alertmanager
+### 4. Alertmanager
 
 Ga naar https://alertmanager.localhost
 
@@ -257,7 +282,7 @@ Alertmanager dashboard
 - Overzicht van actuele alerts
 - Mogelijkheid om alerts te dempen.
 
-### 4. Karma Alert Dashboard
+### 5. Karma Alert Dashboard
 
 Ga naar https://karma.localhost
 
@@ -266,7 +291,7 @@ Hier zie je een overzicht van alle actieve waarschuwingen (bijv. "Disk bijna vol
 Karma UI
 ![karma](images/karma.png)
 
-### 5. Storage (MinIO)
+### 6. Storage (MinIO)
 
 Ga naar https://minio.localhost
 
@@ -284,7 +309,7 @@ Minio dashboard bucket
 
 Hier kun je zien hoeveel data Loki en Tempo verbruiken in hun buckets.
 
-### 6. webhook-tester
+### 7. webhook-tester
 
 Ga naar https://webhook-tester.localhost
 
@@ -293,21 +318,21 @@ Alertmanager stuurt de alerts door naar de webhook-tester
 Webhook-tester UI
 ![webhook-tester-ui](/images/webook-tester.png)
 
-### 7. Alloy exporter
+### 8. Alloy exporter
 
 https://alloy.localhost
 
 Alloy UI
 ![alloy-ui](./images/alloy-uit.png)
 
-### 8. Blackbox exporter
+### 9. Blackbox exporter
 
 https://blackbox.localhost
 
 Blackbox dashboard
 ![blackbox-dahboard](/images/blackbox.png)
 
-### 9. Loki
+### 10. Loki
 
 Loki dashboard
 ![loki-dashboard](/images/loki.png)
@@ -315,20 +340,22 @@ Loki dashboard
 Loki logging dashboard
 ![loki-logs-dashboard](./images/loki-logs-dashboard.png)
 
-### 10. Tempo
+### 11. Tempo
 
 Tempo dashboard
 ![tempo-dashboard](/images/tempo-dashboard.png)
 
-### 11. node-exporter
+### 12. node-exporter
 
 nodes-exporter-full
 ![nodes-exporter-full-dashboard](/images/node-exporter-full.png)
 
-### 12. podman-exporter
+### 13. podman-exporter
 
 podman-exporter
 ![podman-exporter-dashboard](/images/podman-exporter.png)
 
+### 14. Traefik
 
-
+Treafik
+![traefik](/images/traefik.png)
