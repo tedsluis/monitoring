@@ -19,13 +19,13 @@ scrape_configs:
       - targets: ['localhost:9090']
 
   # node-exporter draait op het host netwerk, dus we gebruiken 'host.containers.internal' om er toegang toe te krijgen vanuit de container.
-  - job_name: 'fedora-workstation'
+  - job_name: 'node-exporter'
     static_configs:
       - targets: ['host.containers.internal:9100']
 
   - job_name: 'podman-exporter'
     static_configs:
-      - targets: ['host.containers.internal:9882']
+      - targets: ['podman-exporter:9882']
 
   - job_name: 'alertmanager'
     static_configs:
@@ -54,30 +54,30 @@ scrape_configs:
       module: [http_2xx]
     static_configs:
       - targets:
-        # Karma
-        - http://karma:8080/health
-        # Prometheus (Zichzelf checken)
-        - http://prometheus:9090/-/healthy
-        # Grafana
-        - http://grafana:3000/healthz
         # Alertmanager
         - http://alertmanager:9093/-/healthy
         # Alloy
         - http://alloy:12345/-/healthy
+        # Blackbox Exporter
+        - http://blackbox-exporter:9115/-/healthy
+        # Karma
+        - http://karma:8080/health
+        # Grafana
+        - http://grafana:3000/healthz
         # Loki
         - http://loki:3100/ready
-        # Podman Exporter
-        - http://podman-exporter:9882
-        # Node Exporter (Let op: draait op host netwerk!)
-        - http://host.containers.internal:9100
-        # Prometheus Blackbox Exporter
-        - http://blackbox-exporter:9115/-/healthy
-        # tempo
-        - http://tempo:3200/ready
-        # OTel Collector
-        - http://otel-collector:8888/metrics
         # MinIO
         - http://minio:9000/minio/health/ready
+        # Node Exporter (Let op: draait op host netwerk!)
+        - http://host.containers.internal:9100
+        # OTel Collector
+        - http://otel-collector:8888/metrics
+        # Podman Exporter
+        - http://podman-exporter:9882
+        # Prometheus
+        - http://prometheus:9090/-/healthy
+        # tempo
+        - http://tempo:3200/ready
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -116,3 +116,7 @@ scrape_configs:
     metrics_path: /minio/v2/metrics/resource
     static_configs:
     - targets: ['minio:9000']
+
+  - job_name: 'traefik'
+    static_configs:
+      - targets: ['traefik:8082']

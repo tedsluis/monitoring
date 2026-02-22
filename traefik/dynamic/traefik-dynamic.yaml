@@ -1,0 +1,16 @@
+http:
+  routers:
+    # Route voor Node Exporter
+    node-exporter:
+      rule: "Host(`node-exporter.localhost`)"
+      service: "node-exporter-service"
+      entryPoints:
+        - "websecure"
+      tls: {}
+
+  services:
+    node-exporter-service:
+      loadBalancer:
+        servers:
+          # Verwijst naar de host via de gateway (zie extra_hosts in compose)
+          - url: "http://host.containers.internal:9100"

@@ -24,7 +24,6 @@ compactor:
 
 storage:
   trace:
-    # HIER IS DE WIJZIGING NAAR minio S3 storage.
     backend: s3
     s3:
       bucket: tempo-data
@@ -33,11 +32,13 @@ storage:
       secret_key: minio123
       insecure: true
     wal:
+      # Oorspronkelijke trace WAL
       path: /var/tempo/wal
 
 overrides:
   defaults:
     metrics_generator:
+      # FIX: local-blocks is nu definitief en veilig verwijderd.
       processors: [service-graphs, span-metrics]
 
 metrics_generator:
@@ -45,8 +46,9 @@ metrics_generator:
     external_labels:
       source: tempo
       cluster: fedora-workstation
+
   storage:
-    path: /var/tempo/generator/wal
+    # De unieke cache voor de metrics generator
+    path: /var/tempo/wal/metrics_wal
     remote_write:
       - url: http://prometheus:9090/api/v1/write
-        send_exemplars: true

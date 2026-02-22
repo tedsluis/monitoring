@@ -1,0 +1,26 @@
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = localhost
+DNS.2 = *.localhost
+DNS.3 = alertmanager.localhost
+DNS.4 = alloy.localhost
+DNS.5 = atlas.localhost
+DNS.6 = blackbox.localhost
+DNS.7 = grafana.localhost
+DNS.8 = minio.localhost
+DNS.9 = loki.localhost
+DNS.10 = karma.localhost
+DNS.11 = node-exporter.localhost
+DNS.12 = otel-collector.localhost
+DNS.13 = podman-exporter.localhost
+DNS.14 = prometheus.localhost
+DNS.15 = s3.localhost
+DNS.16 = tempo.localhost
+DNS.17 = traefik.localhost
+DNS.18 = traefik-metrics.localhost
+DNS.19 = webhook-tester.localhost
+IP.1 = 127.0.0.1

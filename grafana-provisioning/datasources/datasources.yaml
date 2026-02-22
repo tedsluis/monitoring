@@ -34,6 +34,25 @@ datasources:
       tracesToLogsV2:
         datasourceUid: loki
         tags: ['job', 'instance', 'pod', 'container']
+      
+      # Koppel de Service Graphs aan Prometheus
+      serviceMap:
+        datasourceUid: prometheus
+        
+      # tracesToMetrics is verplicht voor de Span Rate in de sporen-lijst
+      tracesToMetrics:
+        datasourceUid: prometheus
+        tags:
+          - key: 'service.name'
+            value: 'service'
+          - key: 'job'
+            value: 'job'
+            
+      # FIX: Activeer TraceQL Metrics via Prometheus! 
+      # Dit stopt de 500 errors in Grafana Drilldown.
+      traceqlMetrics:
+        datasourceUid: prometheus
+            
       nodeGraph:
         enabled: true
       search:

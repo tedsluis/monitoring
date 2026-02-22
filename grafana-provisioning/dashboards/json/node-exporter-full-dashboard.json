@@ -15677,8 +15677,8 @@
       },
       {
         "current": {
-          "text": "fedora-workstation",
-          "value": "fedora-workstation"
+          "text": "node-exporter",
+          "value": "node-exporter"
         },
         "datasource": {
           "type": "prometheus",

@@ -8,8 +8,8 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "Instance {{ $labels.instance }} is down"
-          description: "De node exporter is al meer dan 1 minuut niet bereikbaar."
+          summary: "Target {{ $labels.job }} ({{ $labels.instance }}) is down"
+          description: "De service {{ $labels.job }} is al meer dan 1 minuut niet bereikbaar voor Prometheus."
 
       # 2. Waarschuwing als Disk ruimte < 10% is
       - alert: HostOutOfDiskSpace
@@ -399,7 +399,9 @@ groups:
         # -1=unknown, 0=created, 1=initialized, 2=running,
         # 3=stopped, 4=paused, 5=exited, 6=removing, 7=stopping
       - alert: PodmanContainerDown
-        expr: podman_container_state != 2
+        # We pakken de state (!= 2) en vermenigvuldigen deze met de info metric (die altijd waarde 1 heeft).
+        # We 'joinen' ze op basis van 'id' en 'instance' en trekken de 'name' label naar binnen.
+        expr: (podman_container_state != 2) * on(id, instance) group_left(name) podman_container_info
         for: 1m
         labels:
           severity: critical
@@ -421,9 +423,14 @@ groups:
       # 1. Container Crashes & Status
       # ---------------------------------------------------------
       - alert: PodmanContainerStopped
-        # Alarm als een container NIET draait, tenzij handmatig gestopt.
-        # Filtert op exit codes die niet 0 (succes) of 137/143 (SIGTERM/SIGKILL door user) zijn.
-        expr: podman_container_state{state="exited"} == 1 and podman_container_exit_code != 0
+        # Alarm als een container is gecrasht of een error gaf (status 5 = exited, exit_code != 0).
+        # We gebruiken podman_container_exit_code als basis, zodat de $value het daadwerkelijke exit_code getal is.
+        expr: >
+          (
+            podman_container_exit_code != 0 
+            and on(id, instance) 
+            podman_container_state == 5
+          ) * on(id, instance) group_left(name, image) podman_container_info
         for: 1m
         labels:
           severity: warning
@@ -432,24 +439,28 @@ groups:
           description: "Container {{ $labels.name }} (Image: {{ $labels.image }}) is gestopt met exit code {{ $value }}."
 
       - alert: PodmanContainerRestartLoop
-        # Alarm als een container meer dan 2x herstart in 5 minuten
-        expr: increase(podman_container_restart_count[5m]) > 2
+        # Alarm als een container meer dan 2x herstart in 5 minuten.
+        # De changes() functie telt hoe vaak de start_time timestamp verandert.
+        expr: >
+          (
+            changes(podman_container_started_seconds[5m]) > 2
+          ) * on(id, instance) group_left(name, image) podman_container_info
         labels:
           severity: critical
         annotations:
           summary: "Container {{ $labels.name }} herstart constant"
-          description: "Mogelijke CrashLoop: Container is {{ $value }} keer herstart in de laatste 5 minuten."
+          description: "Mogelijke CrashLoop: Container {{ $labels.name }} (Image: {{ $labels.image }}) is {{ $value }} keer herstart in de laatste 5 minuten."
 
       - alert: PodmanContainerUnhealthy
         # Alleen relevant als je containers een HEALTHCHECK hebben gedefinieerd in hun Dockerfile/Containerfile
         # health_status: 0=healthy, 1=unhealthy, 2=starting
-        expr: podman_container_health_status == 1
+        expr: (podman_container_health == 1) * on(id, instance) group_left(name, image) podman_container_info
         for: 2m
         labels:
           severity: critical
         annotations:
           summary: "Container {{ $labels.name }} is unhealthy"
-          description: "De healthcheck van container {{ $labels.name }} faalt."
+          description: "De healthcheck van container {{ $labels.name }} (Image: {{ $labels.image }}) faalt."
 
       # ---------------------------------------------------------
       # 2. Performance & Resources
@@ -694,7 +705,7 @@ groups:
           description: "OpenTelemetry Collector failing to send log records via {{ $labels.exporter }}\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
       - alert: OpentelemetryCollectorExporterQueueNearlyFull
-        expr: (otelcol_exporter_queue_size / on(instance, job, exporter) otelcol_exporter_queue_capacity) > 0.8 and otelcol_exporter_queue_capacity > 0
+        expr: (otelcol_exporter_queue_size / otelcol_exporter_queue_capacity) > 0.8 and otelcol_exporter_queue_capacity > 0
         for: 0m
         labels:
           severity: warning
@@ -721,7 +732,7 @@ groups:
           description: "OpenTelemetry Collector processor {{ $labels.processor }} is refusing metric points, likely due to backpressure\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
       - alert: OpentelemetryCollectorHighMemoryUsage
-        expr: (otelcol_process_runtime_heap_alloc_bytes{job=~".*otel.*collector.*"} / on(instance, job) otelcol_process_runtime_total_sys_memory_bytes{job=~".*otel.*collector.*"}) > 0.9
+        expr: (otelcol_process_runtime_heap_alloc_bytes{job=~".*otel.*collector.*"} / otelcol_process_runtime_total_sys_memory_bytes{job=~".*otel.*collector.*"}) > 0.9
         for: 5m
         labels:
           severity: warning

@@ -7,7 +7,7 @@ Deze repository bevat een complete Observability, geoptimaliseerd voor Fedora Wo
 
 -   Metrics: Prometheus (v3.9) met Node Exporter & Podman Exporter.
 -   Logs: Grafana Loki (v3.3) met opslag op MinIO (S3).
--   Traces: Grafana Tempo (v2.6) in combinatie met OpenTelemetry.
+-   Traces: Grafana Tempo (v2.10) in combinatie met OpenTelemetry.
 -   Grafana: (v12.3) als frontend voor metrics, logging en tracing. 
 -   Grafana Dashboards en Datasources worden automatisch geladen (IaC).
 -   Collection: Alloy en Opentelemetry collector voor het verzamelen van container en journald logs.
@@ -21,22 +21,24 @@ Deze repository bevat een complete Observability, geoptimaliseerd voor Fedora Wo
 
 De stack bestaat uit de volgende services:
 
-| Service         | Poort | Beschrijving                                     | 
-|-----------------|-------|--------------------------------------------------|
-| Grafana         | 3000  | Dashboard en visualisatie.                       |
-| Prometheus      | 9090  | Time-series database voor metrics.               |
-| Alertmanager    | 9093  | Verwerkt en routeert alerts.                     |
-| Karma           | 8080  | UI Dashboard voor Alertmanager meldingen.        |
-| Loki            | 3100  | Log aggregatie (via MinIO S3).                   |
-| Tempo           | 3200  | Distributed Tracing backend (via MinIO S3).      |
-| MinIO           | 9000  | S3 Object Storage API.                           |
-| MinIO Console   | 9001  | Webinterface voor storage beheer.                |
-| Alloy           | 12345 | Collector voor logs (journald) en traces (OTEL). |
-| Blackbox        | 9115  | Uitvoeren van HTTP/TCP health probes.            |
-| Node-exporter   | 9100  | Host metrics collector.                          |
-| podman-exporter | 9882  | podman metrics collector.                        |
-| OpenTelemetry   | 8888  | Open Telemetry Collector.                        |
-| webhook-tester  | 5001  | Webhooks inspectie.                              |
+| Service           | Poort | Beschrijving                                     | 
+|-------------------|-------|--------------------------------------------------|
+| Alertmanager      |  9093 | Verwerkt en routeert alerts.                     |
+| Alloy             | 12345 | Collector voor logs (journald en podman logs).   |
+| Blackbox          |  9115 | Uitvoeren van HTTP/TCP health probes.            |
+| Grafana           |  3000 | Dashboards en visualisatie.                      |
+| Karma             |  8080 | UI Dashboard voor Alertmanager meldingen.        |
+| Loki              |  3100 | Log aggregatie (via MinIO S3).                   |
+| MinIO             |  9000 | S3 Object Storage API.                           |
+| MinIO Console     |  9001 | Webinterface voor storage beheer.                |
+| NGINX             |    80 | Startpagina.                                     |
+| Node-exporter     |  9100 | Host metrics collector.                          |
+| OpenTelemetry     |  8888 | Open Telemetry Collector.                        |
+| podman-exporter   |  9882 | podman metrics collector.                        |
+| Prometheus        |  9090 | Time-series database voor metrics.               |
+| Tempo             |  3200 | Distributed Tracing backend (via MinIO S3).      |
+| Traefik           |   443 | Reverse proxy.                                   |
+| webhook-tester    |  5001 | Webhooks inspectie.                              |
 
 Diagram
 ![diagram](./images/diagram.png)
@@ -54,9 +56,14 @@ sudo dnf install podman podman-compose -y
 # Activeer de Podman socket voor je gebruiker (Rootless)\
 systemctl --user enable --now podman.socket
 
-
 # Check of de socket werkt
 ls -l /run/user/$(id -u)/podman/podman.sock
+
+# Maak het gebruik van port 80 mogelijk
+sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
+net.ipv4.ip_unprivileged_port_start = 80
+echo "net.ipv4.ip_unprivileged_port_start=80" | sudo tee /etc/sysctl.d/99-rootless-ports.conf
+net.ipv4.ip_unprivileged_port_start=80
 ```
 
 ## Installatie & Starten
@@ -66,16 +73,75 @@ ls -l /run/user/$(id -u)/podman/podman.sock
     git clone https://github.com/tedsluis/monitoring.git\
     cd monitoring
 ```
+
 2.  Start de stack:
 ```bash
     podman-compose up -d
 ```
-    
 De eerste keer zal de `minio-init` container automatisch de benodigde buckets (`loki-data` en `tempo-data`) aanmaken.
 
-3.  Controleer de status:
+3. certificaat maken en CA trusten
 ```bash
-    podman ps
+$ ./renew-certs.sh 
+=== Start Certificaat Vernieuwing (Versie 3.2) ===
+Opruimen oude bestanden...
+Genereren SAN configuratie...
+Genereren Root CA...
+.........+........+.+...+...+...+...........+.+++++++++++++++++++++++++++++++++++++++*................+.....+.+.....+...+....+...+.....+++++++++++++++++++++++++++++++++++++++*.....+.....+...+.............+.....++++++
+.........+++++++++++++++++++++++++++++++++++++++*....+...+..+++++++++++++++++++++++++++++++++++++++*..+..................+..+...+.........+...+...+...+.......+........+......+....+.........+.....+.............+........+.+......+.........+..............+.+.....+................+...+.....+....+..+...++++++
+-----
+Genereren Server Certificaat...
+Certificate request self-signature ok
+subject=C=NL, ST=Utrecht, L=Utrecht, O=Bachstraat, OU=Home, CN=*.localhost
+Permissies corrigeren (chmod 644)...
+Bijwerken Fedora Trust Store...
+Controleren of System Bundle het certificaat vertrouwt...
+✓ SUCCES: Systeem bundel vertrouwt nu je certificaat!
+Traefik herstarten...
+traefik
+traefik
+f440114ea928262e964b7dddeded7e2dbbcc3f5cb2047c5c5f71033a51d3a2d3
+traefik
+=== Klaar! ===
+Test nu met: curl -v https://grafana.localhost
+```
+    
+4.  Controleer de status:
+```bash
+    podman ps -a
+
+    CONTAINER ID  IMAGE                                                   COMMAND               CREATED        STATUS                    PORTS                                                             NAMES
+    f524a3ca328f  docker.io/library/traefik:v3.6.8                        traefik               3 minutes ago  Up 3 minutes              0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:4317->4317/tcp  traefik
+    43b51e82de7f  docker.io/minio/minio:latest                            server /data --co...  3 minutes ago  Up 3 minutes (healthy)    9000/tcp                                                          minio
+    b6cb71d79258  quay.io/prometheus/node-exporter:v1.10.0                --path.rootfs=/ho...  3 minutes ago  Up 3 minutes              9100/tcp                                                          node-exporter
+    9bb655a1256a  quay.io/navidys/prometheus-podman-exporter:latest                             3 minutes ago  Up 3 minutes              9882/tcp                                                          podman-exporter
+    1639e991fd9b  quay.io/prometheus/prometheus:v3.9.0                    --config.file=/et...  3 minutes ago  Up 3 minutes              9090/tcp                                                          prometheus
+    0ad72220502a  quay.io/prometheus/alertmanager:v0.28.0                 --config.file=/et...  3 minutes ago  Up 3 minutes              9093/tcp                                                          alertmanager
+    5c7d100a08b9  docker.io/grafana/alloy:latest                          run --server.http...  3 minutes ago  Up 3 minutes                                                                                alloy
+    631dbae21d7b  quay.io/prometheus/blackbox-exporter:latest             --config.file=/co...  3 minutes ago  Up 3 minutes              9115/tcp                                                          blackbox-exporter
+    061ff5c11526  docker.io/tarampampam/webhook-tester:latest             start                 3 minutes ago  Up 3 minutes                                                                                webhook-tester
+    d407d0a9d78a  docker.io/library/nginx:alpine                          nginx -g daemon o...  3 minutes ago  Up 3 minutes              80/tcp                                                            startpagina
+    09aae3a22f00  docker.io/minio/mc:latest                                                     3 minutes ago  Exited (0) 3 minutes ago                                                                    minio-init
+    237d4ad33122  ghcr.io/prymitive/karma:latest                                                3 minutes ago  Up 3 minutes              8080/tcp                                                          karma
+    1eb506abaf76  docker.io/grafana/loki:3.3.2                            -config.file=/etc...  3 minutes ago  Up 3 minutes              3100/tcp                                                          loki
+    725f28f5ede0  docker.io/grafana/tempo:2.6.1                           -config.file=/etc...  3 minutes ago  Up 3 minutes                                                                                tempo
+    3ca266a019d6  docker.io/otel/opentelemetry-collector-contrib:0.119.0  --config=/etc/ote...  3 minutes ago  Up 3 minutes              4317-4318/tcp, 55678-55679/tcp                                    otel-collector
+    81bc654217d5  docker.io/grafana/grafana:12.3.0                                              3 minutes ago  Up 3 minutes              3000/tcp                                                          grafana
+```
+note: De minio-init container draait alleen bij het starten van minio.
+
+## Stoppen, starten of herstart
+
+```bash
+podman-compose down
+
+podman-compose up -d
+
+podman-compose down && podman-compose up -d
+
+podman-compose up -d --force-recreate webhook-tester
+
+podman restart webhook-tester
 ```
 
 ## Configuratie
@@ -97,17 +163,16 @@ De configuratie is opgedeeld in mappen per component. Dankzij Grafana Provisioni
 
 ### Inloggegevens (Defaults)
 
-| Service | Gebruikersnaam | Wachtwoord | Opmerking                   |
-|---------|----------------|------------|-----------------------------|
-| Grafana | admin          | admin      | Wijzig dit na eerste login! |
-| MinIO   | minio          | minio123   | Beheer via poort 9001.      |
+| Service | Gebruikersnaam | Wachtwoord | Opmerking                             |
+|---------|----------------|------------|---------------------------------------|
+| Grafana | admin          | admin      | Deze kun je wijzigen na eerste login! |
+| MinIO   | minio          | minio123   | Beheer via poort 9001.                |
 
 ## Gebruik
 
-
 ### 1. Dashboards (Grafana)
 
-Ga naar http://localhost:3000
+Ga naar https://grafana.localhost
 
 Grafana vormt het centrale, visuele hart van deze observability stack en fungeert als 'single pane of glass' voor al je data. Het open-source platform verbindt naadloos met Prometheus (metrics), Loki (logs) en Tempo (traces), waardoor je via interactieve dashboards en de krachtige Explore-modus diepgaand inzicht krijgt in de prestaties van je systeem. Dankzij de geautomatiseerde provisioning worden de datasources en dashboards direct bij het opstarten ingeladen, zodat je zonder handmatige configuratie direct aan de slag kunt met het analyseren en correleren van je monitoringgegevens.
 
@@ -115,7 +180,7 @@ Grafana vormt het centrale, visuele hart van deze observability stack en fungeer
 
 Deze repo bevat een aantal grafana dashboarden die opgeslagen zijn in [./grafana-provisioning/dashboards/json/](./grafana-provisioning/dashboards/json/) in json formaat.
 
-Grafana Dashboarden
+Grafana Dashboards
 ![grafana-dashboarden](./images/grafana-dashboarden.png)
 
 #### Explore
@@ -164,7 +229,7 @@ De datasources voor Prometheus, Loki en Tempo zijn geconfigureerd in [./grafana-
 
 ### 2. Prometheus Metrics
 
-Ga naar http://localhost:9090
+Ga naar https://prometheus.localhost
 
 - `/query`:  metrics querier.
 - `/alerts`: alert rule overzicht
@@ -179,7 +244,7 @@ Prometheus dashboard
 
 ### 3. Alertmanager
 
-Ga naar http://localhost:9093
+Ga naar https://alertmanager.localhost
 
 Alertmanager UI
 ![alertmanager](/images/alertmanager.png)
@@ -192,7 +257,7 @@ Alertmanager dashboard
 
 ### 4. Karma Alert Dashboard
 
-Ga naar http://localhost:8080.
+Ga naar https://karma.localhost
 
 Hier zie je een overzicht van alle actieve waarschuwingen (bijv. "Disk bijna vol", "Container down" of "Health Check Failed").
 
@@ -201,7 +266,7 @@ Karma UI
 
 ### 5. Storage (MinIO)
 
-Ga naar http://localhost:9001.
+Ga naar https://minio.localhost
 
 Minio UI - login
 ![minio](images/minio.png)
@@ -219,6 +284,8 @@ Hier kun je zien hoeveel data Loki en Tempo verbruiken in hun buckets.
 
 ### 6. webhook-tester
 
+Ga naar https://webhook-tester.localhost
+
 Alertmanager stuurt de alerts door naar de webhook-tester
 
 Webhook-tester UI
@@ -226,14 +293,14 @@ Webhook-tester UI
 
 ### 7. Alloy exporter
 
-http://localhost:12345/
+https://alloy.localhost
 
 Alloy UI
 ![alloy-ui](./images/alloy-uit.png)
 
 ### 8. Blackbox exporter
 
-http://localhost:9115/
+https://blackbox.localhost
 
 Blackbox dashboard
 ![blackbox-dahboard](/images/blackbox.png)
@@ -262,15 +329,4 @@ podman-exporter
 ![podman-exporter-dashboard](/images/podman-exporter.png)
 
 
-## Troubleshooting
-
--   Permission Denied op volumes?\
-    De containers (o.a. MinIO, Loki, Tempo) draaien met user: "0:0". In Rootless Podman wordt dit gemapt naar jouw eigen user ID (1000). Dit is noodzakelijk voor schrijfrechten.\
-    Fix: Voer podman unshare chown -R 1000:1000 . uit in de map als rechten corrupt zijn geraakt.
-
--   Geen logs in Loki?\
-    Check of Alloy draait en of de journald mounts correct zijn. Alloy vereist security_opt: label=disable om /var/log/journal van de host te kunnen lezen.
-
--   MinIO start niet?\
-    Als je wisselt tussen rootful/rootless kan het volume gelocked zijn. Verwijder het volume met podman volume rm monitoring_minio-data en herstart.
 

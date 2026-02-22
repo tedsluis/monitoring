@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Portal</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --hover-bg: #334155;
+            --accent: #38bdf8;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* Tabs Navigatie */
+        .tabs-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #334155;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 1rem 2rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background-color: rgba(255, 255, 255, 0.05);
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* Tab Content Area */
+        .tab-content {
+            display: none; /* Standaard verborgen */
+            width: 100%;
+            max-width: 1200px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block; /* Zichtbaar als actief */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Grid en Cards */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        /* Specifieke layout voor Explore tab: max 3 per rij */
+        #tab-explore .grid {
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid #334155;
+            border-top: 4px solid var(--card-accent);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            background-color: var(--hover-bg);
+            border-color: var(--card-accent);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            color: var(--card-accent);
+        }
+
+        .card p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .port-badge {
+            margin-top: auto;
+            padding-top: 1rem;
+            font-size: 0.8rem;
+            color: #64748b;
+            font-family: monospace;
+        }
+
+        /* Specifieke Categorie Kleuren */
+        .core { --card-accent: #38bdf8; /* Lichtblauw */ }
+        .exporter { --card-accent: #10b981; /* Smaragdgroen */ }
+        .dashboard { --card-accent: #f59e0b; /* Amber/Oranje */ }
+        .explore { --card-accent: #a855f7; /* Paars */ }
+
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <h1>🚀 Full Stack Monitoring</h1>
+        <p class="subtitle">Centraal overzicht van alle services, exporters en dashboards</p>
+    </div>
+
+    <!-- Tabblad Knoppen -->
+    <div class="tabs-container">
+        <button class="tab-btn active" onclick="openTab(event, 'tab-services')">Tools</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-exporters')">Metrics exporters</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-dashboards')">Grafana dashboards</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-explore')">Drilldown & Explore</button>
+    </div>
+
+    <!-- Tab: Services -->
+    <div id="tab-services" class="tab-content active">
+        <div class="grid">
+            <a href="https://grafana.localhost" class="card core" target="_blank" rel="noopener noreferrer">
+                <h2>Grafana</h2>
+                <p>Datavisualisatie, dashboards en metrics verkenner.</p>
+                <div class="port-badge">grafana.localhost</div>
+            </a>
+            <a href="https://prometheus.localhost" class="card core" target="_blank" rel="noopener noreferrer">
+                <h2>Prometheus</h2>
+                <p>Time-series database en metrics scraping.</p>
+                <div class="port-badge">prometheus.localhost</div>
+            </a>
+            <a href="https://alertmanager.localhost" class="card core" target="_blank" rel="noopener noreferrer">
+                <h2>Alertmanager</h2>
+                <p>Beheer en routering van Prometheus alerts.</p>
+                <div class="port-badge">alertmanager.localhost</div>
+            </a>
+            <a href="https://karma.localhost" class="card core" target="_blank" rel="noopener noreferrer">
+                <h2>Karma</h2>
+                <p>Geavanceerd dashboard voor Alertmanager.</p>
+                <div class="port-badge">karma.localhost</div>
+            </a>
+            <a href="https://traefik.localhost/dashboard/" class="card core" target="_blank" rel="noopener noreferrer">
+                <h2>Traefik</h2>
+                <p>Reverse proxy status, routers en services overzicht.</p>
+                <div class="port-badge">traefik.localhost</div>
+            </a>
+            <a href="https://minio.localhost" class="card core" target="_blank" rel="noopener noreferrer">
+                <h2>MinIO console</h2>
+                <p>S3-compatibele object storage voor logs en traces.</p>
+                <div class="port-badge">minio.localhost</div>
+            </a>
+            <a href="https://webhook-tester.localhost" class="card core" target="_blank" rel="noopener noreferrer">
+                <h2>Webhook tester</h2>
+                <p>Testomgeving voor inkomende Alertmanager webhooks.</p>
+                <div class="port-badge">webhook-tester.localhost</div>
+            </a>
+            <a href="https://alloy.localhost" class="card core" target="_blank" rel="noopener noreferrer">
+                <h2>Alloy</h2>
+                <p>OpenTelemetry Collector & Log pipeline.</p>
+                <div class="port-badge">alloy.localhost</div>
+            </a>
+            <!-- ATLAS TOEGEVOEGD -->
+            <a href="https://atlas.localhost" class="card core" target="_blank" rel="noopener noreferrer">
+                <h2>Atlas Network Map</h2>
+                <p>Dynamische visualisatie en discovery van containers en netwerkinfrastructuur.</p>
+                <div class="port-badge">atlas.localhost</div>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Tab: Exporters -->
+    <div id="tab-exporters" class="tab-content">
+        <div class="grid">
+            <a href="https://alertmanager.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <h2>Alertmanager exporter</h2>
+                <p>Alertmanager metrics.</p>
+                <div class="port-badge">alertmanager.localhost/metrics</div>
+            </a>
+            <a href="https://alloy.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <h2>Alloy exporter</h2>
+                <p>Alloy metrics endpoint.</p>
+                <div class="port-badge">alloy.localhost/metrics</div>
+            </a>
+            <a href="https://blackbox.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <h2>Blackbox exporter</h2>
+                <p>Endpoint probing (HTTP, ICMP, DNS health checks).</p>
+                <div class="port-badge">blackbox.localhost/metrics</div>
+            </a>
+            <a href="https://grafana.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <h2>Grafana exporter</h2>
+                <p>Grafana Metrics.</p>
+                <div class="port-badge">grafana.localhost/metrics</div>
+            </a>
+            <a href="https://karma.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <h2>Karma exporter</h2>
+                <p>Karma Metrics.</p>
+                <div class="port-badge">karma.localhost/metrics</div>
+            </a>
+            <a href="https://loki.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <h2>Loki exporter</h2>
+                <p>Loki metrics.</p>
+                <div class="port-badge">loki.localhost/metrics</div>
+            </a>
+            <a href="https://s3.localhost/minio/v2/metrics/cluster" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <h2>MinIO cluster exporter</h2>
+                <p>Ruwe Prometheus metrics voor de MinIO cluster status.</p>
+                <div class="port-badge">s3.localhost/minio/v2/metrics/cluster</div>
+            </a>
+            <a href="https://s3.localhost/minio/v2/metrics/bucket" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <h2>MinIO bucket exporter</h2>
+                <p>Ruwe Prometheus metrics per individuele MinIO bucket.</p>
+                <div class="port-badge">s3.localhost/minio/v2/metrics/bucket</div>
+            </a>
+            <a href="https://s3.localhost/minio/v2/metrics/node" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <h2>MinIO node exporter</h2>
+                <p>Ruwe Prometheus metrics voor de opslagnodes.</p>
+                <div class="port-badge">s3.localhost/minio/v2/metrics/node</div>
+            </a>
+            <a href="https://s3.localhost/minio/v2/metrics/resource" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <h2>MinIO resource exporter</h2>
+                <p>Ruwe Prometheus metrics voor systeem resources van MinIO.</p>
+                <div class="port-badge">s3.localhost/minio/v2/metrics/resource</div>
+            </a>
+            <a href="https://node-exporter.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <h2>Node exporter</h2>
+                <p>Host metrics (CPU, RAM, Disk, Netwerk).</p>
+                <div class="port-badge">node-exporter.localhost/metrics</div>
+            </a>
+            <a href="https://otel-collector.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <h2>OTel Collector exporter</h2>
+                <p>OpenTelemetry Collector metrics.</p>
+                <div class="port-badge">otel-collector.localhost/metrics</div>
+            </a>
+            <a href="https://podman-exporter.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <h2>Podman exporter</h2>
+                <p>Metrics van draaiende Podman containers.</p>
+                <div class="port-badge">podman-exporter.localhost/metrics</div>
+            </a>
+            <a href="https://prometheus.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <h2>Prometheus exporter</h2>
+                <p>Prometheus metrics.</p>
+                <div class="port-badge">prometheus.localhost/metrics</div>
+            </a>
+            <a href="https://tempo.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <h2>Tempo exporter</h2>
+                <p>Tempo metrics.</p>
+                <div class="port-badge">tempo.localhost/metrics</div>
+            </a>
+            <a href="https://traefik-metrics.localhost" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <h2>Traefik exporter</h2>
+                <p>Traefik metrics.</p>
+                <div class="port-badge">traefik-metrics.localhost</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Tab: Dashboards -->
+    <div id="tab-dashboards" class="tab-content">
+        <div class="grid">
+            <a href="https://grafana.localhost/d/alertmanager-dashboard/alertmanager-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
+                <h2>Alertmanager dashboard</h2>
+                <p>Grafana weergave van actieve alerts en notificatie status.</p>
+                <div class="port-badge">grafana.localhost/d/alertmanager...</div>
+            </a>
+            <a href="https://grafana.localhost/d/blackbox-dashboard/blackbox-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
+                <h2>Blackbox dashboard</h2>
+                <p>Gedetailleerde uptime en response tijden van netwerk probes.</p>
+                <div class="port-badge">grafana.localhost/d/blackbox...</div>
+            </a>
+            <a href="https://grafana.localhost/d/grafana-internals-dashboard/grafana-internals-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
+                <h2>Grafana internals dashboard</h2>
+                <p>Gedetailleerde informatie over interne Grafana componenten.</p>
+                <div class="port-badge">grafana.localhost/d/grafana...</div>
+            </a>
+            <a href="https://grafana.localhost/d/loki-global-metrics-dashboard/loki-global-metrics-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
+                <h2>Loki metrics dashboard</h2>
+                <p>Gedetailleerde informatie over Loki metrics.</p>
+                <div class="port-badge">grafana.localhost/d/loki-global...</div>
+            </a>
+            <a href="https://grafana.localhost/d/loki-logs-dashboard/loki-logs-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
+                <h2>Loki logs dashboard</h2>
+                <p>Gedetailleerde logs.</p>
+                <div class="port-badge">grafana.localhost/d/loki-logs...</div>
+            </a>
+            <a href="https://grafana.localhost/d/minio-dashboard/minio-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
+                <h2>MinIO overview dashboard</h2>
+                <p>S3 storage gebruik, node health en netwerk prestaties.</p>
+                <div class="port-badge">grafana.localhost/d/minio...</div>
+            </a>
+            <a href="https://grafana.localhost/d/minio-bucket-dashboard/minio-bucket-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
+                <h2>MinIO bucket dashboard</h2>
+                <p>S3 bucket gebruik en prestaties.</p>
+                <div class="port-badge">grafana.localhost/d/minio-bucket...</div>
+            </a>
+            <a href="https://grafana.localhost/d/minio-node-dashboard/minio-node-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
+                <h2>MinIO node dashboard</h2>
+                <p>S3 nodes gebruik, node health en prestaties.</p>
+                <div class="port-badge">grafana.localhost/d/minio-node...</div>
+            </a>
+            <a href="https://grafana.localhost/d/node-exporter-full-dashboard/node-exporter-full-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
+                <h2>Node exporter dashboard</h2>
+                <p>Gedetailleerde informatie over node prestaties.</p>
+                <div class="port-badge">grafana.localhost/d/node-exporter-full...</div>
+            </a>
+            <a href="https://grafana.localhost/d/opentelemetry-tempo/opentelemetry-and-tempo" class="card dashboard" target="_blank" rel="noopener noreferrer">
+                <h2>OpenTelemetry & Tempo dashboard</h2>
+                <p>Gedetailleerde informatie over OpenTelemetry en Tempo.</p>
+                <div class="port-badge">grafana.localhost/d/opentelemetry-tempo...</div>
+            </a>
+            <a href="https://grafana.localhost/d/podman-exporter-dashboard/podman-exporter-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
+                <h2>Podman exporter dashboard</h2>
+                <p>Gedetailleerde informatie over Podman containers.</p>
+                <div class="port-badge">grafana.localhost/d/podman-exporter...</div>
+            </a>
+            <a href="https://grafana.localhost/d/prometheus-stats-dashboard/prometheus-stats-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
+                <h2>Prometheus stats dashboard</h2>
+                <p>Gedetailleerde informatie over Prometheus statistieken.</p>
+                <div class="port-badge">grafana.localhost/d/prometheus-stats...</div>
+            </a>
+            <a href="https://grafana.localhost/d/traefik-dashboard/traefik-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
+                <h2>Traefik dashboard</h2>
+                <p>Gedetailleerde informatie over Traefik.</p>
+                <div class="port-badge">grafana.localhost/d/traefik...</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Tab: Drilldown & Explore -->
+    <div id="tab-explore" class="tab-content">
+        <div class="grid">
+            <a href="https://grafana.localhost/explore?schemaVersion=1&panes=%7B%2234m%22%3A%7B%22datasource%22%3A%22prometheus%22%2C%22queries%22%3A%5B%7B%22refId%22%3A%22A%22%2C%22expr%22%3A%22%22%2C%22range%22%3Atrue%2C%22instant%22%3Atrue%2C%22datasource%22%3A%7B%22type%22%3A%22prometheus%22%2C%22uid%22%3A%22prometheus%22%7D%7D%5D%2C%22range%22%3A%7B%22from%22%3A%22now-1h%22%2C%22to%22%3A%22now%22%7D%2C%22compact%22%3Afalse%7D%7D&orgId=1" class="card explore" target="_blank" rel="noopener noreferrer">
+                <h2>Explore: Prometheus</h2>
+                <p>Directe toegang tot de Grafana Explore weergave voor het onderzoeken van metrics.</p>
+                <div class="port-badge">grafana.localhost/explore (metrics)</div>
+            </a>
+            <a href="https://grafana.localhost/explore?schemaVersion=1&panes=%7B%2234m%22:%7B%22datasource%22:%22loki%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22expr%22:%22%22,%22queryType%22:%22range%22,%22datasource%22:%7B%22type%22:%22loki%22,%22uid%22:%22loki%22%7D,%22editorMode%22:%22builder%22,%22direction%22:%22backward%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D,%22compact%22:false%7D%7D&orgId=1" class="card explore" target="_blank" rel="noopener noreferrer">
+                <h2>Explore: Loki</h2>
+                <p>Directe toegang tot de Grafana Explore weergave voor het zoeken door logbestanden.</p>
+                <div class="port-badge">grafana.localhost/explore (logs)</div>
+            </a>
+            <a href="https://grafana.localhost/explore?schemaVersion=1&panes=%7B%2234m%22:%7B%22datasource%22:%22tempo%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22tempo%22,%22uid%22:%22tempo%22%7D%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D,%22compact%22:false%7D%7D&orgId=1" class="card explore" target="_blank" rel="noopener noreferrer">
+                <h2>Explore: Tempo</h2>
+                <p>Directe toegang tot de Grafana Explore weergave voor het analyseren van traces.</p>
+                <div class="port-badge">grafana.localhost/explore (traces)</div>
+            </a>
+            <a href="https://grafana.localhost/a/grafana-metricsdrilldown-app/drilldown?from=now-1h&to=now&timezone=browser&var-metrics_filters=&var-filters=&var-labelsWingman=%28none%29&layout=grid&filters-rule=&filters-prefix=&filters-suffix=&search_txt=&var-metrics-reducer-sort-by=default&filters-recent=&var-ds=prometheus&var-other_metric_filters=" class="card explore" target="_blank" rel="noopener noreferrer">
+                <h2>App: Metrics Drilldown</h2>
+                <p>Grafana applicatie voor geavanceerde Prometheus metrics verkenning.</p>
+                <div class="port-badge">grafana.localhost/a/metricsdrilldown</div>
+            </a>
+            <a href="https://grafana.localhost/a/grafana-lokiexplore-app/explore?patterns=%5B%5D&from=now-15m&to=now&timezone=browser&var-lineFormat=&var-ds=loki&var-filters=&var-fields=&var-levels=&var-metadata=&var-jsonFields=&var-all-fields=&var-patterns=&var-lineFilterV2=&var-lineFilters=&var-primary_label=service_name%7C%3D~%7C.%2B" class="card explore" target="_blank" rel="noopener noreferrer">
+                <h2>App: Loki Logs Explore</h2>
+                <p>Gespecialiseerde Grafana applicatie voor het filteren en zoeken in Loki logs.</p>
+                <div class="port-badge">grafana.localhost/a/lokiexplore</div>
+            </a>
+            <a href="https://grafana.localhost/a/grafana-exploretraces-app/explore?from=now-30m&to=now&timezone=browser&var-ds=tempo&var-primarySignal=nestedSetParent%3C0&var-filters=&var-metric=rate&var-groupBy=resource.service.name&var-spanListColumns=&var-latencyThreshold=&var-partialLatencyThreshold=&var-durationPercentiles=0.9&actionView=breakdown" class="card explore" target="_blank" rel="noopener noreferrer">
+                <h2>App: Traces Explore</h2>
+                <p>Grafana applicatie voor diepgaande trace en performance analyse met Tempo.</p>
+                <div class="port-badge">grafana.localhost/a/exploretraces</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- JavaScript voor de tab logica -->
+    <script>
+        function openTab(evt, tabName) {
+            // Verberg alle tab content
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+
+            // Verwijder de "active" class van alle knoppen
+            const tabBtns = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].classList.remove("active");
+            }
+
+            // Toon de geselecteerde tab en maak de knop actief
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+
+</body>
+</html>
