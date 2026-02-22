@@ -14,6 +14,8 @@ Deze repository bevat een complete Observability, geoptimaliseerd voor Fedora Wo
 -   Storage: MinIO (S3 compatible) voor langdurige, efficiënte opslag van logs en traces.
 -   Alerting: Prometheus Alertmanager gekoppeld aan Karma (alert dashboard) en Blackbox Exporter (health checks).
 -   Karma: Dashboard voor alerts.
+-   Reverse proxy met TSL: Treafik proxy met self signed certificaat.
+-   Static webpage: NGINX.
 -   Security: Volledig compatible met SELinux en draait Rootless (met specifieke fixes voor socket-toegang).
 -   webhook-tester: ontvangt alerts van alertmanager voor inspectie.
 
@@ -108,25 +110,25 @@ Test nu met: curl -v https://grafana.localhost
     
 4.  Controleer de status:
 ```bash
-    podman ps -a
-
-    CONTAINER ID  IMAGE                                                   COMMAND               CREATED        STATUS                    PORTS                                                             NAMES
-    f524a3ca328f  docker.io/library/traefik:v3.6.8                        traefik               3 minutes ago  Up 3 minutes              0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:4317->4317/tcp  traefik
-    43b51e82de7f  docker.io/minio/minio:latest                            server /data --co...  3 minutes ago  Up 3 minutes (healthy)    9000/tcp                                                          minio
-    b6cb71d79258  quay.io/prometheus/node-exporter:v1.10.0                --path.rootfs=/ho...  3 minutes ago  Up 3 minutes              9100/tcp                                                          node-exporter
-    9bb655a1256a  quay.io/navidys/prometheus-podman-exporter:latest                             3 minutes ago  Up 3 minutes              9882/tcp                                                          podman-exporter
-    1639e991fd9b  quay.io/prometheus/prometheus:v3.9.0                    --config.file=/et...  3 minutes ago  Up 3 minutes              9090/tcp                                                          prometheus
-    0ad72220502a  quay.io/prometheus/alertmanager:v0.28.0                 --config.file=/et...  3 minutes ago  Up 3 minutes              9093/tcp                                                          alertmanager
-    5c7d100a08b9  docker.io/grafana/alloy:latest                          run --server.http...  3 minutes ago  Up 3 minutes                                                                                alloy
-    631dbae21d7b  quay.io/prometheus/blackbox-exporter:latest             --config.file=/co...  3 minutes ago  Up 3 minutes              9115/tcp                                                          blackbox-exporter
-    061ff5c11526  docker.io/tarampampam/webhook-tester:latest             start                 3 minutes ago  Up 3 minutes                                                                                webhook-tester
-    d407d0a9d78a  docker.io/library/nginx:alpine                          nginx -g daemon o...  3 minutes ago  Up 3 minutes              80/tcp                                                            startpagina
-    09aae3a22f00  docker.io/minio/mc:latest                                                     3 minutes ago  Exited (0) 3 minutes ago                                                                    minio-init
-    237d4ad33122  ghcr.io/prymitive/karma:latest                                                3 minutes ago  Up 3 minutes              8080/tcp                                                          karma
-    1eb506abaf76  docker.io/grafana/loki:3.3.2                            -config.file=/etc...  3 minutes ago  Up 3 minutes              3100/tcp                                                          loki
-    725f28f5ede0  docker.io/grafana/tempo:2.6.1                           -config.file=/etc...  3 minutes ago  Up 3 minutes                                                                                tempo
-    3ca266a019d6  docker.io/otel/opentelemetry-collector-contrib:0.119.0  --config=/etc/ote...  3 minutes ago  Up 3 minutes              4317-4318/tcp, 55678-55679/tcp                                    otel-collector
-    81bc654217d5  docker.io/grafana/grafana:12.3.0                                              3 minutes ago  Up 3 minutes              3000/tcp                                                          grafana
+$ podman ps -a
+CONTAINER ID  IMAGE                                                   COMMAND               CREATED            STATUS                        PORTS                                                             NAMES
+411ab6d1f4f7  docker.io/minio/minio:latest                            server /data --co...  About an hour ago  Up About an hour (healthy)    9000/tcp                                                          minio
+59245bcf1e80  quay.io/prometheus/node-exporter:v1.10.0                --path.rootfs=/ho...  About an hour ago  Up About an hour              9100/tcp                                                          node-exporter
+2cc393300009  quay.io/navidys/prometheus-podman-exporter:latest                             About an hour ago  Up About an hour              9882/tcp                                                          podman-exporter
+475d18b9a8be  quay.io/prometheus/prometheus:v3.9.0                    --config.file=/et...  About an hour ago  Up About an hour              9090/tcp                                                          prometheus
+12261d191511  quay.io/prometheus/alertmanager:v0.28.0                 --config.file=/et...  About an hour ago  Up About an hour              9093/tcp                                                          alertmanager
+1e64f1268d9f  docker.io/grafana/alloy:latest                          run --server.http...  About an hour ago  Up About an hour                                                                                alloy
+390b37cb9743  quay.io/prometheus/blackbox-exporter:latest             --config.file=/co...  About an hour ago  Up About an hour              9115/tcp                                                          blackbox-exporter
+497bbec4217b  docker.io/tarampampam/webhook-tester:latest             start                 About an hour ago  Up About an hour                                                                                webhook-tester
+80f9359c878a  docker.io/library/nginx:alpine                          nginx -g daemon o...  About an hour ago  Up About an hour              80/tcp                                                            startpagina
+e5f5b6b8b678  docker.io/keinstien/atlas:latest                        /config/scripts/a...  About an hour ago  Up About an hour              8888-8889/tcp                                                     atlas
+f6b48cc5b314  docker.io/minio/mc:latest                                                     About an hour ago  Exited (0) About an hour ago                                                                    minio-init
+261032e096aa  ghcr.io/prymitive/karma:latest                                                About an hour ago  Up About an hour              8080/tcp                                                          karma
+5912702e7961  docker.io/grafana/loki:3.3.2                            -config.file=/etc...  About an hour ago  Up About an hour              3100/tcp                                                          loki
+5715a625d745  docker.io/grafana/tempo:2.10.1                          -config.file=/etc...  About an hour ago  Up About an hour                                                                                tempo
+3897dfef2e21  docker.io/otel/opentelemetry-collector-contrib:0.119.0  --config=/etc/ote...  About an hour ago  Up About an hour              4317-4318/tcp, 55678-55679/tcp                                    otel-collector
+5993dbcb16b1  docker.io/grafana/grafana:12.3.0                                              About an hour ago  Up About an hour              3000/tcp                                                          grafana
+f440114ea928  docker.io/library/traefik:v3.6.8                        traefik               26 minutes ago     Up 26 minutes                 0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:4317->4317/tcp  traefik
 ```
 note: De minio-init container draait alleen bij het starten van minio.
 
