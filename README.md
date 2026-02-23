@@ -177,7 +177,7 @@ De configuratie is opgedeeld in mappen per component. Dankzij Grafana Provisioni
 | Service | Gebruikersnaam | Wachtwoord | Opmerking                             |
 |---------|----------------|------------|---------------------------------------|
 | Grafana | admin          | admin      | Deze kun je wijzigen na eerste login! |
-| MinIO   | minio          | minio123   | Beheer via poort 9001.                |
+| MinIO   | minio          | minio123   | Wijzige kan in compose.yml            |
 
 ## Gebruik
 
@@ -201,14 +201,14 @@ Ga naar https://localhost
 
 Ga naar https://grafana.localhost
 
-Grafana vormt het centrale, visuele hart van deze stack en fungeert als 'single pane of glass' voor alle data. Het open-source platform verbindt met Prometheus (metrics), Loki (logs) en Tempo (traces), waardoor via dashboards en de Explore-modus diepgaand inzicht in de prestaties van het systeem onstaat. Dankzij de geautomatiseerde provisioning worden de datasources en dashboards direct bij het opstarten ingeladen, zodat alles werkt zonder handmatige configuratie.
+Grafana vormt het centrale, visuele hart van deze stack en fungeert als 'single pane of glass' voor alle data. Het open-source platform verbindt met Prometheus (metrics), Loki (logs) en Tempo (traces), waardoor via dashboards en de Explore-modus diepgaand inzicht van het systeem onstaat. Dankzij de geautomatiseerde provisioning worden de datasources en dashboards direct bij het opstarten ingeladen, zodat alles werkt zonder handmatige configuratie.
 
 #### Dashboards
 
 Deze repo bevat een aantal grafana dashboarden die opgeslagen zijn in [./grafana-provisioning/dashboards/json/](./grafana-provisioning/dashboards/json/) in json formaat.
 
 Grafana Dashboards
-![grafana-dashboarden](./images/grafana-dashboarden.png)
+![grafana-dashboarden](./images/grafana-dashboards.png)
 
 #### Explore
 
@@ -217,7 +217,7 @@ De Explore-modus biedt een geavanceerde interface voor ad-hoc analyse en trouble
 **Loki logs explore**
 
  De Loki-datasource in combinatie met LogQ maakt het mogelijk om logstromen efficiënt te filteren op labels, specifieke tekstpatronen of reguliere expressies te doorzoeken en logvolumes visueel weer te geven naast de ruwe logregels. 
-![Loki-explore](/images/explore-loki.png)
+![Loki-explore](/images/explore-logs.png)
 
 **Prometheus metrics explore**
 
@@ -227,24 +227,30 @@ De Prometheus-datasource biedt in combinatie met PromQL-queries de mogelijk om h
 **Tempo tracing explore**
 
 De Tempo-datasource in combinatie TraceQL biedt een gedetailleerde visualisatie van de levenscyclus van requests door de gedistribueerde architectuur. Via de waterfall-weergave kunnen gebruikers de latency per component analyseren, waardoor performance-bottlenecks en fouten binnen specifieke spans nauwkeurig kunnen worden geïsoleerd. De integratie met TraceQL maakt gerichte filtering van traces mogelijk, wat in combinatie met gecorreleerde logs en metrics zorgt voor een efficiënte analyse van de hoofdoorzaak bij incidenten. Het kan bijvoorbeeld interesant zijn om te filteren op request niet een http status code van 4xx of 5xx hebben. Of request die langer duren dan 500ms.
-![tempo-explore](/images/explore-tracing.png)
+![tempo-explore](/images/explore-traces.png)
+
+Explore trace - service graph
+![traces-explore](/images/explore-traces-service-graph.png)
 
 #### Drilldown
 
 De drill-down functionaliteit binnen Grafana biedt de mogelijkheid om diepgaande foutanalyse door metrics, logs en traces contextueel met elkaar te verbinden. Vanuit een anomalie in een metrics-dashboard kan je direct navigeren naar de gecorreleerde logregels in Loki, om vervolgens via automatisch gedetecteerde trace-ID's door te schakelen naar gedetailleerde request-spans in Tempo. Deze integratie elimineert de noodzaak om handmatig tijdstippen en identifiers te synchroniseren tussen verschillende datasources, wat de efficiëntie van root cause analysis en performance-optimalisatie aanzienlijk verhoogt.
 
 Metrics drilldown
-![Metrics-drilldown](/images/drilldown-metrics.png)
+![Metrics-drilldown](/images/drilldown-metrics-dashboard.png)
 
-Loki drilldown
-![loki-drilldown](/images/drilldown-log.png)
+Logs drilldown
+![loki-drilldown](/images/drill-down-logs-dashboard.png)
+
+Traces drilldown
+![traces-drilldown](/images/drilldown-breakdown.png)
 
 #### Grafana alerts
 
 Grafana Alerting biedt een centrale interface voor het monitoren van alerts. Deze module aggregeert alert rules vanuit zowel Prometheus (voor metrics) als Loki (voor logdata), waardoor een overzicht ontstaat van de operationele status. Je kunt via dit dashboard de realtime status van alerts (‘Pending’ of ‘Firing’) analyseren, de onderliggende query-definities bekijken en inzicht verkrijgen in de evaluatiecriteria die de stabiliteit en beschikbaarheid van het platform bewaken.
 
 Grafana Alerting
-![grafana-alerting](/images/grafana-alerting.png)
+![grafana-alerting](/images/grafana-alerts.png)
 
 #### Grafana datasources
 
@@ -264,10 +270,10 @@ Ga naar https://prometheus.localhost
 - `/config`: volledige prometheus configuratie.
 
 Prometheus UI - alert rules overzich
-![prometheus-rules](images/prometheus-rules.png)
+![prometheus](images/prometheus.png)
 
 Prometheus dashboard
-![prometheus-dashboard](./images/prometheus.png)
+![prometheus-dashboard](./images/prometheus-dashboard.png)
 
 ### 4. Alertmanager
 
@@ -277,7 +283,7 @@ Alertmanager UI
 ![alertmanager](/images/alertmanager.png)
 
 Alertmanager dashboard
-![alertmanager-dashboard](./images/alertmanager-dashboard.png)
+![alertmanager-dashboard](./images/alertmanager-metrics-dashboard.png)
 
 - Overzicht van actuele alerts
 - Mogelijkheid om alerts te dempen.
@@ -296,16 +302,19 @@ Karma UI
 Ga naar https://minio.localhost
 
 Minio UI - login
-![minio](images/minio.png)
+![minio](images/minio-login.png)
 
 Minio UI - object browser
-![minio-ui](./images/minio-ui.png)
+![minio-object-browser](./images/minio-object-browser.png)
 
-Minio dashboard overview
+Minio overview dashboard
 ![minio](./images/minio-dashboard.png)
 
-Minio dashboard bucket
+Minio bucket dashboard
 ![minio-bucket](./images/minio-bucket-dashboard.png)
+
+Minio node dashboard
+![minio-node](./images/minio-node-dashboard.png)
 
 Hier kun je zien hoeveel data Loki en Tempo verbruiken in hun buckets.
 
@@ -322,40 +331,69 @@ Webhook-tester UI
 
 https://alloy.localhost
 
-Alloy UI
-![alloy-ui](./images/alloy-uit.png)
+Alloy
+![alloy](./images/alloy.png)
+
+Alloy Graph
+![alloy-graph](./images/alloy-graph.png)
 
 ### 9. Blackbox exporter
 
 https://blackbox.localhost
 
 Blackbox dashboard
-![blackbox-dahboard](/images/blackbox.png)
+![blackbox-dashboard](/images/blackbox-dashboard.png)
 
 ### 10. Loki
 
 Loki dashboard
-![loki-dashboard](/images/loki.png)
+![loki-metrics-dashboard](/images/loki-metrics-dashboard.png)
 
 Loki logging dashboard
-![loki-logs-dashboard](./images/loki-logs-dashboard.png)
+![loki-logs-dashboard](./images/loki-logs-dashboards.png)
 
 ### 11. Tempo
 
-Tempo dashboard
-![tempo-dashboard](/images/tempo-dashboard.png)
+
+### Otel-collector
+
 
 ### 12. node-exporter
 
 nodes-exporter-full
-![nodes-exporter-full-dashboard](/images/node-exporter-full.png)
+![nodes-exporter-full-dashboard](/images/node-exporter-dashbaord.png)
 
 ### 13. podman-exporter
 
 podman-exporter
-![podman-exporter-dashboard](/images/podman-exporter.png)
+![podman-exporter-dashboard](/images/podman-exporter-dashboard.png)
 
 ### 14. Traefik
 
+Ga naar: https://traefik.localhost
+
 Treafik
 ![traefik](/images/traefik.png)
+
+Treafik dashboard
+![traefik](/images/traefik.dashboard.png)
+
+## alles verwijderen
+
+```bash
+# alle containers stoppen
+$ podman-compose down
+
+# alle tonen en verwijderen
+$ podman volume ls | grep monitoring
+local       monitoring_prometheus-data
+local       monitoring_loki-wal
+local       monitoring_tempo-wal
+local       monitoring_minio-data
+local       monitoring_grafana-data
+
+$ podman volume rm monitoring_prometheus-data monitoring_loki-wal monitoring_tempo-wal monitoring_minio-data monitoring_grafana-data
+
+# verwijder monitoring repo
+$ rm -rf REPONAAM
+```
