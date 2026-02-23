@@ -325,7 +325,7 @@ Ga naar https://webhook-tester.localhost
 Alertmanager stuurt de alerts door naar de webhook-tester
 
 Webhook-tester UI
-![webhook-tester-ui](/images/webook-tester.png)
+![webhook-tester-ui](/images/webhook-tester.png)
 
 ### 8. Alloy exporter
 
@@ -355,20 +355,20 @@ Loki logging dashboard
 ### 11. Tempo
 
 
-### Otel-collector
+### 12. Otel-collector
 
 
-### 12. node-exporter
+### 13. node-exporter
 
 nodes-exporter-full
 ![nodes-exporter-full-dashboard](/images/node-exporter-dashbaord.png)
 
-### 13. podman-exporter
+### 14. podman-exporter
 
 podman-exporter
 ![podman-exporter-dashboard](/images/podman-exporter-dashboard.png)
 
-### 14. Traefik
+### 15. Traefik
 
 Ga naar: https://traefik.localhost
 
@@ -378,13 +378,13 @@ Treafik
 Treafik dashboard
 ![traefik](/images/traefik.dashboard.png)
 
-## alles verwijderen
+## Alles verwijderen
 
 ```bash
 # alle containers stoppen
 $ podman-compose down
 
-# alle tonen en verwijderen
+# toon volumes
 $ podman volume ls | grep monitoring
 local       monitoring_prometheus-data
 local       monitoring_loki-wal
@@ -392,7 +392,19 @@ local       monitoring_tempo-wal
 local       monitoring_minio-data
 local       monitoring_grafana-data
 
+# verwijder volumes
 $ podman volume rm monitoring_prometheus-data monitoring_loki-wal monitoring_tempo-wal monitoring_minio-data monitoring_grafana-data
+
+# verwijder certificaten
+$ rm /etc/pki/ca-trust/source/anchors/my-local-ca.pem
+$ rm /etc/pki/ca-trust/source/anchors/my-local-ca.crt
+$ sudo update-ca-trust extract
+
+# disable podman socket
+$ systemctl --user disable --now podman.socket
+
+# verwijder rootless ports
+sudo rm /etc/sysctl.d/99-rootless-ports.conf
 
 # verwijder monitoring repo
 $ rm -rf REPONAAM
