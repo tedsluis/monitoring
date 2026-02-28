@@ -32,14 +32,34 @@ storage:
       secret_key: minio123
       insecure: true
     wal:
-      # Oorspronkelijke trace WAL
-      path: /var/tempo/wal
+      # Definieer de traces WAL hier, in plaats van via CLI
+      path: /var/tempo/wal/traces
+
+# overrides:
+#   defaults:
+#     metrics_generator:
+#       # FIX: local-blocks is nu definitief en veilig verwijderd.
+#       processors: [service-graphs, span-metrics]
+
+# metrics_generator:
+#   registry:
+#     external_labels:
+#       source: tempo
+#       cluster: fedora-workstation
+
+#   storage:
+#     # De unieke cache voor de metrics generator
+#     path: /var/tempo/wal/metrics_wal
+#     remote_write:
+#       - url: http://prometheus:9090/api/v1/write
+
+# overrides:
+#   # CRITICAAL: Gebruik deze platte notatie voor processors in versie 2.10+
+#   metrics_generator_processors: [service-graphs, span-metrics, local-blocks]
 
 overrides:
-  defaults:
-    metrics_generator:
-      # FIX: local-blocks is nu definitief en veilig verwijderd.
-      processors: [service-graphs, span-metrics]
+  # Zorg dat local-blocks actief is!
+  metrics_generator_processors: [service-graphs, span-metrics, local-blocks]
 
 metrics_generator:
   registry:
@@ -49,6 +69,17 @@ metrics_generator:
 
   storage:
     # De unieke cache voor de metrics generator
-    path: /var/tempo/wal/metrics_wal
+    path: /var/tempo/wal/metrics
     remote_write:
       - url: http://prometheus:9090/api/v1/write
+        send_exemplars: true
+
+  processor:
+    # HIer geven we de local_blocks processor specifieke configuratie
+    local_blocks:
+      filter_server_spans: false
+      
+  # CRITICAAL: Vertel de metrics generator waar de traces WAL is
+  # In Tempo 2.10 moet dit via traces_storage geconfigureerd worden
+  traces_storage:
+    path: /var/tempo/wal/traces

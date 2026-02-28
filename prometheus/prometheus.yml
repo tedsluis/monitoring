@@ -78,6 +78,12 @@ scrape_configs:
         - http://prometheus:9090/-/healthy
         # tempo
         - http://tempo:3200/ready
+        # Traefik
+        - http://traefik:8082/ping
+        # webhook-tester
+        - http://webhook-tester:8080/
+        # NGINX
+        - http://nginx:80/
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target

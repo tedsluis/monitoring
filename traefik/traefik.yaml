@@ -54,3 +54,6 @@ metrics:
     addEntryPointsLabels: true
     addRoutersLabels: true
     addServicesLabels: true
+
+ping:
+  entryPoint: "metrics"

@@ -8,7 +8,7 @@
 set -e
 
 # Configuratie
-BASE_DIR="/home/tedsluis/monitoring/traefik/certs"
+BASE_DIR="${HOME}/monitoring/traefik/certs"
 CA_KEY="myCA.key"
 CA_CERT="myCA.pem"
 CA_CONF="ca.conf"
@@ -31,6 +31,7 @@ echo -e "${YELLOW}=== Start Certificaat Vernieuwing (Versie 3.2) ===${NC}"
 
 # Zorg dat de map bestaat
 mkdir -p "$BASE_DIR"
+chmod 755 "$BASE_DIR"
 cd "$BASE_DIR"
 
 # 1. Schoonmaak
@@ -154,7 +155,7 @@ fi
 echo "Traefik herstarten..."
 if command -v podman-compose &> /dev/null; then
     # Als podman-compose beschikbaar is, gebruik dat voor nettere recreate
-    cd /home/tedsluis/monitoring
+    cd ${HOME}/monitoring
     podman-compose up -d --force-recreate traefik
 else
     # Fallback naar gewone podman restart
