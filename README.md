@@ -85,24 +85,25 @@ The first time, the `minio-init` container will automatically create the require
 3. Create certificate and trust CA:
 ```bash
 $ ./renew-certs.sh 
-=== Starting Certificate Renewal (Version 3.2) ===
+=== Start Certificate Renewal (Version 3.2) ===
 Cleaning up old files...
 Generating SAN configuration...
 Generating Root CA...
-.........+........+.+...+...+...+...........+.+++++++++++++++++++++++++++++++++++++++*................+.....+.+.....+...+....+...+.....+++++++++++++++++++++++++++++++++++++++*.....+.....+...+.............+.....++++++
-.........+++++++++++++++++++++++++++++++++++++++*....+...+..+++++++++++++++++++++++++++++++++++++++*..+..................+..+...+.........+...+...+...+.......+........+......+....+.........+.....+.............+........+.+......+.........+..............+.+.....+................+...+.....+....+..+...++++++
+...+++++++++++++++++++++++++++++++++++++++*.....+....+...+..+.+....................+.......+...+++++++++++++++++++++++++++++++++++++++*.....+.......+.........+........++++++
+...+.....+++++++++++++++++++++++++++++++++++++++*...+......+...+..+....+......+......+..+.............+..+.+......+++++++++++++++++++++++++++++++++++++++*....+.........+......+.+..................+..+...................+.........+.....+....+..+.+.........+........+.+..+....+......+.........+......+...+.........+..+.............+.....+.......+........+......+.........+.......+......+..+.......+...+............+......+........+.........+...+....+........+.+..+...+.......+.....+....+...+..+..........+......+..+.+.........+..+........................+.......+...+..+.......+..+...+...+............+.+......+...+............+.....+.+.....+....+........+......+....+........+...+..........+......+...........+..........+.................++++++
 -----
-Generating server certificate...
+Generating Server Certificate...
 Certificate request self-signature ok
 subject=C=NL, ST=Utrecht, L=Utrecht, O=Bachstraat, OU=Home, CN=*.localhost
-Correcting permissions (chmod 644)...
+Fixing permissions (chmod 644)...
 Updating Fedora Trust Store...
-Checking if system bundle trusts the certificate...
+Checking if System Bundle trusts the certificate...
 ✓ SUCCESS: System bundle now trusts your certificate!
 Restarting Traefik...
+WARN[0010] StopSignal SIGTERM failed to stop container traefik in 10 seconds, resorting to SIGKILL 
 traefik
 traefik
-f440114ea928262e964b7dddeded7e2dbbcc3f5cb2047c5c5f71033a51d3a2d3
+7ca33df28db75aec091abf01850c21eca9b226f27e430ece68c43300772c0e48
 traefik
 === Done! ===
 Test now with: curl -v https://grafana.localhost
@@ -407,5 +408,5 @@ $ systemctl --user disable --now podman.socket
 sudo rm /etc/sysctl.d/99-rootless-ports.conf
 
 # remove monitoring repo
-$ rm -rf REPONAAM
+$ rm -rf REPONAME
 ```
