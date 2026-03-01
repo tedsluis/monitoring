@@ -5,167 +5,7 @@ networks:
     driver: bridge
 
 services:
-  # ---------------------------------------------------------
-  # Traefik (Reverse Proxy & Ingress)
-  # ---------------------------------------------------------
-  traefik:
-    image: traefik:v3.6.8
-    container_name: traefik
-    security_opt:
-      - label=disable
-    ports:
-      - "80:80"     # HTTP -> HTTPS
-      - "443:443"   # HTTPS Services
-      - "4317:4317" # OTLP gRPC (TCP/TLS)
-    volumes:
-      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
-      - ./traefik/traefik.yaml:/etc/traefik/traefik.yaml:ro
-      # Mount de map voor dynamische config (node-exporter)
-      - ./traefik/dynamic:/etc/traefik/dynamic:ro 
-      - ./traefik/certs:/etc/traefik/certs:ro
-    networks:
-      - monitoring-net
-    # Zorgt dat Traefik 'host.containers.internal' kan resolven naar de host IP
-    # Dit is nodig voor de node-exporter proxy
-    extra_hosts:
-      - "host.containers.internal:host-gateway"
-    labels:
-      - "traefik.enable=true"
-      # Dashboard routing (https://traefik.localhost)
-      - "traefik.http.routers.api.rule=Host(`traefik.localhost`)"
-      - "traefik.http.routers.api.service=api@internal"
-      - "traefik.http.routers.api.tls=true"
-      - "traefik.http.routers.api.entrypoints=websecure"
-      # Traefik Metrics (Publiek inzien via browser)
-      - "traefik.http.routers.traefik-metrics.rule=Host(`traefik-metrics.localhost`)"
-      - "traefik.http.routers.traefik-metrics.service=prometheus@internal"
-      - "traefik.http.routers.traefik-metrics.tls=true"
-
-  # ---------------------------------------------------------
-  # Minio (S3 Compatible Storage)
-  # ---------------------------------------------------------
-  minio:
-    image: minio/minio:latest
-    container_name: minio
-    user: "0:0"
-    networks:
-      - monitoring-net
-    environment:
-      - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio123
-      - MINIO_PROMETHEUS_AUTH_TYPE=public
-    command: server /data --console-address ":9001"
-    volumes:
-      - minio-data:/data:Z
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    labels:
-      - "traefik.enable=true"
-      # MinIO Console (https://minio.localhost)
-      - "traefik.http.routers.minio.rule=Host(`minio.localhost`)"
-      - "traefik.http.routers.minio.service=minio-console"
-      - "traefik.http.routers.minio.tls=true"
-      - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
-      # S3 API (Interne gebruik, maar handig om bereikbaar te hebben)
-      - "traefik.http.routers.minio-api.rule=Host(`s3.localhost`)"
-      - "traefik.http.routers.minio-api.service=minio-api"
-      - "traefik.http.routers.minio-api.tls=true"
-      - "traefik.http.services.minio-api.loadbalancer.server.port=9000"
-      # 1. Koppel een nieuwe middleware aan de bestaande minio-api router
-      - "traefik.http.routers.minio-api.middlewares=minio-scraper-trick"
-      # 2. Maak de middleware aan: overschrijf de User-Agent header
-      - "traefik.http.middlewares.minio-scraper-trick.headers.customrequestheaders.User-Agent=Prometheus/1.0"
-
-  # ---------------------------------------------------------
-  # MinIO Init
-  # ---------------------------------------------------------
-  minio-init:
-    image: minio/mc
-    container_name: minio-init
-    networks:
-      - monitoring-net
-    depends_on:
-      minio:
-        condition: service_healthy
-    entrypoint: >
-      /bin/sh -c "
-      until mc alias set myminio http://minio:9000 minio minio123; do echo '...waiting for minio...'; sleep 1; done;
-      mc mb myminio/loki-data --ignore-existing;
-      mc mb myminio/tempo-data --ignore-existing;
-      echo 'Buckets created';
-      exit 0;
-      "
-
-  # ---------------------------------------------------------
-  # Node Exporter (UITZONDERING!)
-  # ---------------------------------------------------------
-  node-exporter:
-    image: quay.io/prometheus/node-exporter:v1.10.0
-    container_name: node-exporter
-    command:
-      - '--path.rootfs=/host'
-    # MOET OP HOST NETWERK BLIJVEN
-    pid: host
-    network_mode: host
-    restart: unless-stopped
-    volumes:
-      - '/:/host:ro,rslave'
-    # Noot: Traefik config hiervoor staat in traefik/dynamic/services.yaml
-
-  # ---------------------------------------------------------
-  # Podman Exporter
-  # ---------------------------------------------------------
-  podman-exporter:
-    image: quay.io/navidys/prometheus-podman-exporter:latest
-    container_name: podman-exporter
-    user: "0:0"
-    networks:
-      - monitoring-net
-    environment:
-      - CONTAINER_HOST=unix:///run/podman/podman.sock
-    restart: unless-stopped
-    security_opt:
-      - label=disable
-    volumes:
-      - /run/user/1000/podman/podman.sock:/run/podman/podman.sock:ro
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.podman-exporter.rule=Host(`podman-exporter.localhost`)"
-      - "traefik.http.routers.podman-exporter.tls=true"
-      - "traefik.http.services.podman-exporter.loadbalancer.server.port=9882"
-
-  # ---------------------------------------------------------
-  # Prometheus
-  # ---------------------------------------------------------
-  prometheus:
-    image: quay.io/prometheus/prometheus:v3.9.0
-    container_name: prometheus
-    user: "65534:65534"
-    networks:
-      - monitoring-net
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=15d'
-      - '--web.enable-lifecycle'
-      - '--web.enable-remote-write-receiver'
-    restart: unless-stopped
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:Z
-      - ./prometheus/alert.rules.yml:/etc/prometheus/alert.rules.yml:Z
-      - prometheus-data:/prometheus:Z
-    extra_hosts:
-      - "host.containers.internal:host-gateway" 
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.prometheus.rule=Host(`prometheus.localhost`)"
-      - "traefik.http.routers.prometheus.tls=true"
-      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
-
+ 
   # ---------------------------------------------------------
   # Alertmanager
   # ---------------------------------------------------------
@@ -186,6 +26,77 @@ services:
       - "traefik.http.routers.alertmanager.rule=Host(`alertmanager.localhost`)"
       - "traefik.http.routers.alertmanager.tls=true"
       - "traefik.http.services.alertmanager.loadbalancer.server.port=9093"
+
+  # ---------------------------------------------------------
+  # Alloy
+  # ---------------------------------------------------------
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    user: "0:0"
+    networks:
+      - monitoring-net
+    command: 
+      - run 
+      - --server.http.listen-addr=0.0.0.0:12345 
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+    restart: unless-stopped
+    security_opt:
+      - label=disable
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/log/journal:/var/log/journal:ro
+      - /run/log/journal:/run/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.alloy.rule=Host(`alloy.localhost`)"
+      - "traefik.http.routers.alloy.tls=true"
+      - "traefik.http.services.alloy.loadbalancer.server.port=12345"
+
+  # ---------------------------------------------------------
+  # Atlas (Network Visualizer)
+  # ---------------------------------------------------------
+  atlas:
+    image: keinstien/atlas:latest
+    container_name: atlas
+    networks:
+      - monitoring-net
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    volumes:
+      # We koppelen de podman socket op exact dezelfde manier als bij Traefik:
+      # Pas dit pad aan als Traefik een ander socket-pad gebruikt in jouw opzet.
+      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:Z
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.atlas.rule=Host(`atlas.localhost`)"
+      - "traefik.http.routers.atlas.tls=true"
+      # Atlas serveert de React UI en FastAPI backend standaard op poort 80 intern
+      - "traefik.http.services.atlas.loadbalancer.server.port=8888"
+
+  # ---------------------------------------------------------
+  # Blackbox Exporter
+  # ---------------------------------------------------------
+  blackbox-exporter:
+    image: quay.io/prometheus/blackbox-exporter:latest
+    container_name: blackbox-exporter
+    networks:
+      - monitoring-net
+    restart: unless-stopped
+    volumes:
+      - ./blackbox/blackbox.yml:/config/blackbox.yml:Z
+    command:
+      - '--config.file=/config/blackbox.yml'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.blackbox.rule=Host(`blackbox.localhost`)"
+      - "traefik.http.routers.blackbox.tls=true"
+      - "traefik.http.services.blackbox.loadbalancer.server.port=9115"
 
   # ---------------------------------------------------------
   # Grafana
@@ -270,53 +181,176 @@ services:
       - "traefik.http.routers.loki.tls=true"
       - "traefik.http.services.loki.loadbalancer.server.port=3100"
 
+ # ---------------------------------------------------------
+  # Minio (S3 Compatible Storage)
   # ---------------------------------------------------------
-  # Alloy
-  # ---------------------------------------------------------
-  alloy:
-    image: grafana/alloy:latest
-    container_name: alloy
+  minio:
+    image: minio/minio:latest
+    container_name: minio
     user: "0:0"
     networks:
       - monitoring-net
-    command: 
-      - run 
-      - --server.http.listen-addr=0.0.0.0:12345 
-      - --storage.path=/var/lib/alloy/data
-      - /etc/alloy/config.alloy
+    environment:
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio123
+      - MINIO_PROMETHEUS_AUTH_TYPE=public
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data:Z
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "traefik.enable=true"
+      # MinIO Console (https://minio.localhost)
+      - "traefik.http.routers.minio.rule=Host(`minio.localhost`)"
+      - "traefik.http.routers.minio.service=minio-console"
+      - "traefik.http.routers.minio.tls=true"
+      - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
+      # S3 API (Interne gebruik, maar handig om bereikbaar te hebben)
+      - "traefik.http.routers.minio-api.rule=Host(`s3.localhost`)"
+      - "traefik.http.routers.minio-api.service=minio-api"
+      - "traefik.http.routers.minio-api.tls=true"
+      - "traefik.http.services.minio-api.loadbalancer.server.port=9000"
+      # 1. Koppel een nieuwe middleware aan de bestaande minio-api router
+      - "traefik.http.routers.minio-api.middlewares=minio-scraper-trick"
+      # 2. Maak de middleware aan: overschrijf de User-Agent header
+      - "traefik.http.middlewares.minio-scraper-trick.headers.customrequestheaders.User-Agent=Prometheus/1.0"
+
+  # ---------------------------------------------------------
+  # MinIO Init
+  # ---------------------------------------------------------
+  minio-init:
+    image: minio/mc
+    container_name: minio-init
+    networks:
+      - monitoring-net
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      until mc alias set myminio http://minio:9000 minio minio123; do echo '...waiting for minio...'; sleep 1; done;
+      mc mb myminio/loki-data --ignore-existing;
+      mc mb myminio/tempo-data --ignore-existing;
+      echo 'Buckets created';
+      exit 0;
+      "
+
+# ---------------------------------------------------------
+  # NGINX (Statische HTML)
+  # ---------------------------------------------------------
+  nginx:
+    image: docker.io/library/nginx:alpine
+    container_name: nginx
+    networks:
+      - monitoring-net
+    volumes:
+      - ./landing-page/index.html:/usr/share/nginx/html/index.html:Z
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      # Routeer naar https://localhost (of http wat door traefik wordt geüpgraded)
+      - "traefik.http.routers.nginx.rule=Host(`localhost`)"
+      - "traefik.http.routers.nginx.tls=true"
+      # Nginx luistert intern op poort 80
+      - "traefik.http.services.nginx.loadbalancer.server.port=80"
+
+  # ---------------------------------------------------------
+  # Node Exporter (UITZONDERING!)
+  # ---------------------------------------------------------
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.10.0
+    container_name: node-exporter
+    command:
+      - '--path.rootfs=/host'
+    # MOET OP HOST NETWERK BLIJVEN
+    pid: host
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+    # Noot: Traefik config hiervoor staat in traefik/dynamic/services.yaml
+
+  # ---------------------------------------------------------
+  # OpenTelemetry Collector
+  # ---------------------------------------------------------
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.119.0
+    container_name: otel-collector
+    command: ["--config=/etc/otel-config.yaml"]
+    networks:
+      - monitoring-net
+    volumes:
+      - ./otel/otel-config.yaml:/etc/otel-config.yaml:Z
+    restart: unless-stopped
+    depends_on:
+      - tempo
+    labels:
+      - "traefik.enable=true"
+      # TCP Router voor OTLP gRPC (poort 4317)
+      # LET OP: Clients moeten SNI 'otel-collector.localhost' meesturen!
+      - "traefik.tcp.routers.otel.rule=HostSNI(`otel-collector.localhost`)"
+      - "traefik.tcp.routers.otel.entrypoints=otlp"
+      - "traefik.tcp.routers.otel.tls=true"
+      - "traefik.tcp.services.otel.loadbalancer.server.port=4317"
+      # HTTP Router voor OTel Collector Metrics (poort 8888)
+      - "traefik.http.routers.otel-collector.rule=Host(`otel-collector.localhost`)"
+      - "traefik.http.routers.otel-collector.tls=true"
+      - "traefik.http.services.otel-collector.loadbalancer.server.port=8888"
+
+  # ---------------------------------------------------------
+  # Podman Exporter
+  # ---------------------------------------------------------
+  podman-exporter:
+    image: quay.io/navidys/prometheus-podman-exporter:latest
+    container_name: podman-exporter
+    user: "0:0"
+    networks:
+      - monitoring-net
+    environment:
+      - CONTAINER_HOST=unix:///run/podman/podman.sock
     restart: unless-stopped
     security_opt:
       - label=disable
     volumes:
-      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
-      - /var/log/journal:/var/log/journal:ro
-      - /run/log/journal:/run/log/journal:ro
-      - /etc/machine-id:/etc/machine-id:ro
-      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
+      - /run/user/1000/podman/podman.sock:/run/podman/podman.sock:ro
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.alloy.rule=Host(`alloy.localhost`)"
-      - "traefik.http.routers.alloy.tls=true"
-      - "traefik.http.services.alloy.loadbalancer.server.port=12345"
+      - "traefik.http.routers.podman-exporter.rule=Host(`podman-exporter.localhost`)"
+      - "traefik.http.routers.podman-exporter.tls=true"
+      - "traefik.http.services.podman-exporter.loadbalancer.server.port=9882"
 
   # ---------------------------------------------------------
-  # Blackbox Exporter
+  # Prometheus
   # ---------------------------------------------------------
-  blackbox-exporter:
-    image: quay.io/prometheus/blackbox-exporter:latest
-    container_name: blackbox-exporter
+  prometheus:
+    image: quay.io/prometheus/prometheus:v3.9.0
+    container_name: prometheus
+    user: "65534:65534"
     networks:
       - monitoring-net
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+      - '--web.enable-remote-write-receiver'
     restart: unless-stopped
     volumes:
-      - ./blackbox/blackbox.yml:/config/blackbox.yml:Z
-    command:
-      - '--config.file=/config/blackbox.yml'
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:Z
+      - ./prometheus/alert.rules.yml:/etc/prometheus/alert.rules.yml:Z
+      - prometheus-data:/prometheus:Z
+    extra_hosts:
+      - "host.containers.internal:host-gateway" 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.blackbox.rule=Host(`blackbox.localhost`)"
-      - "traefik.http.routers.blackbox.tls=true"
-      - "traefik.http.services.blackbox.loadbalancer.server.port=9115"
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus.localhost`)"
+      - "traefik.http.routers.prometheus.tls=true"
+      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
 
   # ---------------------------------------------------------
   # Tempo
@@ -347,31 +381,40 @@ services:
       - "traefik.http.services.tempo.loadbalancer.server.port=3200"
 
   # ---------------------------------------------------------
-  # OpenTelemetry Collector
+  # Traefik (Reverse Proxy & Ingress)
   # ---------------------------------------------------------
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.119.0
-    container_name: otel-collector
-    command: ["--config=/etc/otel-config.yaml"]
+  traefik:
+    image: traefik:v3.6.8
+    container_name: traefik
+    security_opt:
+      - label=disable
+    ports:
+      - "80:80"     # HTTP -> HTTPS
+      - "443:443"   # HTTPS Services
+      - "4317:4317" # OTLP gRPC (TCP/TLS)
+    volumes:
+      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yaml:/etc/traefik/traefik.yaml:ro
+      # Mount de map voor dynamische config (node-exporter)
+      - ./traefik/dynamic:/etc/traefik/dynamic:ro 
+      - ./traefik/certs:/etc/traefik/certs:ro
     networks:
       - monitoring-net
-    volumes:
-      - ./otel/otel-config.yaml:/etc/otel-config.yaml:Z
-    restart: unless-stopped
-    depends_on:
-      - tempo
+    # Zorgt dat Traefik 'host.containers.internal' kan resolven naar de host IP
+    # Dit is nodig voor de node-exporter proxy
+    extra_hosts:
+      - "host.containers.internal:host-gateway"
     labels:
       - "traefik.enable=true"
-      # TCP Router voor OTLP gRPC (poort 4317)
-      # LET OP: Clients moeten SNI 'otel-collector.localhost' meesturen!
-      - "traefik.tcp.routers.otel.rule=HostSNI(`otel-collector.localhost`)"
-      - "traefik.tcp.routers.otel.entrypoints=otlp"
-      - "traefik.tcp.routers.otel.tls=true"
-      - "traefik.tcp.services.otel.loadbalancer.server.port=4317"
-      # HTTP Router voor OTel Collector Metrics (poort 8888)
-      - "traefik.http.routers.otel-collector.rule=Host(`otel-collector.localhost`)"
-      - "traefik.http.routers.otel-collector.tls=true"
-      - "traefik.http.services.otel-collector.loadbalancer.server.port=8888"
+      # Dashboard routing (https://traefik.localhost)
+      - "traefik.http.routers.api.rule=Host(`traefik.localhost`)"
+      - "traefik.http.routers.api.service=api@internal"
+      - "traefik.http.routers.api.tls=true"
+      - "traefik.http.routers.api.entrypoints=websecure"
+      # Traefik Metrics (Publiek inzien via browser)
+      - "traefik.http.routers.traefik-metrics.rule=Host(`traefik-metrics.localhost`)"
+      - "traefik.http.routers.traefik-metrics.service=prometheus@internal"
+      - "traefik.http.routers.traefik-metrics.tls=true"
 
   # ---------------------------------------------------------
   # Webhook Tester
@@ -389,48 +432,6 @@ services:
       - "traefik.http.routers.webhook.rule=Host(`webhook-tester.localhost`)"
       - "traefik.http.routers.webhook.tls=true"
       - "traefik.http.services.webhook.loadbalancer.server.port=8080"
-
-# ---------------------------------------------------------
-  # NGINX (Statische HTML)
-  # ---------------------------------------------------------
-  nginx:
-    image: docker.io/library/nginx:alpine
-    container_name: nginx
-    networks:
-      - monitoring-net
-    volumes:
-      - ./landing-page/index.html:/usr/share/nginx/html/index.html:Z
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      # Routeer naar https://localhost (of http wat door traefik wordt geüpgraded)
-      - "traefik.http.routers.nginx.rule=Host(`localhost`)"
-      - "traefik.http.routers.nginx.tls=true"
-      # Nginx luistert intern op poort 80
-      - "traefik.http.services.nginx.loadbalancer.server.port=80"
-
-  # ---------------------------------------------------------
-  # Atlas (Network Visualizer)
-  # ---------------------------------------------------------
-  atlas:
-    image: keinstien/atlas:latest
-    container_name: atlas
-    networks:
-      - monitoring-net
-    cap_add:
-      - NET_RAW
-      - NET_ADMIN
-    volumes:
-      # We koppelen de podman socket op exact dezelfde manier als bij Traefik:
-      # Pas dit pad aan als Traefik een ander socket-pad gebruikt in jouw opzet.
-      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:Z
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.atlas.rule=Host(`atlas.localhost`)"
-      - "traefik.http.routers.atlas.tls=true"
-      # Atlas serveert de React UI en FastAPI backend standaard op poort 80 intern
-      - "traefik.http.services.atlas.loadbalancer.server.port=8888"
 
 volumes:
   prometheus-data:
