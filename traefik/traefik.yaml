@@ -43,7 +43,7 @@ providers:
   docker:
     endpoint: "unix:///var/run/docker.sock"
     exposedByDefault: false
-  # Hier vertellen we Traefik om in deze map te kijken voor dynamische configs (zoals TLS!)
+  # Here we tell Traefik to look in this directory for dynamic configs (like TLS!)
   file:
     directory: /etc/traefik/dynamic
     watch: true

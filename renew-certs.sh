@@ -1,14 +1,18 @@
 #!/bin/bash
 
 # ==============================================================================
-# Script: renew-certs.sh (Versie 3.2 - Permission Fix)
-# Doel:   Regenereert certificaten, fixt rechten voor containers en update Trust Store.
+# Script: renew-certs.sh
+# Purpose: Regenerates certificates, fixes permissions for containers and updates Trust Store.
 # ==============================================================================
 
 set -e
 
-# Configuratie
-BASE_DIR="${HOME}/monitoring/traefik/certs"
+# Configuration
+# Resolve repository root relative to this script so the script works
+# regardless of where the repository is cloned.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR" && pwd)"
+BASE_DIR="${REPO_ROOT}/traefik/certs"
 CA_KEY="myCA.key"
 CA_CERT="myCA.pem"
 CA_CONF="ca.conf"
@@ -17,29 +21,29 @@ SERVER_CSR="localhost.csr"
 SERVER_CERT="localhost.crt"
 EXT_FILE="localhost.ext"
 
-# Fedora paden
+# Fedora paths
 SYS_ANCHOR="/etc/pki/ca-trust/source/anchors/my-local-ca.pem"
 SYS_BUNDLE="/etc/pki/tls/certs/ca-bundle.crt" 
 
-# Kleurtjes
+# Colors
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-echo -e "${YELLOW}=== Start Certificaat Vernieuwing (Versie 3.2) ===${NC}"
+echo -e "${YELLOW}=== Start Certificate Renewal (Version 3.2) ===${NC}"
 
-# Zorg dat de map bestaat
+# Ensure the directory exists
 mkdir -p "$BASE_DIR"
 chmod 755 "$BASE_DIR"
 cd "$BASE_DIR"
 
-# 1. Schoonmaak
-echo "Opruimen oude bestanden..."
+# 1. Cleanup
+echo "Cleaning up old files..."
 rm -f "$CA_KEY" "$CA_CERT" "myCA.srl" "$SERVER_KEY" "$SERVER_CSR" "$SERVER_CERT" "$CA_CONF" "$EXT_FILE"
 
-# 2. Maak localhost.ext (SAN configuratie)
-echo "Genereren SAN configuratie..."
+# 2. Create localhost.ext (SAN configuration)
+echo "Generating SAN configuration..."
 cat > "$EXT_FILE" << EOF
 authorityKeyIdentifier=keyid,issuer
 basicConstraints=CA:FALSE
@@ -69,7 +73,7 @@ DNS.19 = webhook-tester.localhost
 IP.1 = 127.0.0.1
 EOF
 
-# 3. CA Config (Cruciaal: CA:TRUE)
+# 3. CA Config (Critical: CA:TRUE)
 cat > "$CA_CONF" << EOF
 [ req ]
 prompt = no
@@ -91,36 +95,36 @@ basicConstraints = critical,CA:true
 keyUsage = critical, digitalSignature, cRLSign, keyCertSign
 EOF
 
-# 4. Genereer CA
-echo "Genereren Root CA..."
+# 4. Generate CA
+echo "Generating Root CA..."
 openssl req -x509 -new -nodes -keyout "$CA_KEY" -sha256 -days 3650 -out "$CA_CERT" -config "$CA_CONF" -extensions v3_ca
 
-# Check validiteit
+# Check validity
 if ! openssl x509 -in "$CA_CERT" -text -noout | grep -q "CA:TRUE"; then
-    echo -e "${RED}✗ FOUT: CA is niet gemarkeerd als CA!${NC}"
+    echo -e "${RED}✗ ERROR: CA is not marked as CA!${NC}"
     exit 1
 fi
 
-# 5. Genereer Server Cert
-echo "Genereren Server Certificaat..."
+# 5. Generate Server Certificate
+echo "Generating Server Certificate..."
 openssl genrsa -out "$SERVER_KEY" 2048
 openssl req -new -key "$SERVER_KEY" -out "$SERVER_CSR" -subj "/C=NL/ST=Utrecht/L=Utrecht/O=Bachstraat/OU=Home/CN=*.localhost"
 openssl x509 -req -in "$SERVER_CSR" -CA "$CA_CERT" -CAkey "$CA_KEY" -CAcreateserial \
 -out "$SERVER_CERT" -days 3650 -sha256 -extfile "$EXT_FILE"
 
-# 6. FIX: Bestandsrechten
-# Dit is cruciaal: Traefik (non-root in container) moet deze files kunnen lezen!
-echo -e "${YELLOW}Permissies corrigeren (chmod 644)...${NC}"
+# 6. FIX: File permissions
+# This is critical: Traefik (non-root in container) must be able to read these files!
+echo -e "${YELLOW}Fixing permissions (chmod 644)...${NC}"
 chmod 644 "$SERVER_KEY" "$SERVER_CERT" "$CA_CERT"
 
 # 7. Trust Store Update
-echo "Bijwerken Fedora Trust Store..."
+echo "Updating Fedora Trust Store..."
 
-# Verwijder oude ankers
+# Remove old anchors
 sudo rm -f "/etc/pki/ca-trust/source/anchors/my-local-ca.crt"
 sudo rm -f "$SYS_ANCHOR"
 
-# Kopieer nieuwe, maar CLEAN PEM (alleen het certificaat, geen text header)
+# Copy new, but CLEAN PEM (certificate only, no text header)
 openssl x509 -in "$CA_CERT" -out "$CA_CERT.clean"
 sudo cp "$CA_CERT.clean" "$SYS_ANCHOR"
 rm "$CA_CERT.clean"
@@ -128,39 +132,39 @@ rm "$CA_CERT.clean"
 sudo chmod 644 "$SYS_ANCHOR"
 sudo chown root:root "$SYS_ANCHOR"
 
-# Forceer update
+# Force update
 sudo update-ca-trust extract
 
-# 8. Verificatie tegen System Bundle
-echo "Controleren of System Bundle het certificaat vertrouwt..."
+# 8. Verification against System Bundle
+echo "Checking if System Bundle trusts the certificate..."
 
 if openssl verify -CAfile "$SYS_BUNDLE" "$SERVER_CERT" | grep -q "OK"; then
-    echo -e "${GREEN}✓ SUCCES: Systeem bundel vertrouwt nu je certificaat!${NC}"
+    echo -e "${GREEN}✓ SUCCESS: System bundle now trusts your certificate!${NC}"
 else
-    echo -e "${RED}⚠️  WAARSCHUWING: Systeem bundel validatie faalde.${NC}"
-    echo -e "Probeer fallback methode: Direct appenden aan user-trust..."
+    echo -e "${RED}⚠️  WARNING: System bundle validation failed.${NC}"
+    echo -e "Trying fallback method: Directly append to user-trust..."
     echo "" | sudo tee -a "$SYS_BUNDLE" > /dev/null
     openssl x509 -in "$CA_CERT" | sudo tee -a "$SYS_BUNDLE" > /dev/null
     
     if openssl verify -CAfile "$SYS_BUNDLE" "$SERVER_CERT" | grep -q "OK"; then
-         echo -e "${GREEN}✓ SUCCES: CA handmatig toegevoegd en gevalideerd.${NC}"
+         echo -e "${GREEN}✓ SUCCESS: CA manually added and validated.${NC}"
     else
-         echo -e "${RED}✗ FOUT: Zelfs handmatig toevoegen faalde.${NC}"
+         echo -e "${RED}✗ ERROR: Even manual addition failed.${NC}"
          exit 1
     fi
 fi
 
-# 9. Herstart Traefik
-# We gebruiken force-recreate om zeker te zijn dat de nieuwe bestanden worden opgepikt
-echo "Traefik herstarten..."
+# 9. Restart Traefik
+# We use force-recreate to be sure the new files are picked up
+echo "Restarting Traefik..."
 if command -v podman-compose &> /dev/null; then
-    # Als podman-compose beschikbaar is, gebruik dat voor nettere recreate
-    cd ${HOME}/monitoring
+    # If podman-compose is available, use it for cleaner recreate
+    cd "$REPO_ROOT"
     podman-compose up -d --force-recreate traefik
 else
-    # Fallback naar gewone podman restart
+    # Fallback to regular podman restart
     podman restart traefik
 fi
 
-echo -e "${GREEN}=== Klaar! ===${NC}"
-echo "Test nu met: curl -v https://grafana.localhost"
+echo -e "${GREEN}=== Done! ===${NC}"
+echo "Test now with: curl -v https://grafana.localhost"

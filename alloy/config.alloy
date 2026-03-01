@@ -8,46 +8,46 @@ loki.write "local_loki" {
 }
 
 // ==============================================================================
-// STROOM 1: CONTAINER LOGS (VIA PODMAN SOCKET)
-// Dit zorgt voor rijke metadata zoals pod_name
+// STREAM 1: CONTAINER LOGS (VIA PODMAN SOCKET)
+// This provides rich metadata like pod_name
 // ==============================================================================
 
-// 1. Ontdek alle containers via de socket
+// 1. Discover all containers via the socket
 discovery.docker "podman_containers" {
   host = "unix:///var/run/docker.sock"
 }
 
-// 2. Verrijk de metadata (Hier halen we de Pod Naam op)
+// 2. Enrich metadata (Here we get the Pod Name)
 discovery.relabel "podman_metadata" {
   targets = discovery.docker.podman_containers.targets
 
-  // Container Naam: Haal de slash (/) weg die docker API toevoegt (bv /mijn-app -> mijn-app)
+  // Container Name: Remove the slash (/) that docker API adds (e.g. /my-app -> my-app)
   rule {
     source_labels = ["__meta_docker_container_name"]
     regex         = "/(.*)"
     target_label  = "container_name"
   }
 
-  // POD NAAM: Podman zet de pod naam in het label 'io.kubernetes.pod.name'
+  // POD NAME: Podman sets the pod name in the label 'io.kubernetes.pod.name'
   rule {
     source_labels = ["__meta_docker_container_label_io_kubernetes_pod_name"]
     target_label  = "pod_name"
   }
   
-  // Alternatieve Pod Naam (sommige versies gebruiken io.podman.pod.name)
+  // Alternative Pod Name (some versions use io.podman.pod.name)
   rule {
     source_labels = ["__meta_docker_container_label_io_podman_pod_name"]
     target_label  = "pod_name"
   }
 
-  // Docker Compose Project (als je geen pods gebruikt, maar compose groepen)
+  // Docker Compose Project (if you don't use pods, but compose groups)
   rule {
     source_labels = ["__meta_docker_container_label_com_docker_compose_project"]
     target_label  = "project"
   }
 }
 
-// 3. Lees de logs van de containers
+// 3. Read the logs from the containers
 loki.source.docker "podman_stream" {
   host       = "unix:///var/run/docker.sock"
   targets    = discovery.relabel.podman_metadata.output
@@ -59,30 +59,30 @@ loki.source.docker "podman_stream" {
 }
 
 // ==============================================================================
-// STROOM 2: HOST LOGS (VIA JOURNALD)
+// STREAM 2: HOST LOGS (VIA JOURNALD)
 // ==============================================================================
 
-// Processor voor Journald logs
+// Processor for Journald logs
 loki.relabel "journal_relabel" {
   forward_to = [loki.write.local_loki.receiver]
 
-  // Rule: Haal Systemd Unit naam op
+  // Rule: Get Systemd Unit name
   rule {
     source_labels = ["__journal__systemd_unit"]
     target_label  = "unit"
   }
 
-  // BELANGRIJK: Filter duplicaten!
-  // Omdat Podman óók naar Journald schrijft, zouden we logs dubbel krijgen.
-  // We gooien hier alles weg dat een container ID heeft (want dat pakt Stroom 1 al op).
+  // IMPORTANT: Filter duplicates!
+  // Because Podman also writes to Journald, we would get logs in duplicate.
+  // We throw away everything here that has a container ID (because Stream 1 already handles it).
   rule {
     source_labels = ["__journal_container_id"]
-    regex         = ".+"     // Als er iets in staat...
-    action        = "drop"   // ...gooi weg uit deze stroom.
+    regex         = ".+"     // If something is in there...
+    action        = "drop"   // ...throw it away from this stream.
   }
 }
 
-// Source: Lees de journal files van de host
+// Source: Read the journal files from the host
 loki.source.journal "read_host_journal" {
   max_age = "12h"
   path    = "/var/log/journal"

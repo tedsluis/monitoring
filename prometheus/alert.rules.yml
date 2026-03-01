@@ -1,7 +1,7 @@
 groups:
   - name: fedora_workstation_alerts
     rules:
-      # 1. Is de machine/exporter bereikbaar?
+      # 1. Is the machine/exporter reachable?
       - alert: InstanceDown
         expr: up == 0
         for: 1m
@@ -9,39 +9,39 @@ groups:
           severity: critical
         annotations:
           summary: "Target {{ $labels.job }} ({{ $labels.instance }}) is down"
-          description: "De service {{ $labels.job }} is al meer dan 1 minuut niet bereikbaar voor Prometheus."
+          description: "The service {{ $labels.job }} has been unreachable for Prometheus for more than 1 minute."
 
-      # 2. Waarschuwing als Disk ruimte < 10% is
+      # 2. Warning when Disk space < 10%
       - alert: HostOutOfDiskSpace
         expr: (node_filesystem_avail_bytes * 100) / node_filesystem_size_bytes < 10 and ON (instance, device, mountpoint) node_filesystem_readonly == 0
         for: 2m
         labels:
           severity: warning
         annotations:
-          summary: "Disk bijna vol ({{ $labels.instance }})"
-          description: "Nog maar {{ $value | humanize }}% ruimte over op partitie {{ $labels.mountpoint }}."
+          summary: "Disk almost full ({{ $labels.instance }})"
+          description: "Only {{ $value | humanize }}% space left on partition {{ $labels.mountpoint }}."
 
-      # 3. Hoge CPU belasting (als load hoger is dan aantal cores * 1.5)
+      # 3. High CPU load (if load is higher than number of cores * 1.5)
       - alert: HostHighCpuLoad
         expr: node_load1 > (count without (cpu) (node_cpu_seconds_total{mode="idle"})) * 1.5
         for: 5m
         labels:
           severity: warning
         annotations:
-          summary: "Hoge CPU Load ({{ $labels.instance }})"
-          description: "CPU load is al 5 minuten extreem hoog."
+          summary: "High CPU Load ({{ $labels.instance }})"
+          description: "CPU load has been extremely high for 5 minutes."
 
-      # 4. Geheugen vol (< 10% beschikbaar)
+      # 4. Memory full (< 10% available)
       - alert: HostOutOfMemory
         expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
         for: 2m
         labels:
           severity: warning
         annotations:
-          summary: "Geheugen bijna vol ({{ $labels.instance }})"
-          description: "RAM geheugen is bijna op (< 10% vrij)."
+          summary: "Memory almost full ({{ $labels.instance }})"
+          description: "RAM memory is almost out (< 10% free)."
       
-      # 5. Geheugen druk (hoge page faults)
+      # 5. Memory pressure (high page faults)
       - alert: HostMemoryUnderMemoryPressure
         expr: (rate(node_vmstat_pgmajfault[5m]) > 1000)
         for: 0m
@@ -61,7 +61,7 @@ groups:
           summary: Host Memory is underutilized (instance {{ $labels.instance }})
           description: "Node memory usage is < 20% for 1 week. Consider reducing memory space. (instance {{ $labels.instance }})\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 7. Hoge netwerk doorvoer uitgaand (>80% van de netwerk snelheid)
+      # 7. High outgoing network throughput (>80% of network speed)
       - alert: HostUnusualNetworkThroughputIn
         expr: ((rate(node_network_receive_bytes_total[5m]) / node_network_speed_bytes) > .80)
         for: 0m
@@ -71,7 +71,7 @@ groups:
           summary: Host unusual network throughput in (instance {{ $labels.instance }})
           description: "Host receive bandwidth is high (>80%).\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 8. Hoge netwerk doorvoer inkomend (>80% van de netwerk snelheid)
+      # 8. High incoming network throughput (>80% of network speed)
       - alert: HostUnusualNetworkThroughputOut
         expr: ((rate(node_network_transmit_bytes_total[5m]) / node_network_speed_bytes) > .80)
         for: 0m
@@ -81,7 +81,7 @@ groups:
           summary: Host unusual network throughput out (instance {{ $labels.instance }})
           description: "Host transmit bandwidth is high (>80%)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 9. Hoge disk schrijf snelheid (>80% van de disk snelheid)
+      # 9. High disk write speed (>80% of disk speed)
       - alert: HostUnusualDiskReadRate
         expr: (rate(node_disk_io_time_seconds_total[5m]) > .80)
         for: 0m
@@ -91,7 +91,7 @@ groups:
           summary: Host unusual disk read rate (instance {{ $labels.instance }})
           description: "Disk is too busy (IO wait > 80%)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 10. Kritieke waarschuwing als Disk ruimte < 10% is
+      # 10. Critical warning if Disk space < 10%
       # Please add ignored mountpoints in node_exporter parameters like
       # "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|run)($|/)".
       # Same rule using "node_filesystem_free_bytes" will fire when disk fills for non-root users.
@@ -104,7 +104,7 @@ groups:
           summary: Host out of disk space (instance {{ $labels.instance }})
           description: "Disk is almost full (< 10% left)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 11. Kritieke waarschuwing als Disk ruimte op raakt binnen 24 uur
+      # 11. Critical warning if Disk space is running out within 24 hours
       # Please add ignored mountpoints in node_exporter parameters like
       # "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|run)($|/)".
       # Same rule using "node_filesystem_free_bytes" will fire when disk fills for non-root users.
@@ -117,7 +117,7 @@ groups:
           summary: Host disk may fill in 24 hours (instance {{ $labels.instance }})
           description: "Filesystem will likely run out of space within the next 24 hours.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 12. Kritieke waarschuwing als inodes op raken (< 10% left)
+      # 12. Critical warning if inodes are running out (< 10% left)
       - alert: HostOutOfInodes
         expr: (node_filesystem_files_free / node_filesystem_files < .10 and ON (instance, device, mountpoint) node_filesystem_readonly == 0)
         for: 2m
@@ -127,7 +127,7 @@ groups:
           summary: Host out of inodes (instance {{ $labels.instance }})
           description: "Disk is almost running out of available inodes (< 10% left)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 13. Kritieke waarschuwing als er een device error is opgetreden
+      # 13. Critical warning if a device error has occurred
       - alert: HostFilesystemDeviceError
         expr: node_filesystem_device_error{fstype!~"^(fuse.*|tmpfs|cifs|nfs)"} == 1
         for: 2m
@@ -137,7 +137,7 @@ groups:
           summary: Host filesystem device error (instance {{ $labels.instance }})
           description: "Error stat-ing the {{ $labels.mountpoint }} filesystem\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 14. Kritieke waarschuwing als inodes op raken binnen 24 uur
+      # 14. Critical warning if inodes may fill within 24 hours
       - alert: HostInodesMayFillIn24Hours
         expr: predict_linear(node_filesystem_files_free{fstype!~"^(fuse.*|tmpfs|cifs|nfs)"}[1h], 86400) <= 0 and node_filesystem_files_free > 0
         for: 2m
@@ -147,7 +147,7 @@ groups:
           summary: Host inodes may fill in 24 hours (instance {{ $labels.instance }})
           description: "Filesystem will likely run out of inodes within the next 24 hours at current write rate\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 15. Waarschuwing bij ongebruikelijke disk write latency (> 100ms)
+      # 15. Warning for unusual disk write latency (> 100ms)
       - alert: HostUnusualDiskReadLatency
         expr: (rate(node_disk_read_time_seconds_total[1m]) / rate(node_disk_reads_completed_total[1m]) > 0.1 and rate(node_disk_reads_completed_total[1m]) > 0)
         for: 2m
@@ -157,7 +157,7 @@ groups:
           summary: Host unusual disk read latency (instance {{ $labels.instance }})
           description: "Disk latency is growing (read operations > 100ms)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 16. Waarschuwing bij ongebruikelijke disk write latency (> 100ms)
+      # 16. Warning for unusual disk write latency (> 100ms)
       - alert: HostUnusualDiskWriteLatency
         expr: (rate(node_disk_write_time_seconds_total[1m]) / rate(node_disk_writes_completed_total[1m]) > 0.1 and rate(node_disk_writes_completed_total[1m]) > 0)
         for: 2m
@@ -167,7 +167,7 @@ groups:
           summary: Host unusual disk write latency (instance {{ $labels.instance }})
           description: "Disk latency is growing (write operations > 100ms)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 17. Waarschuwing bij hoge CPU load (> 80% gebruikt)
+      # 17. Warning for high CPU load (> 80% used)
       - alert: HostHighCpuLoad
         expr: 1 - (avg without (cpu) (rate(node_cpu_seconds_total{mode="idle"}[5m]))) > .80
         for: 10m
@@ -188,7 +188,7 @@ groups:
           summary: Host CPU is underutilized (instance {{ $labels.instance }})
           description: "CPU load has been < 20% for 1 week. Consider reducing the number of CPUs.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 19. Waarschuwing bij hoge CPU steal (> 10%)
+      # 19. Warning for high CPU steal (> 10%)
       - alert: HostCpuStealNoisyNeighbor
         expr: avg without (cpu) (rate(node_cpu_seconds_total{mode="steal"}[5m])) * 100 > 10
         for: 0m
@@ -198,7 +198,7 @@ groups:
           summary: Host CPU steal noisy neighbor (instance {{ $labels.instance }})
           description: "CPU steal is > 10%. A noisy neighbor is killing VM performances or a spot instance may be out of credit.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 20. Waarschuwing bij hoge CPU iowait (> 10%)
+      # 20. Warning for high CPU iowait (> 10%)
       - alert: HostCpuHighIowait
         expr: avg without (cpu) (rate(node_cpu_seconds_total{mode="iowait"}[5m])) > .10
         for: 0m
@@ -208,7 +208,7 @@ groups:
           summary: Host CPU high iowait (instance {{ $labels.instance }})
           description: "CPU iowait > 10%. Your CPU is idling waiting for storage to respond.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 21. Waarschuwing bij ongebruikelijke disk IO (> 80% busy)
+      # 21. Warning for unusual disk IO (> 80% busy)
       - alert: HostUnusualDiskIo
         expr: rate(node_disk_io_time_seconds_total[5m]) > 0.8
         for: 5m
@@ -218,7 +218,7 @@ groups:
           summary: Host unusual disk IO (instance {{ $labels.instance }})
           description: "Disk usage >80%. Check storage for issues or increase IOPS capabilities. Check storage for issues.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 22. Waarschuwing bij hoge context switching (> 2x dagelijkse gemiddelde)
+      # 22. Warning for high context switching (> 2x daily average)
       # x2 context switches is an arbitrary number.
       # The alert threshold depends on the nature of the application.
       # Please read: https://github.com/samber/awesome-prometheus-alerts/issues/58
@@ -231,7 +231,7 @@ groups:
           summary: Host context switching high (instance {{ $labels.instance }})
           description: "Context switching is growing on the node (twice the daily average during the last 15m)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 23. Waarschuwing als swap ruimte voor meer dan 80% gebruikt is
+      # 23. Warning if swap space is using more than 80%
       - alert: HostSwapIsFillingUp
         expr: ((1 - (node_memory_SwapFree_bytes / node_memory_SwapTotal_bytes)) * 100 > 80)
         for: 2m
@@ -241,7 +241,7 @@ groups:
           summary: Host swap is filling up (instance {{ $labels.instance }})
           description: "Swap is filling up (>80%)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 24. Waarschuwing als een systemd service is gecrasht
+      # 24. Warning if a systemd service has crashed
       - alert: HostSystemdServiceCrashed
         expr: (node_systemd_unit_state{state="failed"} == 1)
         for: 0m
@@ -251,7 +251,7 @@ groups:
           summary: Host systemd service crashed (instance {{ $labels.instance }})
           description: "systemd service crashed\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 25. Waarschuwing als een fysieke component te warm is
+      # 25. Warning if a physical component is too hot
       - alert: HostPhysicalComponentTooHot
         expr: node_hwmon_temp_celsius > node_hwmon_temp_max_celsius
         for: 5m
@@ -261,7 +261,7 @@ groups:
           summary: Host physical component too hot (instance {{ $labels.instance }})
           description: "Physical hardware component too hot\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 26. Kritieke waarschuwing als een overtemperature alarm is geactiveerd
+      # 26. Critical warning if an overtemperature alarm has been activated
       - alert: HostNodeOvertemperatureAlarm
         expr: ((node_hwmon_temp_crit_alarm_celsius == 1) or (node_hwmon_temp_alarm == 1))
         for: 0m
@@ -271,7 +271,7 @@ groups:
           summary: Host node overtemperature alarm (instance {{ $labels.instance }})
           description: "Physical node temperature alarm triggered\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 27. Kritieke waarschuwing als software RAID onvoldoende schijven heeft
+      # 27. Critical warning if software RAID has insufficient drives
       - alert: HostSoftwareRaidInsufficientDrives
         expr: ((node_md_disks_required - on(device, instance) node_md_disks{state="active"}) > 0)
         for: 0m
@@ -281,7 +281,7 @@ groups:
           summary: Host software RAID insufficient drives (instance {{ $labels.instance }})
           description: "MD RAID array {{ $labels.device }} on {{ $labels.instance }} has insufficient drives remaining.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 28. Waarschuwing als een software RAID schijf is uitgevallen
+      # 28. Warning if a software RAID disk has failed
       - alert: HostSoftwareRaidDiskFailure
         expr: (node_md_disks{state="failed"} > 0)
         for: 2m
@@ -291,7 +291,7 @@ groups:
           summary: Host software RAID disk failure (instance {{ $labels.instance }})
           description: "MD RAID array {{ $labels.device }} on {{ $labels.instance }} needs attention.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 29. Info alert als de kernel versie is gewijzigd
+      # 29. Info alert if the kernel version has changed
       - alert: HostKernelVersionDeviations
         expr: changes(node_uname_info[1h]) > 0
         for: 0m
@@ -301,7 +301,7 @@ groups:
           summary: Host kernel version deviations (instance {{ $labels.instance }})
           description: "Kernel version for {{ $labels.instance }} has changed.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 30. Waarschuwing als er een OOM kill is opgetreden
+      # 30. Warning if an OOM kill has occurred
       - alert: HostOomKillDetected
         expr: (increase(node_vmstat_oom_kill[1m]) > 0)
         for: 0m
@@ -311,7 +311,7 @@ groups:
           summary: Host OOM kill detected (instance {{ $labels.instance }})
           description: "OOM kill detected\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 31. Info alert als er correctable EDAC errors zijn gedetecteerd
+      # 31. Info alert if correctable EDAC errors have been detected
       - alert: HostEdacCorrectableErrorsDetected
         expr: (increase(node_edac_correctable_errors_total[1m]) > 0)
         for: 0m
@@ -321,7 +321,7 @@ groups:
           summary: Host EDAC Correctable Errors detected (instance {{ $labels.instance }})
           description: "Host {{ $labels.instance }} has had {{ printf \"%.0f\" $value }} correctable memory errors reported by EDAC in the last 5 minutes.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 32. Waarschuwing als er uncorrectable EDAC errors zijn gedetecteerd
+      # 32. Warning if uncorrectable EDAC errors have been detected
       - alert: HostEdacUncorrectableErrorsDetected
         expr: (node_edac_uncorrectable_errors_total > 0)
         for: 0m
@@ -331,7 +331,7 @@ groups:
           summary: Host EDAC Uncorrectable Errors detected (instance {{ $labels.instance }})
           description: "Host {{ $labels.instance }} has had {{ printf \"%.0f\" $value }} uncorrectable memory errors reported by EDAC in the last 5 minutes.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 33. Waarschuwing bij hoge host network transmit errors (> 1% errors)
+      # 33. Warning for high host network transmit errors (> 1% errors)
       - alert: HostNetworkReceiveErrors
         expr: (rate(node_network_receive_errs_total[2m]) / rate(node_network_receive_packets_total[2m]) > 0.01)
         for: 2m
@@ -341,7 +341,7 @@ groups:
           summary: Host Network Receive Errors (instance {{ $labels.instance }})
           description: "Host {{ $labels.instance }} interface {{ $labels.device }} has encountered {{ printf \"%.0f\" $value }} receive errors in the last two minutes.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 34. Waarschuwing bij hoge host network receive errors (> 1% errors)
+      # 34. Warning for high host network receive errors (> 1% errors)
       - alert: HostNetworkTransmitErrors
         expr: (rate(node_network_transmit_errs_total[2m]) / rate(node_network_transmit_packets_total[2m]) > 0.01)
         for: 2m
@@ -351,7 +351,7 @@ groups:
           summary: Host Network Transmit Errors (instance {{ $labels.instance }})
           description: "Host {{ $labels.instance }} interface {{ $labels.device }} has encountered {{ printf \"%.0f\" $value }} transmit errors in the last two minutes.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 35. Waarschuwing als een network bond is gedegradeerd
+      # 35. Warning if a network bond is degraded
       - alert: HostNetworkBondDegraded
         expr: ((node_bonding_active - node_bonding_slaves) != 0)
         for: 2m
@@ -361,7 +361,7 @@ groups:
           summary: Host Network Bond Degraded (instance {{ $labels.instance }})
           description: "Bond \"{{ $labels.device }}\" degraded on \"{{ $labels.instance }}\".\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 36. Waarschuwing als conntrack limiet bijna is bereikt (> 80%)
+      # 36. Warning if conntrack limit has almost been reached (> 80%)
       - alert: HostConntrackLimit
         expr: (node_nf_conntrack_entries / node_nf_conntrack_entries_limit > 0.8)
         for: 5m
@@ -371,7 +371,7 @@ groups:
           summary: Host conntrack limit (instance {{ $labels.instance }})
           description: "The number of conntrack is approaching limit\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 37. Waarschuwing als host clock skew is gedetecteerd (> 50ms afwijking)
+      # 37. Warning if host clock skew has been detected (> 50ms deviation)
       - alert: HostClockSkew
         expr: ((node_timex_offset_seconds > 0.05 and deriv(node_timex_offset_seconds[5m]) >= 0) or (node_timex_offset_seconds < -0.05 and deriv(node_timex_offset_seconds[5m]) <= 0))
         for: 10m
@@ -381,7 +381,7 @@ groups:
           summary: Host clock skew (instance {{ $labels.instance }})
           description: "Clock skew detected. Clock is out of sync. Ensure NTP is configured correctly on this host.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
-      # 38. Waarschuwing als host clock niet synchroniseert (max error >=16s)
+      # 38. Warning if host clock is not synchronizing (max error >=16s)
       - alert: HostClockNotSynchronising
         expr: (min_over_time(node_timex_sync_status[1m]) == 0 and node_timex_maxerror_seconds >= 16)
         for: 2m
@@ -393,21 +393,21 @@ groups:
 
   - name: podman_exporter_alerts
     rules:
-      # 39. Alarm als een container stopt (behalve als je hem zelf stopt, 
-        # dit kijkt naar containers die 'niet running' zijn maar wel bestaan).
-        # De podman-exporter gebruikt integers voor status:
+      # 39. Alarm if a container stops (except if you stop it yourself, 
+        # this looks at containers that are 'not running' but do exist).
+        # The podman-exporter uses integers for status:
         # -1=unknown, 0=created, 1=initialized, 2=running,
         # 3=stopped, 4=paused, 5=exited, 6=removing, 7=stopping
       - alert: PodmanContainerDown
-        # We pakken de state (!= 2) en vermenigvuldigen deze met de info metric (die altijd waarde 1 heeft).
-        # We 'joinen' ze op basis van 'id' en 'instance' en trekken de 'name' label naar binnen.
+        # We take the state (!= 2) and multiply it with the info metric (which always has value 1).
+        # We 'join' them based on 'id' and 'instance' and pull the 'name' label into it.
         expr: (podman_container_state != 2) * on(id, instance) group_left(name) podman_container_info
         for: 1m
         labels:
           severity: critical
         annotations:
-          summary: "Container {{ $labels.name }} draait niet"
-          description: "Container {{ $labels.name }} heeft status code {{ $value }} (niet running)."
+          summary: "Container {{ $labels.name }} is not running"
+          description: "Container {{ $labels.name }} has status code {{ $value }} (not running)."
 
       # 40. Podman Exporter down alert
       - alert: PodmanExporterDown
@@ -417,14 +417,14 @@ groups:
           severity: critical
         annotations:
           summary: "Podman Exporter down"
-          description: "Kan geen metrics ophalen van de Podman socket."
+          description: "Cannot retrieve metrics from the Podman socket."
 
       # ---------------------------------------------------------
       # 1. Container Crashes & Status
       # ---------------------------------------------------------
       - alert: PodmanContainerStopped
-        # Alarm als een container is gecrasht of een error gaf (status 5 = exited, exit_code != 0).
-        # We gebruiken podman_container_exit_code als basis, zodat de $value het daadwerkelijke exit_code getal is.
+        # Alarm if a container has crashed or gave an error (status 5 = exited, exit_code != 0).
+        # We use podman_container_exit_code as basis, so $value is the actual exit_code number.
         expr: >
           (
             podman_container_exit_code != 0 
@@ -435,12 +435,12 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "Container {{ $labels.name }} is gecrasht"
-          description: "Container {{ $labels.name }} (Image: {{ $labels.image }}) is gestopt met exit code {{ $value }}."
+          summary: "Container {{ $labels.name }} has crashed"
+          description: "Container {{ $labels.name }} (Image: {{ $labels.image }}) stopped with exit code {{ $value }}."
 
       - alert: PodmanContainerRestartLoop
-        # Alarm als een container meer dan 2x herstart in 5 minuten.
-        # De changes() functie telt hoe vaak de start_time timestamp verandert.
+        # Alarm if a container restarts more than 2x in 5 minutes.
+        # The changes() function counts how many times the start_time timestamp changes.
         expr: >
           (
             changes(podman_container_started_seconds[5m]) > 2
@@ -448,11 +448,11 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "Container {{ $labels.name }} herstart constant"
-          description: "Mogelijke CrashLoop: Container {{ $labels.name }} (Image: {{ $labels.image }}) is {{ $value }} keer herstart in de laatste 5 minuten."
+          summary: "Container {{ $labels.name }} keeps restarting"
+          description: "Possible CrashLoop: Container {{ $labels.name }} (Image: {{ $labels.image }}) restarted {{ $value }} times in the last 5 minutes."
 
       - alert: PodmanContainerUnhealthy
-        # Alleen relevant als je containers een HEALTHCHECK hebben gedefinieerd in hun Dockerfile/Containerfile
+        # Only relevant if your containers have a HEALTHCHECK defined in their Dockerfile/Containerfile
         # health_status: 0=healthy, 1=unhealthy, 2=starting
         expr: (podman_container_health == 1) * on(id, instance) group_left(name, image) podman_container_info
         for: 2m
@@ -460,41 +460,41 @@ groups:
           severity: critical
         annotations:
           summary: "Container {{ $labels.name }} is unhealthy"
-          description: "De healthcheck van container {{ $labels.name }} (Image: {{ $labels.image }}) faalt."
+          description: "The healthcheck of container {{ $labels.name }} (Image: {{ $labels.image }}) is failing."
 
       # ---------------------------------------------------------
       # 2. Performance & Resources
       # ---------------------------------------------------------
       - alert: PodmanContainerHighCpu
-        # Alarm als een container meer dan 80% van 1 CPU core gebruikt (pas drempel aan naar wens)
-        # We normaliseren dit over 5 minuten om pieken te negeren.
+        # Alarm if a container uses more than 80% of 1 CPU core (adjust threshold as needed)
+        # We normalize this over 5 minutes to ignore spikes.
         expr: rate(podman_container_cpu_usage_seconds_total[5m]) * 100 > 80
         for: 5m
         labels:
           severity: warning
         annotations:
-          summary: "Hoog CPU gebruik: {{ $labels.name }}"
-          description: "Container {{ $labels.name }} gebruikt veel CPU ({{ $value }}%)."
+          summary: "High CPU usage: {{ $labels.name }}"
+          description: "Container {{ $labels.name }} is using high CPU ({{ $value }}%)."
 
       - alert: PodmanContainerHighMemory
-        # Alarm als een container meer dan 1GB RAM gebruikt (pas drempel aan naar wens)
-        # Podman exporter geeft bytes terug. 1e9 = 1GB.
+        # Alarm if a container uses more than 1GB RAM (adjust threshold as needed)
+        # Podman exporter returns bytes. 1e9 = 1GB.
         expr: podman_container_memory_usage_bytes > 1e9
         for: 5m
         labels:
           severity: warning
         annotations:
-          summary: "Hoog Geheugen gebruik: {{ $labels.name }}"
-          description: "Container {{ $labels.name }} gebruikt meer dan 1GB RAM ({{ $value | humanize1024 }})."
+          summary: "High Memory usage: {{ $labels.name }}"
+          description: "Container {{ $labels.name }} is using more than 1GB RAM ({{ $value | humanize1024 }})."
 
       - alert: PodmanContainerOOMKilled
-        # Werkt alleen als podman-exporter toegang heeft tot OOM events
+        # Works only if podman-exporter has access to OOM events
         expr: increase(podman_container_oom_killed_count[5m]) > 0
         labels:
           severity: critical
         annotations:
-          summary: "Container {{ $labels.name }} gedood door OOM"
-          description: "De container is door het systeem gestopt wegens geheugentekort (Out Of Memory)."
+          summary: "Container {{ $labels.name }} killed by OOM"
+          description: "The container was killed by the system due to out of memory (Out Of Memory)."
 
   - name: watchdog_alerts
     rules:
@@ -503,8 +503,8 @@ groups:
         labels:
           severity: none
         annotations:
-          summary: "Prometheus werkt en stuurt alerts naar Alertmanager"
-          description: "Dit is een heartbeat alert die altijd 'firing' is."
+          summary: "Prometheus is working and sending alerts to Alertmanager"
+          description: "This is a heartbeat alert that is always 'firing'."
 
   - name: alertmanager_alerts
     rules:
@@ -515,37 +515,37 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "Alertmanager configuratie inconsistent"
-          description: "Verschillende alertmanagers hebben verschillende configs."
+          summary: "Alertmanager configuration inconsistent"
+          description: "Different alertmanagers have different configs."
 
       - alert: AlertmanagerFailedReload
         expr: alertmanager_config_last_reload_successful == 0
         labels:
           severity: warning
         annotations:
-          summary: "Alertmanager reload mislukt"
-          description: "De laatste configuratiewijziging kon niet geladen worden."
+          summary: "Alertmanager reload failed"
+          description: "The latest configuration change could not be loaded."
 
   - name: loki_alerts
     rules:
-      # --- LOKI (Omdat Loki soms metrics dropt bij heavy load) ---
+      # --- LOKI (Because Loki sometimes drops metrics under heavy load) ---
       - alert: LokiRequestErrors
-        # Check op 5xx errors in de Loki API
+        # Check for 5xx errors in the Loki API
         expr: 100 * sum(rate(loki_request_duration_seconds_count{status_code=~"5.."}[1m])) by (namespace, job, route) / sum(rate(loki_request_duration_seconds_count[1m])) by (namespace, job, route) > 10
         for: 5m
         labels:
           severity: warning
         annotations:
-          summary: "Loki geeft veel errors"
-          description: "Meer dan 10% van de requests naar Loki falen."
+          summary: "Loki gives many errors"
+          description: "More than 10% of requests to Loki fail."
 
       - alert: LokiPanics
         expr: sum(increase(loki_panic_total[10m])) > 0
         labels:
           severity: critical
         annotations:
-          summary: "Loki is gecrasht (Panic)"
-          description: "Loki heeft een panic geregistreerd in de logs/metrics."
+          summary: "Loki has crashed (Panic)"
+          description: "Loki has registered a panic in the logs/metrics."
 
       - alert: LokiProcessTooManyRestarts
         expr: changes(process_start_time_seconds{job=~".*loki.*"}[15m]) > 2
@@ -592,8 +592,8 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "Grafana Alerting Fouten"
-          description: "Grafana kan zijn eigen alerts niet evalueren."
+          summary: "Grafana Alerting Errors"
+          description: "Grafana cannot evaluate its own alerts."
 
   - name: alloy_alerts
     rules:
@@ -620,24 +620,24 @@ groups:
   - name: blackbox_alerts
     rules:
       - alert: ServiceHealthCheckFailed
-        # probe_success is 1 (gelukt) of 0 (mislukt)
+        # probe_success is 1 (success) or 0 (failed)
         expr: probe_success == 0
         for: 1m
         labels:
           severity: critical
         annotations:
           summary: "Health Check Failed: {{ $labels.instance }}"
-          description: "De HTTP probe naar {{ $labels.instance }} is mislukt. Service is mogelijk down of reageert traag."
+          description: "The HTTP probe to {{ $labels.instance }} failed. Service might be down or responding slowly."
 
       - alert: ServiceSlowResponse
-        # Waarschuwing als response trager is dan 1 seconde
+        # Warning if response is slower than 1 second
         expr: probe_duration_seconds > 1
         for: 5m
         labels:
           severity: warning
         annotations:
-          summary: "Trage response: {{ $labels.instance }}"
-          description: "De HTTP probe naar {{ $labels.instance }} duurt langer dan 1 seconde (huidige waarde: {{ $value | humanizeDuration }})."
+          summary: "Slow response: {{ $labels.instance }}"
+          description: "The HTTP probe to {{ $labels.instance }} takes longer than 1 second (current value: {{ $value | humanizeDuration }})."
 
   - name: opentelemetrycollector_alerts
     rules:

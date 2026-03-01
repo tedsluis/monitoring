@@ -1,43 +1,43 @@
-# Full Stack monitoring met Prometheus, Loki, Tempo en Grafana
+# Full Stack monitoring with Prometheus, Loki, Tempo and Grafana
 ## Fedora Workstation & Podman Rootless
 
-Deze repository bevat een complete observability stack, geoptimaliseerd voor Fedora Workstation met rootless Podman. De stack combineert metrics, logs en traces in één geïntegreerde omgeving met Grafana als frontend.
+This repository contains a complete observability stack, optimized for Fedora Workstation with rootless Podman. The stack combines metrics, logs and traces into one integrated environment with Grafana as the frontend.
 
 ## Features
 
--   Metrics: Prometheus (v3.9) met Node Exporter & Podman Exporter.
--   Logs: Grafana Loki (v3.3) met opslag op MinIO (S3).
--   Traces: Grafana Tempo (v2.10) in combinatie met OpenTelemetry.
--   Grafana: (v12.3) als frontend voor metrics, logging en tracing. 
--   Grafana Dashboards en Datasources worden automatisch geladen (IaC).
--   Collection: Alloy en Opentelemetry collector voor het verzamelen van container en journald logs.
--   Storage: MinIO (S3 compatible) voor langdurige, efficiënte opslag van logs en traces.
--   Alerting: Prometheus Alertmanager gekoppeld aan Karma (alert dashboard) en Blackbox Exporter (health checks).
--   Karma: Dashboard voor alerts.
--   Reverse proxy met TSL encryptie: Treafik proxy met self signed certificaat.
+-   Metrics: Prometheus (v3.9) with Node Exporter & Podman Exporter.
+-   Logs: Grafana Loki (v3.3) with storage on MinIO (S3).
+-   Traces: Grafana Tempo (v2.10) with OpenTelemetry.
+-   Grafana: (v12.3) as frontend for metrics, logging and tracing. 
+-   Grafana Dashboards and Datasources are automatically loaded (IaC).
+-   Collection: Alloy and OpenTelemetry collector for collecting container and journald logs.
+-   Storage: MinIO (S3 compatible) for long-term, efficient storage of logs and traces.
+-   Alerting: Prometheus Alertmanager connected to Karma (alert dashboard) and Blackbox Exporter (health checks).
+-   Karma: Dashboard for alerts.
+-   Reverse proxy with TLS encryption: Traefik proxy with self-signed certificate.
 -   Static webpage: NGINX.
--   Security: Volledig compatible met SELinux en draait Rootless (met specifieke fixes voor socket-toegang).
--   webhook-tester: ontvangt alerts van alertmanager voor inspectie.
+-   Security: Fully compatible with SELinux and runs rootless (with specific fixes for socket access).
+-   webhook-tester: receives alerts from alertmanager for inspection.
 
-## Architectuur
+## Architecture
 
-De stack bestaat uit de volgende services:
+The stack consists of the following services:
 
 | Service           | Poort | Beschrijving                                     | 
 |-------------------|-------|--------------------------------------------------|
-| Alertmanager      |  9093 | Verwerkt en routeert alerts.                     |
-| Alloy             | 12345 | Collector voor logs (journald en podman logs).   |
-| Blackbox          |  9115 | Uitvoeren van HTTP/TCP health probes.            |
-| Grafana           |  3000 | Dashboards en visualisatie.                      |
-| Karma             |  8080 | UI Dashboard voor Alertmanager meldingen.        |
-| Loki              |  3100 | Log aggregatie (via MinIO S3).                   |
+| Alertmanager      |  9093 | Processes and routes alerts.                     |
+| Alloy             | 12345 | Collector for logs (journald and podman logs).   |
+| Blackbox          |  9115 | Performs HTTP/TCP health probes.                 |
+| Grafana           |  3000 | Dashboards and visualization.                    |
+| Karma             |  8080 | UI dashboard for Alertmanager notifications.     |
+| Loki              |  3100 | Log aggregation (via MinIO S3).                  |
 | MinIO             |  9000 | S3 Object Storage API.                           |
-| MinIO Console     |  9001 | Webinterface voor storage beheer.                |
-| NGINX             |    80 | Startpagina.                                     |
+| MinIO Console     |  9001 | Web interface for storage management.            |
+| NGINX             |    80 | Start page.                                      |
 | Node-exporter     |  9100 | Host metrics collector.                          |
 | OpenTelemetry     |  8888 | Open Telemetry Collector.                        |
 | podman-exporter   |  9882 | podman metrics collector.                        |
-| Prometheus        |  9090 | Time-series database voor metrics.               |
+| Prometheus        |  9090 | Time-series database for metrics.                |
 | Tempo             |  3200 | Distributed Tracing backend (via MinIO S3).      |
 | Traefik           |   443 | Reverse proxy.                                   |
 | webhook-tester    |  5001 | Webhooks inspectie.                              |
@@ -47,68 +47,68 @@ Diagram
 
 ## Prerequisites
 
--   OS: Fedora Linux (getest op Fedora 43+).
--   Tools: podman en podman-compose.
--   Podman Socket: De user-socket moet actief zijn voor de Podman Exporter en Alloy.
+-   OS: Fedora Linux (tested on Fedora 43+).
+-   Tools: podman and podman-compose.
+-   Podman Socket: The user socket must be active for the Podman Exporter and Alloy.
 
 ```bash
-# Installeer benodigdheden\
+# Install requirements\
 sudo dnf install podman podman-compose -y
 
-# Activeer de Podman socket voor je gebruiker (Rootless)\
+# Activate the Podman socket for your user (Rootless)\
 systemctl --user enable --now podman.socket
 
-# Check of de socket werkt
+# Check if the socket works
 ls -l /run/user/$(id -u)/podman/podman.sock
 
-# Maak het gebruik van port 80 mogelijk
+# Enable using port 80
 sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
 net.ipv4.ip_unprivileged_port_start = 80
 echo "net.ipv4.ip_unprivileged_port_start=80" | sudo tee /etc/sysctl.d/99-rootless-ports.conf
 net.ipv4.ip_unprivileged_port_start=80
 ```
 
-## Installatie & Starten
+## Installation & Startup
 
-1.  Clone de repository:
+1.  Clone the repository:
 ```bash
     git clone https://github.com/tedsluis/monitoring.git\
     cd monitoring
 ```
 
-2.  Start de stack:
+2.  Start the stack:
 ```bash
     podman-compose up -d
 ```
-De eerste keer zal de `minio-init` container automatisch de benodigde buckets (`loki-data` en `tempo-data`) aanmaken.
+The first time, the `minio-init` container will automatically create the required buckets (`loki-data` and `tempo-data`).
 
-3. Certificaat maken en CA trusten:
+3. Create certificate and trust CA:
 ```bash
 $ ./renew-certs.sh 
-=== Start Certificaat Vernieuwing (Versie 3.2) ===
-Opruimen oude bestanden...
-Genereren SAN configuratie...
-Genereren Root CA...
+=== Starting Certificate Renewal (Version 3.2) ===
+Cleaning up old files...
+Generating SAN configuration...
+Generating Root CA...
 .........+........+.+...+...+...+...........+.+++++++++++++++++++++++++++++++++++++++*................+.....+.+.....+...+....+...+.....+++++++++++++++++++++++++++++++++++++++*.....+.....+...+.............+.....++++++
 .........+++++++++++++++++++++++++++++++++++++++*....+...+..+++++++++++++++++++++++++++++++++++++++*..+..................+..+...+.........+...+...+...+.......+........+......+....+.........+.....+.............+........+.+......+.........+..............+.+.....+................+...+.....+....+..+...++++++
 -----
-Genereren Server Certificaat...
+Generating server certificate...
 Certificate request self-signature ok
 subject=C=NL, ST=Utrecht, L=Utrecht, O=Bachstraat, OU=Home, CN=*.localhost
-Permissies corrigeren (chmod 644)...
-Bijwerken Fedora Trust Store...
-Controleren of System Bundle het certificaat vertrouwt...
-✓ SUCCES: Systeem bundel vertrouwt nu je certificaat!
-Traefik herstarten...
+Correcting permissions (chmod 644)...
+Updating Fedora Trust Store...
+Checking if system bundle trusts the certificate...
+✓ SUCCESS: System bundle now trusts your certificate!
+Restarting Traefik...
 traefik
 traefik
 f440114ea928262e964b7dddeded7e2dbbcc3f5cb2047c5c5f71033a51d3a2d3
 traefik
-=== Klaar! ===
-Test nu met: curl -v https://grafana.localhost
+=== Done! ===
+Test now with: curl -v https://grafana.localhost
 ```
     
-4.  Controleer de status:
+4.  Check the status:
 ```bash
 $ podman ps -a
 CONTAINER ID  IMAGE                                                   COMMAND               CREATED            STATUS                        PORTS                                                             NAMES
@@ -130,60 +130,60 @@ f6b48cc5b314  docker.io/minio/mc:latest                                         
 5993dbcb16b1  docker.io/grafana/grafana:12.3.0                                              About an hour ago  Up About an hour              3000/tcp                                                          grafana
 f440114ea928  docker.io/library/traefik:v3.6.8                        traefik               26 minutes ago     Up 26 minutes                 0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:4317->4317/tcp  traefik
 ```
-note: De minio-init container draait alleen bij het starten van minio.
+note: The minio-init container only runs when starting minio.
 
-## Stoppen, starten of herstart
+## Stop, start or restart
 
 ```bash
-# alle containers stoppen
+# stop all containers
 podman-compose down
 
-# alle containers starten
+# start all containers
 podman-compose up -d
 
-# alle containers herstarten
+# restart all containers
 podman-compose down && podman-compose up -d
 
-# een specifieke container herstarten en de wijzigingen van compose.yaml meenemen
+# restart a specific container and include changes from compose.yaml
 podman-compose up -d --force-recreate webhook-tester
 
-# een specifieke container herstarten zonder wijziging van compose.yaml mee te nemen
+# restart a specific container without applying compose.yaml changes
 podman restart webhook-tester
 ```
 
-## Configuratie
+## Configuration
 
-De configuratie is opgedeeld in mappen per component. Dankzij Grafana Provisioning worden datasources automatisch ingeladen.
+The configuration is divided into folders per component. Thanks to Grafana Provisioning, datasources are automatically loaded.
 
-### Mappenstructuur
+### Directory structure
 
--   `alertmanager/`: Routing van notificaties.
--   `alloy/`: Pipeline configuratie voor het lezen van journald en de podman.socket.
--   `blackbox/`: Definities voor HTTP health checks.
--   `grafana-provisioning/`: Koppelt Prometheus, Loki en Tempo automatisch aan Grafana.
--   `grafana-provisioning/dashboards/json`: grafana dashboarden.
--   `grafana-provisioning/datasources`: automatisch datasource configiratie.
--   `landing-page/`: index.html en nginx config.
--   `loki/`: Configuratie voor Loki (S3 backend) en recording rules.
--   `otel`: opentelemetry configuratie.
--   `prometheus/`: prometheus.yml en alert.rules.yml.
--   `tempo/`: Configuratie voor Tempo (S3 backend).
+-   `alertmanager/`: Routing of notifications.
+-   `alloy/`: Pipeline configuration for reading journald and the podman.socket.
+-   `blackbox/`: Definitions for HTTP health checks.
+-   `grafana-provisioning/`: Automatically links Prometheus, Loki, and Tempo to Grafana.
+-   `grafana-provisioning/dashboards/json`: Grafana dashboards.
+-   `grafana-provisioning/datasources`: automatic datasource configuration.
+-   `landing-page/`: index.html and nginx config.
+-   `loki/`: Configuration for Loki (S3 backend) and recording rules.
+-   `otel`: OpenTelemetry configuration.
+-   `prometheus/`: prometheus.yml and alert.rules.yml.
+-   `tempo/`: Configuration for Tempo (S3 backend).
 -   `traefik/`: traefik.yaml
--   `traefik/certs`: certificaten.
--   `traefik/dynamic`: dynamische traefik configuratie.
+-   `traefik/certs`: certificates.
+-   `traefik/dynamic`: dynamic Traefik configuration.
 
-### Inloggegevens (Defaults)
+### Login credentials (Defaults)
 
-| Service | Gebruikersnaam | Wachtwoord | Opmerking                             |
-|---------|----------------|------------|---------------------------------------|
-| Grafana | admin          | admin      | Deze kun je wijzigen na eerste login! |
-| MinIO   | minio          | minio123   | Wijzige kan in compose.yml            |
+| Service | Username | Password | Note                             |
+|---------|----------------|------------|----------------------------------------|
+| Grafana | admin          | admin      | You can change this after first login! |
+| MinIO   | minio          | minio123   | Can be changed in compose.yml          |
 
-## Gebruik
+## Usage
 
-### 1. NGINX start pagina
+### 1. NGINX start page
 
-Ga naar https://localhost
+Go to https://localhost
 
 
 ![startpagina1](./images/startpagina1.png)
@@ -199,34 +199,34 @@ Ga naar https://localhost
 
 ### 2. Dashboards (Grafana)
 
-Ga naar https://grafana.localhost
+Go to https://grafana.localhost
 
-Grafana vormt het centrale, visuele hart van deze stack en fungeert als 'single pane of glass' voor alle data. Het open-source platform verbindt met Prometheus (metrics), Loki (logs) en Tempo (traces), waardoor via dashboards en de Explore-modus diepgaand inzicht van het systeem onstaat. Dankzij de geautomatiseerde provisioning worden de datasources en dashboards direct bij het opstarten ingeladen, zodat alles werkt zonder handmatige configuratie.
+Grafana is the central visual heart of this stack and functions as a 'single pane of glass' for all data. The open-source platform connects to Prometheus (metrics), Loki (logs) and Tempo (traces), enabling deep system insight through dashboards and the Explore mode. Thanks to automated provisioning, datasources and dashboards are loaded at startup, so everything works without manual configuration.
 
 #### Dashboards
 
-Deze repo bevat een aantal grafana dashboarden die opgeslagen zijn in [./grafana-provisioning/dashboards/json/](./grafana-provisioning/dashboards/json/) in json formaat.
+This repo contains a number of Grafana dashboards stored in [./grafana-provisioning/dashboards/json/](./grafana-provisioning/dashboards/json/) in JSON format.
 
 Grafana Dashboards
 ![grafana-dashboarden](./images/grafana-dashboards.png)
 
 #### Explore
 
-De Explore-modus biedt een geavanceerde interface voor ad-hoc analyse en troubleshooting, waarbij gebruikers direct query's kunnen uitvoeren. Hiermee faciliteert Explore snelle incidentdiagnose en root-cause analyse, zonder de noodzaak om vooraf gedefinieerde dashboards te configureren.
+The Explore mode provides an advanced interface for ad-hoc analysis and troubleshooting, where users can execute queries directly. Explore thus facilitates rapid incident diagnosis and root-cause analysis, without the need to configure predefined dashboards in advance.
 
 **Loki logs explore**
 
- De Loki-datasource in combinatie met LogQ maakt het mogelijk om logstromen efficiënt te filteren op labels, specifieke tekstpatronen of reguliere expressies te doorzoeken en logvolumes visueel weer te geven naast de ruwe logregels. 
+ The Loki datasource combined with LogQL makes it possible to efficiently filter log streams by labels, search for specific text patterns or regular expressions, and visualize log volumes alongside raw log lines. 
 ![Loki-explore](/images/explore-logs.png)
 
 **Prometheus metrics explore**
 
-De Prometheus-datasource biedt in combinatie met PromQL-queries de mogelijk om het iteratief onderzoeken van time-series data, het visualiseren van trends en het vergelijken van metrieken via split-view functionaliteit.
+The Prometheus datasource, combined with PromQL queries, enables iterative exploration of time-series data, trend visualization, and comparison of metrics using split-view functionality.
 ![prometheus-explore](/images/explore-metrics.png)
 
 **Tempo tracing explore**
 
-De Tempo-datasource in combinatie TraceQL biedt een gedetailleerde visualisatie van de levenscyclus van requests door de gedistribueerde architectuur. Via de waterfall-weergave kunnen gebruikers de latency per component analyseren, waardoor performance-bottlenecks en fouten binnen specifieke spans nauwkeurig kunnen worden geïsoleerd. De integratie met TraceQL maakt gerichte filtering van traces mogelijk, wat in combinatie met gecorreleerde logs en metrics zorgt voor een efficiënte analyse van de hoofdoorzaak bij incidenten. Het kan bijvoorbeeld interesant zijn om te filteren op request niet een http status code van 4xx of 5xx hebben. Of request die langer duren dan 500ms.
+The Tempo datasource combined with TraceQL provides a detailed visualization of the lifecycle of requests through the distributed architecture. Using the waterfall view, users can analyze latency per component, isolating performance bottlenecks and errors within specific spans. Integration with TraceQL enables targeted filtering of traces, which, combined with correlated logs and metrics, allows efficient root-cause analysis during incidents. For example, it can be interesting to filter for requests that do not have an HTTP status code of 4xx or 5xx, or requests that take longer than 500ms.
 ![tempo-explore](/images/explore-traces.png)
 
 Explore trace - service graph
@@ -234,7 +234,7 @@ Explore trace - service graph
 
 #### Drilldown
 
-De drill-down functionaliteit binnen Grafana biedt de mogelijkheid om diepgaande foutanalyse door metrics, logs en traces contextueel met elkaar te verbinden. Vanuit een anomalie in een metrics-dashboard kan je direct navigeren naar de gecorreleerde logregels in Loki, om vervolgens via automatisch gedetecteerde trace-ID's door te schakelen naar gedetailleerde request-spans in Tempo. Deze integratie elimineert de noodzaak om handmatig tijdstippen en identifiers te synchroniseren tussen verschillende datasources, wat de efficiëntie van root cause analysis en performance-optimalisatie aanzienlijk verhoogt.
+The drill-down functionality within Grafana offers the ability to connect in-depth error analysis through metrics, logs and traces contextually with each other. From an anomaly in a metrics dashboard, you can directly navigate to the correlated log lines in Loki, and then use automatically detected trace IDs to switch to detailed request spans in Tempo. This integration eliminates the need to manually synchronize timestamps and identifiers between different datasources, significantly increasing the efficiency of root cause analysis and performance optimization.
 
 Metrics drilldown
 ![Metrics-drilldown](/images/drilldown-metrics-dashboard.png)
@@ -247,29 +247,29 @@ Traces drilldown
 
 #### Grafana alerts
 
-Grafana Alerting biedt een centrale interface voor het monitoren van alerts. Deze module aggregeert alert rules vanuit zowel Prometheus (voor metrics) als Loki (voor logdata), waardoor een overzicht ontstaat van de operationele status. Je kunt via dit dashboard de realtime status van alerts (‘Pending’ of ‘Firing’) analyseren, de onderliggende query-definities bekijken en inzicht verkrijgen in de evaluatiecriteria die de stabiliteit en beschikbaarheid van het platform bewaken.
+Grafana Alerting provides a central interface for monitoring alerts. This module aggregates alert rules from both Prometheus (for metrics) and Loki (for log data), creating an overview of the operational status. Through this dashboard you can analyze the real-time status of alerts (‘Pending’ or ‘Firing’), examine the underlying query definitions, and gain insight into the evaluation criteria that safeguard the platform’s stability and availability.
 
 Grafana Alerting
 ![grafana-alerting](/images/grafana-alerts.png)
 
 #### Grafana datasources
 
-Datasources vormen binnen Grafana de technische interface naar de onderliggende data-opslagsystemen, waardoor de applicatie in staat is gegevens op te halen zonder deze zelf te persisteren. In deze configuratie zijn Prometheus, Loki en Tempo gedefinieerd als primaire bronnen voor het ontsluiten van respectievelijk metrics, logbestanden en distributed traces. 
+Datasources in Grafana serve as the technical interface to the underlying data storage systems, allowing the application to retrieve data without persisting it itself. In this configuration, Prometheus, Loki and Tempo are defined as the primary sources for exposing metrics, log files and distributed traces, respectively. 
 ![grafana-datasources](./images/grafana-datasource.png)
 
-De datasources voor Prometheus, Loki en Tempo zijn geconfigureerd in [./grafana-provisioning/dashboards/dashboard.yaml](./grafana-provisioning/datasources/datasources.yaml)
+The datasources for Prometheus, Loki and Tempo are configured in [./grafana-provisioning/dashboards/dashboard.yaml](./grafana-provisioning/datasources/datasources.yaml)
 
 
 ### 3. Prometheus Metrics
 
-Ga naar https://prometheus.localhost
+Go to https://prometheus.localhost
 
 - `/query`:  metrics querier.
-- `/alerts`: alert rule overzicht
-- `/targets`: status van de scrape targets.
-- `/config`: volledige prometheus configuratie.
+- `/alerts`: alert rule overview
+- `/targets`: status of the scrape targets.
+- `/config`: full prometheus configuration.
 
-Prometheus UI - alert rules overzich
+Prometheus UI - alert rules overview
 ![prometheus](images/prometheus.png)
 
 Prometheus dashboard
@@ -277,7 +277,7 @@ Prometheus dashboard
 
 ### 4. Alertmanager
 
-Ga naar https://alertmanager.localhost
+Go to https://alertmanager.localhost
 
 Alertmanager UI
 ![alertmanager](/images/alertmanager.png)
@@ -285,21 +285,21 @@ Alertmanager UI
 Alertmanager dashboard
 ![alertmanager-dashboard](./images/alertmanager-metrics-dashboard.png)
 
-- Overzicht van actuele alerts
-- Mogelijkheid om alerts te dempen.
+- Overview of current alerts
+- Ability to silence alerts.
 
 ### 5. Karma Alert Dashboard
 
-Ga naar https://karma.localhost
+Go to https://karma.localhost
 
-Hier zie je een overzicht van alle actieve waarschuwingen (bijv. "Disk bijna vol", "Container down" of "Health Check Failed").
+Here you see an overview of all active warnings (e.g., "Disk almost full", "Container down" or "Health Check Failed").
 
 Karma UI
 ![karma](images/karma.png)
 
 ### 6. Storage (MinIO)
 
-Ga naar https://minio.localhost
+Go to https://minio.localhost
 
 Minio UI - login
 ![minio](images/minio-login.png)
@@ -316,13 +316,13 @@ Minio bucket dashboard
 Minio node dashboard
 ![minio-node](./images/minio-node-dashboard.png)
 
-Hier kun je zien hoeveel data Loki en Tempo verbruiken in hun buckets.
+Here you can see how much data Loki and Tempo are using in their buckets.
 
 ### 7. webhook-tester
 
-Ga naar https://webhook-tester.localhost
+Go to https://webhook-tester.localhost
 
-Alertmanager stuurt de alerts door naar de webhook-tester
+Alertmanager sends the alerts to the webhook-tester
 
 Webhook-tester UI
 ![webhook-tester-ui](/images/webhook-tester.png)
@@ -370,7 +370,7 @@ podman-exporter
 
 ### 15. Traefik
 
-Ga naar: https://traefik.localhost
+Go to: https://traefik.localhost
 
 Treafik
 ![traefik](/images/traefik.png)
@@ -378,13 +378,13 @@ Treafik
 Treafik dashboard
 ![traefik](/images/traefik.dashboard.png)
 
-## Alles verwijderen
+## Remove everything
 
 ```bash
-# alle containers stoppen
+# stop all containers
 $ podman-compose down
 
-# toon volumes
+# show volumes
 $ podman volume ls | grep monitoring
 local       monitoring_prometheus-data
 local       monitoring_loki-wal
@@ -392,10 +392,10 @@ local       monitoring_tempo-wal
 local       monitoring_minio-data
 local       monitoring_grafana-data
 
-# verwijder volumes
+# remove volumes
 $ podman volume rm monitoring_prometheus-data monitoring_loki-wal monitoring_tempo-wal monitoring_minio-data monitoring_grafana-data
 
-# verwijder certificaten
+# remove certificates
 $ rm /etc/pki/ca-trust/source/anchors/my-local-ca.pem
 $ rm /etc/pki/ca-trust/source/anchors/my-local-ca.crt
 $ sudo update-ca-trust extract
@@ -403,9 +403,9 @@ $ sudo update-ca-trust extract
 # disable podman socket
 $ systemctl --user disable --now podman.socket
 
-# verwijder rootless ports
+# remove rootless ports
 sudo rm /etc/sysctl.d/99-rootless-ports.conf
 
-# verwijder monitoring repo
+# remove monitoring repo
 $ rm -rf REPONAAM
 ```

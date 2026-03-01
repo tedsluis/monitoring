@@ -42,7 +42,7 @@ compactor:
   retention_delete_worker_count: 150
   delete_request_store: s3
 
-# Alertmanager configuratie voor Loki's Ruler
+# Alertmanager configuration for Loki's Ruler
 ruler:
   storage:
     type: local

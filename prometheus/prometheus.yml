@@ -2,11 +2,11 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
-# Koppel de regels
+# Link the rules
 rule_files:
   - "alert.rules.yml"
 
-# Koppel Alertmanager
+# Link Alertmanager
 alerting:
   alertmanagers:
     - static_configs:
@@ -18,7 +18,7 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-  # node-exporter draait op het host netwerk, dus we gebruiken 'host.containers.internal' om er toegang toe te krijgen vanuit de container.
+  # node-exporter runs on the host network, so we use 'host.containers.internal' to access it from the container.
   - job_name: 'node-exporter'
     static_configs:
       - targets: ['host.containers.internal:9100']
@@ -47,7 +47,7 @@ scrape_configs:
     static_configs:
       - targets: ['karma:8080']
 
-  # http probes voor de verschillende services. We gebruiken de blackbox exporter om deze probes uit te voeren.
+  # HTTP probes for the different services. We use the blackbox exporter to perform these probes.
   - job_name: 'blackbox-http'
     metrics_path: /probe
     params:
@@ -68,7 +68,7 @@ scrape_configs:
         - http://loki:3100/ready
         # MinIO
         - http://minio:9000/minio/health/ready
-        # Node Exporter (Let op: draait op host netwerk!)
+        # Note: runs on host network!
         - http://host.containers.internal:9100
         # OTel Collector
         - http://otel-collector:8888/metrics
@@ -104,7 +104,7 @@ scrape_configs:
     static_configs:
       - targets: ['otel-collector:8888']
 
-  # MinIO heeft verschillende metrics endpoints, dus we definiëren meerdere jobs voor elk type metric.
+  # MinIO has different metrics endpoints, so we define multiple jobs for each metric type.
   - job_name: 'minio'
     metrics_path: /minio/v2/metrics/cluster
     scheme: http

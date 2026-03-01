@@ -68,15 +68,15 @@ services:
       - NET_RAW
       - NET_ADMIN
     volumes:
-      # We koppelen de podman socket op exact dezelfde manier als bij Traefik:
-      # Pas dit pad aan als Traefik een ander socket-pad gebruikt in jouw opzet.
+      # We link the Podman socket exactly the same way as with Traefik:
+      # Adjust this path if Traefik uses a different socket path in your setup.
       - /run/user/1000/podman/podman.sock:/var/run/docker.sock:Z
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.atlas.rule=Host(`atlas.localhost`)"
       - "traefik.http.routers.atlas.tls=true"
-      # Atlas serveert de React UI en FastAPI backend standaard op poort 80 intern
+
       - "traefik.http.services.atlas.loadbalancer.server.port=8888"
 
   # ---------------------------------------------------------
@@ -210,14 +210,14 @@ services:
       - "traefik.http.routers.minio.service=minio-console"
       - "traefik.http.routers.minio.tls=true"
       - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
-      # S3 API (Interne gebruik, maar handig om bereikbaar te hebben)
+      # S3 API (Internal use, but nice to have accessible)
       - "traefik.http.routers.minio-api.rule=Host(`s3.localhost`)"
       - "traefik.http.routers.minio-api.service=minio-api"
       - "traefik.http.routers.minio-api.tls=true"
       - "traefik.http.services.minio-api.loadbalancer.server.port=9000"
-      # 1. Koppel een nieuwe middleware aan de bestaande minio-api router
+      # 1. Link a new middleware to the existing minio-api router
       - "traefik.http.routers.minio-api.middlewares=minio-scraper-trick"
-      # 2. Maak de middleware aan: overschrijf de User-Agent header
+      # 2. Create the middleware: override the User-Agent header
       - "traefik.http.middlewares.minio-scraper-trick.headers.customrequestheaders.User-Agent=Prometheus/1.0"
 
   # ---------------------------------------------------------
@@ -241,7 +241,7 @@ services:
       "
 
 # ---------------------------------------------------------
-  # NGINX (Statische HTML)
+  # NGINX (Static HTML)
   # ---------------------------------------------------------
   nginx:
     image: docker.io/library/nginx:alpine
@@ -253,27 +253,27 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      # Routeer naar https://localhost (of http wat door traefik wordt geüpgraded)
+      # Route to https://localhost (or http which is upgraded by traefik)
       - "traefik.http.routers.nginx.rule=Host(`localhost`)"
       - "traefik.http.routers.nginx.tls=true"
-      # Nginx luistert intern op poort 80
+      # Nginx listens internally on port 80
       - "traefik.http.services.nginx.loadbalancer.server.port=80"
 
   # ---------------------------------------------------------
-  # Node Exporter (UITZONDERING!)
+  # Node Exporter (EXCEPTION!)
   # ---------------------------------------------------------
   node-exporter:
     image: quay.io/prometheus/node-exporter:v1.10.0
     container_name: node-exporter
     command:
       - '--path.rootfs=/host'
-    # MOET OP HOST NETWERK BLIJVEN
+    # MUST STAY ON HOST NETWORK
     pid: host
     network_mode: host
     restart: unless-stopped
     volumes:
       - '/:/host:ro,rslave'
-    # Noot: Traefik config hiervoor staat in traefik/dynamic/services.yaml
+    # Note: Traefik config for this is in traefik/dynamic/services.yaml
 
   # ---------------------------------------------------------
   # OpenTelemetry Collector
@@ -291,13 +291,13 @@ services:
       - tempo
     labels:
       - "traefik.enable=true"
-      # TCP Router voor OTLP gRPC (poort 4317)
-      # LET OP: Clients moeten SNI 'otel-collector.localhost' meesturen!
+      # TCP Router for OTLP gRPC (port 4317)
+      # NOTE: Clients must send SNI 'otel-collector.localhost'!
       - "traefik.tcp.routers.otel.rule=HostSNI(`otel-collector.localhost`)"
       - "traefik.tcp.routers.otel.entrypoints=otlp"
       - "traefik.tcp.routers.otel.tls=true"
       - "traefik.tcp.services.otel.loadbalancer.server.port=4317"
-      # HTTP Router voor OTel Collector Metrics (poort 8888)
+      # HTTP Router for OTel Collector Metrics (port 8888)
       - "traefik.http.routers.otel-collector.rule=Host(`otel-collector.localhost`)"
       - "traefik.http.routers.otel-collector.tls=true"
       - "traefik.http.services.otel-collector.loadbalancer.server.port=8888"
@@ -373,7 +373,7 @@ services:
     volumes:
       - ./tempo/tempo.yaml:/etc/tempo.yaml:Z
       - tempo-wal:/var/tempo/wal:Z
-    # Tempo exposen we normaal niet publiek, maar op verzoek:
+    # Tempo is normally not exposed publicly, but on request:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.tempo.rule=Host(`tempo.localhost`)"
@@ -395,13 +395,13 @@ services:
     volumes:
       - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
       - ./traefik/traefik.yaml:/etc/traefik/traefik.yaml:ro
-      # Mount de map voor dynamische config (node-exporter)
+      # Mount the directory for dynamic config (node-exporter)
       - ./traefik/dynamic:/etc/traefik/dynamic:ro 
       - ./traefik/certs:/etc/traefik/certs:ro
     networks:
       - monitoring-net
-    # Zorgt dat Traefik 'host.containers.internal' kan resolven naar de host IP
-    # Dit is nodig voor de node-exporter proxy
+    # Ensure that Traefik can resolve 'host.containers.internal' to the host IP
+    # This is needed for the node-exporter proxy
     extra_hosts:
       - "host.containers.internal:host-gateway"
     labels:
@@ -411,7 +411,7 @@ services:
       - "traefik.http.routers.api.service=api@internal"
       - "traefik.http.routers.api.tls=true"
       - "traefik.http.routers.api.entrypoints=websecure"
-      # Traefik Metrics (Publiek inzien via browser)
+      # Traefik Metrics (Publicly viewable via browser)
       - "traefik.http.routers.traefik-metrics.rule=Host(`traefik-metrics.localhost`)"
       - "traefik.http.routers.traefik-metrics.service=prometheus@internal"
       - "traefik.http.routers.traefik-metrics.tls=true"

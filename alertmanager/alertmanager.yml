@@ -6,11 +6,11 @@ route:
   group_wait: 10s
   group_interval: 10s
   repeat_interval: 1h
-  receiver: 'web-hook' # Standaard ontvanger
+  receiver: 'web-hook' # Default receiver
 
 receivers:
   - name: 'web-hook'
-    # Hier kun je later E-mail, Slack, Discord, PagerDuty etc toevoegen.
-    # Voor nu logging we het alleen in de container logs of sturen we niks.
+    # Here you can later add Email, Slack, Discord, PagerDuty etc.
+    # For now we only log it in the container logs or send nothing.
     webhook_configs:
       - url: 'http://webhook-tester:8080/65ae26f0-131e-4390-8daa-bdaec17e77c2'
