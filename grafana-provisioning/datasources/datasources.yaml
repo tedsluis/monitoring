@@ -30,6 +30,11 @@ datasources:
     url: http://tempo:3200
     access: proxy
     jsonData:
+      grpcUrl: tempo:9095
+      nodeGraph:
+        enabled: true
+      search:
+        hide: false
       # Link from Tempo traces back to Loki logs
       tracesToLogsV2:
         datasourceUid: loki
@@ -53,9 +58,5 @@ datasources:
       traceqlMetrics:
         datasourceUid: prometheus
             
-      nodeGraph:
-        enabled: true
-      search:
-        hide: false
       lokiSearch:
         datasourceUid: loki

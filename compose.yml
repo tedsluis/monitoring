@@ -124,6 +124,8 @@ services:
       - GF_TRACING_PROVIDER=opentelemetry
       - GF_TRACING_OPENTELEMETRY_OTLP_ADDRESS=otel-collector:4317
       - GF_TRACING_OPENTELEMETRY_OTLP_PROTOCOL=grpc
+      - GF_TRACING_OPENTELEMETRY_PROPAGATION=w3c
+      - GF_TRACING_OPENTELEMETRY_ENABLED=true
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.grafana.rule=Host(`grafana.localhost`)"
