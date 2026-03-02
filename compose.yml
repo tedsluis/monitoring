@@ -132,6 +132,7 @@ services:
       - "traefik.http.routers.grafana.entrypoints=websecure"
       - "traefik.http.routers.grafana.tls=true"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - "traefik.http.middlewares.grafana-headers.headers.customrequestheaders.traceparent="
     volumes:
       - grafana-data:/var/lib/grafana:Z
       - ./grafana-provisioning:/etc/grafana/provisioning:Z
