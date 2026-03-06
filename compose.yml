@@ -458,11 +458,15 @@ services:
   keep-backend:
     image: us-central1-docker.pkg.dev/keephq/keep/keep-api:latest
     container_name: keep-backend
+    user: "0:0"
     networks:
       - monitoring-net
     depends_on:
       - keep-db
     environment:
+      - DISABLE_POSTHOG=true
+      - LOG_LEVEL=DEBUG
+      - KEEP_APP_LOG_LEVEL=DEBUG
       # Database connectie
       - DATABASE_CONNECTION_STRING=postgresql://keep:keep@keep-db:5432/keep
       - SECRET_MANAGER_TYPE=FILE
@@ -478,10 +482,13 @@ services:
       
       # Optioneel: specificeer je lokale modelnaam (bijv. llama3, mistral, of qwen)
       # - OPENAI_MODEL=llama3
-      - "PROVIDERS_FILE=/config/providers.yaml"
+      - KEEP_PROVIDERS_DIRECTORY=/config/providers
+      - PROMETHEUS_MULTIPROC_DIR=/prometheus_multiproc_dir
     volumes:
       - keep-state:/state:Z
-      - ./keep/providers.yaml:/config/providers.yaml:ro,Z
+      - ./keep/providers:/config/providers:ro,Z
+    tmpfs:
+      - /prometheus_multiproc_dir
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.keep-api.rule=Host(`keep-api.localhost`)"
@@ -496,6 +503,8 @@ services:
     container_name: keep-frontend
     networks:
       - monitoring-net
+    depends_on:
+      - keep-backend
     environment:
       - API_URL=http://keep-backend:8080
       - NEXTAUTH_URL=https://keep.localhost

@@ -1,0 +1,10 @@
+id: prometheus
+name: prometheus-local
+type: prometheus
+description: "Internal Prometheus (IaC)"
+authentication:
+  url: "http://prometheus:9090"
+
+
+
+

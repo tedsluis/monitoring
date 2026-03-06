@@ -126,3 +126,12 @@ scrape_configs:
   - job_name: 'traefik'
     static_configs:
       - targets: ['traefik:8082']
+
+  - job_name: "keep"
+    static_configs:
+      - targets: ["keep-backend:8080"]
+    metrics_path: "/metrics/processing"
+    http_headers:
+      x-api-key:
+        values:
+          - "585af6cc-5c07-427f-966f-a263473ad402"
