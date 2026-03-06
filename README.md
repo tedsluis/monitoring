@@ -230,6 +230,14 @@ The Prometheus datasource, combined with PromQL queries, enables iterative explo
 The Tempo datasource combined with TraceQL provides a detailed visualization of the lifecycle of requests through the distributed architecture. Using the waterfall view, users can analyze latency per component, isolating performance bottlenecks and errors within specific spans. Integration with TraceQL enables targeted filtering of traces, which, combined with correlated logs and metrics, allows efficient root-cause analysis during incidents. For example, it can be interesting to filter for requests that do not have an HTTP status code of 4xx or 5xx, or requests that take longer than 500ms.
 ![tempo-explore](/images/explore-traces.png)
 
+
+To manually test the proxy path by sending a traceparent header, run this command in your terminal:
+```bash
+ curl -k -H "traceparent: 00-11112222333344445555666677778888-1111222233334444-01" https://grafana.localhost/api/health
+```
+Next, in Grafana, go to Tempo Explore and search for the exact Trace ID: 11112222333344445555666677778888.
+If propagation works, you'll see a beautiful trace tree with the Traefik span at the top and the Grafana span below.
+
 Explore trace - service graph
 ![traces-explore](/images/explore-traces-service-graph.png)
 
@@ -354,6 +362,7 @@ Loki logging dashboard
 ![loki-logs-dashboard](./images/loki-logs-dashboards.png)
 
 ### 11. Tempo
+
 
 
 ### 12. Otel-collector

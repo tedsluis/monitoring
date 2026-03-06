@@ -6,11 +6,26 @@ route:
   group_wait: 10s
   group_interval: 10s
   repeat_interval: 1h
-  receiver: 'web-hook' # Default receiver
+  receiver: 'web-hook' # Fallback receiver
+
+  routes:
+    - receiver: 'keep'
+      group_by: ['alertname']
+      group_wait: 15s
+      group_interval: 15s
+      repeat_interval: 1m
+      continue: true
+
+    - receiver: 'web-hook'
 
 receivers:
-  - name: 'web-hook'
-    # Here you can later add Email, Slack, Discord, PagerDuty etc.
-    # For now we only log it in the container logs or send nothing.
-    webhook_configs:
-      - url: 'http://webhook-tester:8080/65ae26f0-131e-4390-8daa-bdaec17e77c2'
+- name: "keep"
+  webhook_configs:
+    - url: 'http://keep-backend:8080/alerts/event/prometheus?api_key=585af6cc-5c07-427f-966f-a263473ad402'
+      send_resolved: true
+
+- name: 'web-hook'
+  # Here you can later add Email, Slack, Discord, PagerDuty etc.
+  # For now we only log it in the container logs or send nothing.
+  webhook_configs:
+    - url: 'http://webhook-tester:8080/65ae26f0-131e-4390-8daa-bdaec17e77c2'

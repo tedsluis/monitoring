@@ -1,0 +1,11 @@
+- id: prometheus-fedora
+  type: prometheus
+  description: "Internal Prometheus (provisioned as code)"
+  authentication:
+    url: "http://prometheus:9090"
+
+- id: loki-fedora
+  type: loki
+  description: "Internal Loki (provisioned as code)"
+  authentication:
+    url: "http://loki:3100"

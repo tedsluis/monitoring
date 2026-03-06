@@ -70,6 +70,8 @@ DNS.16 = tempo.localhost
 DNS.17 = traefik.localhost
 DNS.18 = traefik-metrics.localhost
 DNS.19 = webhook-tester.localhost
+DNS.20 = keep.localhost
+DNS.21 = keep-api.localhost
 IP.1 = 127.0.0.1
 EOF
 
