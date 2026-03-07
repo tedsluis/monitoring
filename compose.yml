@@ -57,29 +57,6 @@ services:
       - "traefik.http.services.alloy.loadbalancer.server.port=12345"
 
   # ---------------------------------------------------------
-  # Atlas (Network Visualizer)
-  # ---------------------------------------------------------
-  atlas:
-    image: keinstien/atlas:latest
-    container_name: atlas
-    networks:
-      - monitoring-net
-    cap_add:
-      - NET_RAW
-      - NET_ADMIN
-    volumes:
-      # We link the Podman socket exactly the same way as with Traefik:
-      # Adjust this path if Traefik uses a different socket path in your setup.
-      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:Z
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.atlas.rule=Host(`atlas.localhost`)"
-      - "traefik.http.routers.atlas.tls=true"
-
-      - "traefik.http.services.atlas.loadbalancer.server.port=8888"
-
-  # ---------------------------------------------------------
   # Blackbox Exporter
   # ---------------------------------------------------------
   blackbox-exporter:
@@ -146,9 +123,9 @@ services:
     networks:
       - monitoring-net
     environment:
-      - ALERTMANAGER_URI=http://alertmanager:9093
-      - ALERTMANAGER_NAME=Fedora-Alerts
-      - ALERTMANAGER_INTERVAL=15s
+      - CONFIG_FILE=/etc/karma.yaml
+    volumes:
+      - ./karma/karma.yaml:/etc/karma.yaml:ro,Z
     restart: unless-stopped
     depends_on:
       - alertmanager
@@ -157,6 +134,85 @@ services:
       - "traefik.http.routers.karma.rule=Host(`karma.localhost`)"
       - "traefik.http.routers.karma.tls=true"
       - "traefik.http.services.karma.loadbalancer.server.port=8080"
+
+  # ---------------------------------------------------------
+  # Keep Database (PostgreSQL)
+  # ---------------------------------------------------------
+  keep-db:
+    image: postgres:15-alpine
+    container_name: keep-db
+    networks:
+      - monitoring-net
+    environment:
+      - POSTGRES_USER=keep
+      - POSTGRES_PASSWORD=keep
+      - POSTGRES_DB=keep
+    volumes:
+      - keep-db-data:/var/lib/postgresql/data:Z
+    restart: unless-stopped
+
+  # ---------------------------------------------------------
+  # Keep Backend (API & AIOps Engine)
+  # ---------------------------------------------------------
+  keep-backend:
+    image: us-central1-docker.pkg.dev/keephq/keep/keep-api:latest
+    container_name: keep-backend
+    user: "0:0"
+    networks:
+      - monitoring-net
+    depends_on:
+      - keep-db
+    environment:
+      - DISABLE_POSTHOG=true
+      - LOG_LEVEL=DEBUG
+      - KEEP_APP_LOG_LEVEL=DEBUG
+      # Database connectie
+      - DATABASE_CONNECTION_STRING=postgresql://keep:keep@keep-db:5432/keep
+      - SECRET_MANAGER_TYPE=FILE
+      - SECRET_MANAGER_DIRECTORY=/state
+      - KEEP_API_URL=https://keep-api.localhost
+      - KEEP_API_KEY=585af6cc-5c07-427f-966f-a263473ad402
+      - PORT=8080
+      # --- AI Configuratie ---
+      # Verwijs naar je host machine vanuit de container via host.containers.internal
+      # Pas de poort aan als je vLLM of LM Studio (bijv. 1234 of 8000) gebruikt.
+      - OPENAI_API_BASE=http://host.containers.internal:11434/v1
+      - OPENAI_API_KEY=dummy-key # Verplicht voor de OpenAI library, ook al checkt je lokale LLM dit niet.
+      
+      # Optioneel: specificeer je lokale modelnaam (bijv. llama3, mistral, of qwen)
+      # - OPENAI_MODEL=llama3
+      - KEEP_PROVIDERS_DIRECTORY=/config/providers
+      - PROMETHEUS_MULTIPROC_DIR=/prometheus_multiproc_dir
+    volumes:
+      - keep-state:/state:Z
+      - ./keep/providers:/config/providers:ro,Z
+    tmpfs:
+      - /prometheus_multiproc_dir
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keep-api.rule=Host(`keep-api.localhost`)"
+      - "traefik.http.routers.keep-api.tls=true"
+      - "traefik.http.services.keep-api.loadbalancer.server.port=8080"
+
+  # ---------------------------------------------------------
+  # Keep Frontend (UI)
+  # ---------------------------------------------------------
+  keep-frontend:
+    image: us-central1-docker.pkg.dev/keephq/keep/keep-ui:latest
+    container_name: keep-frontend
+    networks:
+      - monitoring-net
+    depends_on:
+      - keep-backend
+    environment:
+      - API_URL=http://keep-backend:8080
+      - NEXTAUTH_URL=https://keep.localhost
+      - NEXTAUTH_SECRET=keep # Pas dit aan voor een eigen veilige string
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keep-ui.rule=Host(`keep.localhost`)"
+      - "traefik.http.routers.keep-ui.tls=true"
+      - "traefik.http.services.keep-ui.loadbalancer.server.port=3000"
 
   # ---------------------------------------------------------
   # Loki
@@ -435,85 +491,6 @@ services:
       - "traefik.http.routers.webhook.rule=Host(`webhook-tester.localhost`)"
       - "traefik.http.routers.webhook.tls=true"
       - "traefik.http.services.webhook.loadbalancer.server.port=8080"
-
-# ---------------------------------------------------------
-  # Keep Database (PostgreSQL)
-  # ---------------------------------------------------------
-  keep-db:
-    image: postgres:15-alpine
-    container_name: keep-db
-    networks:
-      - monitoring-net
-    environment:
-      - POSTGRES_USER=keep
-      - POSTGRES_PASSWORD=keep
-      - POSTGRES_DB=keep
-    volumes:
-      - keep-db-data:/var/lib/postgresql/data:Z
-    restart: unless-stopped
-
-  # ---------------------------------------------------------
-  # Keep Backend (API & AIOps Engine)
-  # ---------------------------------------------------------
-  keep-backend:
-    image: us-central1-docker.pkg.dev/keephq/keep/keep-api:latest
-    container_name: keep-backend
-    user: "0:0"
-    networks:
-      - monitoring-net
-    depends_on:
-      - keep-db
-    environment:
-      - DISABLE_POSTHOG=true
-      - LOG_LEVEL=DEBUG
-      - KEEP_APP_LOG_LEVEL=DEBUG
-      # Database connectie
-      - DATABASE_CONNECTION_STRING=postgresql://keep:keep@keep-db:5432/keep
-      - SECRET_MANAGER_TYPE=FILE
-      - SECRET_MANAGER_DIRECTORY=/state
-      - KEEP_API_URL=https://keep-api.localhost
-      - KEEP_API_KEY=585af6cc-5c07-427f-966f-a263473ad402
-      - PORT=8080
-      # --- AI Configuratie ---
-      # Verwijs naar je host machine vanuit de container via host.containers.internal
-      # Pas de poort aan als je vLLM of LM Studio (bijv. 1234 of 8000) gebruikt.
-      - OPENAI_API_BASE=http://host.containers.internal:11434/v1
-      - OPENAI_API_KEY=dummy-key # Verplicht voor de OpenAI library, ook al checkt je lokale LLM dit niet.
-      
-      # Optioneel: specificeer je lokale modelnaam (bijv. llama3, mistral, of qwen)
-      # - OPENAI_MODEL=llama3
-      - KEEP_PROVIDERS_DIRECTORY=/config/providers
-      - PROMETHEUS_MULTIPROC_DIR=/prometheus_multiproc_dir
-    volumes:
-      - keep-state:/state:Z
-      - ./keep/providers:/config/providers:ro,Z
-    tmpfs:
-      - /prometheus_multiproc_dir
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.keep-api.rule=Host(`keep-api.localhost`)"
-      - "traefik.http.routers.keep-api.tls=true"
-      - "traefik.http.services.keep-api.loadbalancer.server.port=8080"
-
-  # ---------------------------------------------------------
-  # Keep Frontend (UI)
-  # ---------------------------------------------------------
-  keep-frontend:
-    image: us-central1-docker.pkg.dev/keephq/keep/keep-ui:latest
-    container_name: keep-frontend
-    networks:
-      - monitoring-net
-    depends_on:
-      - keep-backend
-    environment:
-      - API_URL=http://keep-backend:8080
-      - NEXTAUTH_URL=https://keep.localhost
-      - NEXTAUTH_SECRET=keep # Pas dit aan voor een eigen veilige string
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.keep-ui.rule=Host(`keep.localhost`)"
-      - "traefik.http.routers.keep-ui.tls=true"
-      - "traefik.http.services.keep-ui.loadbalancer.server.port=3000"
 
 volumes:
   prometheus-data:

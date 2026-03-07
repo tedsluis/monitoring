@@ -102,7 +102,12 @@
             width: 100%;
         }
 
-        /* Specifieke layout voor Explore tab: max 3 per rij */
+        /* Specifieke layout Service tab: max 3 per row */
+        #tab-services .grid {
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        }
+
+        /* Specifieke layout Explore tab: max 3 per row */
         #tab-explore .grid {
             grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
         }
@@ -174,56 +179,50 @@
     <!-- Tab: Services -->
     <div id="tab-services" class="tab-content active">
         <div class="grid">
-            <a href="https://grafana.localhost" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>Grafana</h2>
-                <p>Data visualization, dashboards and metrics explorer.</p>
-                <div class="port-badge">grafana.localhost</div>
-            </a>
-            <a href="https://prometheus.localhost" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>Prometheus</h2>
-                <p>Time-series database and metrics scraping.</p>
-                <div class="port-badge">prometheus.localhost</div>
-            </a>
             <a href="https://alertmanager.localhost" class="card core" target="_blank" rel="noopener noreferrer">
                 <h2>Alertmanager</h2>
                 <p>Management and routing of Prometheus alerts.</p>
                 <div class="port-badge">alertmanager.localhost</div>
-            </a>
-            <a href="https://karma.localhost" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>Karma</h2>
-                <p>Advanced dashboard for Alertmanager.</p>
-                <div class="port-badge">karma.localhost</div>
-            </a>
-            <a href="https://traefik.localhost/dashboard/" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>Traefik</h2>
-                <p>Reverse proxy status, routers and services overview.</p>
-                <div class="port-badge">traefik.localhost</div>
-            </a>
-            <a href="https://minio.localhost" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>MinIO console</h2>
-                <p>S3-compatible object storage for logs and traces.</p>
-                <div class="port-badge">minio.localhost</div>
-            </a>
-            <a href="https://webhook-tester.localhost/s/65ae26f0-131e-4390-8daa-bdaec17e77c2" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>Webhook tester</h2>
-                <p>Test environment for incoming Alertmanager webhooks.</p>
-                <div class="port-badge">webhook-tester.localhost</div>
             </a>
             <a href="https://alloy.localhost" class="card core" target="_blank" rel="noopener noreferrer">
                 <h2>Alloy</h2>
                 <p>OpenTelemetry Collector & Log pipeline.</p>
                 <div class="port-badge">alloy.localhost</div>
             </a>
-            <!-- ATLAS ADDED -->
-            <a href="https://atlas.localhost" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>Atlas Network Map</h2>
-                <p>Dynamic visualization and discovery of containers and network infrastructure.</p>
-                <div class="port-badge">atlas.localhost</div>
+            <a href="https://grafana.localhost" class="card core" target="_blank" rel="noopener noreferrer">
+                <h2>Grafana</h2>
+                <p>Data visualization, dashboards and metrics explorer.</p>
+                <div class="port-badge">grafana.localhost</div>
+            </a>
+            <a href="https://karma.localhost" class="card core" target="_blank" rel="noopener noreferrer">
+                <h2>Karma</h2>
+                <p>Advanced dashboard for Alertmanager.</p>
+                <div class="port-badge">karma.localhost</div>
             </a>
             <a href="https://keep.localhost" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>Keep</h2>
+                <h2>KeepHQ</h2>
                 <p>Alert management and notification center.</p>
                 <div class="port-badge">keep.localhost</div>
+            </a>
+            <a href="https://minio.localhost" class="card core" target="_blank" rel="noopener noreferrer">
+                <h2>MinIO console</h2>
+                <p>S3-compatible object storage for logs and traces.</p>
+                <div class="port-badge">minio.localhost</div>
+            </a>
+            <a href="https://prometheus.localhost" class="card core" target="_blank" rel="noopener noreferrer">
+                <h2>Prometheus</h2>
+                <p>Time-series database and metrics scraping.</p>
+                <div class="port-badge">prometheus.localhost</div>
+            </a>
+            <a href="https://traefik.localhost/dashboard/" class="card core" target="_blank" rel="noopener noreferrer">
+                <h2>Traefik</h2>
+                <p>Reverse proxy status, routers and services overview.</p>
+                <div class="port-badge">traefik.localhost</div>
+            </a>
+            <a href="https://webhook-tester.localhost/s/65ae26f0-131e-4390-8daa-bdaec17e77c2" class="card core" target="_blank" rel="noopener noreferrer">
+                <h2>Webhook tester</h2>
+                <p>Test environment for incoming Alertmanager webhooks.</p>
+                <div class="port-badge">webhook-tester.localhost</div>
             </a>
         </div>
     </div>
@@ -255,6 +254,11 @@
                 <h2>Karma exporter</h2>
                 <p>Karma Metrics.</p>
                 <div class="port-badge">karma.localhost/metrics</div>
+            </a>
+            <a href="#" onclick="openKeepMetrics(event)" class="card exporter">
+                <h2>KeepHQ exporter</h2>
+                <p>KeepHQ metrics.</p>
+                <div class="port-badge">keep-api.localhost/metrics/processing</div>
             </a>
             <a href="https://loki.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
                 <h2>Loki exporter</h2>
@@ -331,6 +335,11 @@
                 <h2>Grafana internals dashboard</h2>
                 <p>Detailed information about internal Grafana components.</p>
                 <div class="port-badge">grafana.localhost/d/grafana...</div>
+            </a>
+            <a href="https://grafana.localhost/d/keep/keep-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
+                <h2>Keep HQdashboard</h2>
+                <p>Detailed information about internal KeepHQ components.</p>
+                <div class="port-badge">grafana.localhost/d/keep...</div>
             </a>
             <a href="https://grafana.localhost/d/loki-global-metrics-dashboard/loki-global-metrics-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
                 <h2>Loki metrics dashboard</h2>
@@ -439,6 +448,35 @@
             // Show the selected tab and make the button active
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
+        }
+
+        async function openKeepMetrics(event) {
+            event.preventDefault(); // Voorkom dat de browser naar '#' navigeert
+            
+            // Open alvast een nieuw, leeg tabblad met een laad-berichtje
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write('<body style="background: #0f172a; color: #f8fafc; font-family: monospace; padding: 20px;">Laden van metrics...</body>');
+            
+            try {
+                // Doe het verzoek mèt de juiste API-key header
+                const response = await fetch('https://keep-api.localhost/metrics/processing', {
+                    headers: {
+                        'x-api-key': '585af6cc-5c07-427f-966f-a263473ad402'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // Lees de metrics tekst uit
+                const text = await response.text();
+                
+                // Schrijf de resultaten naar het nieuwe tabblad
+                newWindow.document.body.innerHTML = '<pre style="white-space: pre-wrap; word-wrap: break-word;">' + text + '</pre>';
+            } catch (error) {
+                newWindow.document.body.innerHTML = '<div style="color: #ef4444;">Fout bij het ophalen van metrics: ' + error.message + '</div>';
+            }
         }
     </script>
 

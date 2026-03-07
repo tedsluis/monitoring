@@ -8,7 +8,7 @@ This repository contains a complete observability stack, optimized for Fedora Wo
 -   Metrics: Prometheus (v3.9) with Node Exporter & Podman Exporter.
 -   Logs: Grafana Loki (v3.3) with storage on MinIO (S3).
 -   Traces: Grafana Tempo (v2.10) with OpenTelemetry.
--   Grafana: (v12.3) as frontend for metrics, logging and tracing. 
+-   Grafana: (v12.3) as frontend for metrics, logging and tracing.
 -   Grafana Dashboards and Datasources are automatically loaded (IaC).
 -   Collection: Alloy and OpenTelemetry collector for collecting container and journald logs.
 -   Storage: MinIO (S3 compatible) for long-term, efficient storage of logs and traces.
@@ -23,7 +23,7 @@ This repository contains a complete observability stack, optimized for Fedora Wo
 
 The stack consists of the following services:
 
-| Service           | Poort | Beschrijving                                     | 
+| Service           | Poort | Beschrijving                                     |
 |-------------------|-------|--------------------------------------------------|
 | Alertmanager      |  9093 | Processes and routes alerts.                     |
 | Alloy             | 12345 | Collector for logs (journald and podman logs).   |
@@ -84,7 +84,7 @@ The first time, the `minio-init` container will automatically create the require
 
 3. Create certificate and trust CA:
 ```bash
-$ ./renew-certs.sh 
+$ ./renew-certs.sh
 === Start Certificate Renewal (Version 3.2) ===
 Cleaning up old files...
 Generating SAN configuration...
@@ -100,7 +100,7 @@ Updating Fedora Trust Store...
 Checking if System Bundle trusts the certificate...
 ✓ SUCCESS: System bundle now trusts your certificate!
 Restarting Traefik...
-WARN[0010] StopSignal SIGTERM failed to stop container traefik in 10 seconds, resorting to SIGKILL 
+WARN[0010] StopSignal SIGTERM failed to stop container traefik in 10 seconds, resorting to SIGKILL
 traefik
 traefik
 7ca33df28db75aec091abf01850c21eca9b226f27e430ece68c43300772c0e48
@@ -108,28 +108,32 @@ traefik
 === Done! ===
 Test now with: curl -v https://grafana.localhost
 ```
-    
+
 4.  Check the status:
 ```bash
 $ podman ps -a
-CONTAINER ID  IMAGE                                                   COMMAND               CREATED            STATUS                        PORTS                                                             NAMES
-411ab6d1f4f7  docker.io/minio/minio:latest                            server /data --co...  About an hour ago  Up About an hour (healthy)    9000/tcp                                                          minio
-59245bcf1e80  quay.io/prometheus/node-exporter:v1.10.0                --path.rootfs=/ho...  About an hour ago  Up About an hour              9100/tcp                                                          node-exporter
-2cc393300009  quay.io/navidys/prometheus-podman-exporter:latest                             About an hour ago  Up About an hour              9882/tcp                                                          podman-exporter
-475d18b9a8be  quay.io/prometheus/prometheus:v3.9.0                    --config.file=/et...  About an hour ago  Up About an hour              9090/tcp                                                          prometheus
-12261d191511  quay.io/prometheus/alertmanager:v0.28.0                 --config.file=/et...  About an hour ago  Up About an hour              9093/tcp                                                          alertmanager
-1e64f1268d9f  docker.io/grafana/alloy:latest                          run --server.http...  About an hour ago  Up About an hour                                                                                alloy
-390b37cb9743  quay.io/prometheus/blackbox-exporter:latest             --config.file=/co...  About an hour ago  Up About an hour              9115/tcp                                                          blackbox-exporter
-497bbec4217b  docker.io/tarampampam/webhook-tester:latest             start                 About an hour ago  Up About an hour                                                                                webhook-tester
-80f9359c878a  docker.io/library/nginx:alpine                          nginx -g daemon o...  About an hour ago  Up About an hour              80/tcp                                                            nginx
-e5f5b6b8b678  docker.io/keinstien/atlas:latest                        /config/scripts/a...  About an hour ago  Up About an hour              8888-8889/tcp                                                     atlas
-f6b48cc5b314  docker.io/minio/mc:latest                                                     About an hour ago  Exited (0) About an hour ago                                                                    minio-init
-261032e096aa  ghcr.io/prymitive/karma:latest                                                About an hour ago  Up About an hour              8080/tcp                                                          karma
-5912702e7961  docker.io/grafana/loki:3.3.2                            -config.file=/etc...  About an hour ago  Up About an hour              3100/tcp                                                          loki
-5715a625d745  docker.io/grafana/tempo:2.10.1                          -config.file=/etc...  About an hour ago  Up About an hour                                                                                tempo
-3897dfef2e21  docker.io/otel/opentelemetry-collector-contrib:0.119.0  --config=/etc/ote...  About an hour ago  Up About an hour              4317-4318/tcp, 55678-55679/tcp                                    otel-collector
-5993dbcb16b1  docker.io/grafana/grafana:12.3.0                                              About an hour ago  Up About an hour              3000/tcp                                                          grafana
-f440114ea928  docker.io/library/traefik:v3.6.8                        traefik               26 minutes ago     Up 26 minutes                 0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:4317->4317/tcp  traefik
+CONTAINER ID  IMAGE                                                   COMMAND               CREATED             STATUS                         PORTS                                                             NAMES
+81c55c7b7b20  docker.io/keinstien/atlas:latest                        /config/scripts/a...  About an hour ago   Up About an hour               8888-8889/tcp                                                     atlas
+b5536a098b7e  quay.io/prometheus/alertmanager:v0.28.0                 --config.file=/et...  2 minutes ago       Up About a minute              9093/tcp                                                          alertmanager
+b478ebb079ff  docker.io/grafana/alloy:latest                          run --server.http...  About a minute ago  Up About a minute                                                                                alloy
+2db9b9c31c50  quay.io/prometheus/blackbox-exporter:latest             --config.file=/co...  About a minute ago  Up About a minute              9115/tcp                                                          blackbox-exporter
+61f157adda08  docker.io/library/postgres:15-alpine                    postgres              About a minute ago  Up About a minute              5432/tcp                                                          keep-db
+b90a191fdb53  docker.io/minio/minio:latest                            server /data --co...  About a minute ago  Up About a minute (healthy)    9000/tcp                                                          minio
+6ce421121e8c  docker.io/library/nginx:alpine                          nginx -g daemon o...  About a minute ago  Up About a minute              80/tcp                                                            nginx
+b40b4061707b  quay.io/prometheus/node-exporter:v1.10.0                --path.rootfs=/ho...  About a minute ago  Up About a minute              9100/tcp                                                          node-exporter
+9cb5fe5819be  quay.io/navidys/prometheus-podman-exporter:latest                             About a minute ago  Up About a minute              9882/tcp                                                          podman-exporter
+47af223a3811  quay.io/prometheus/prometheus:v3.9.0                    --config.file=/et...  About a minute ago  Up About a minute              9090/tcp                                                          prometheus
+ff3e519deb50  docker.io/library/traefik:v3.6.8                        traefik               About a minute ago  Up About a minute              0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:4317->4317/tcp  traefik
+d92ba13741a4  docker.io/tarampampam/webhook-tester:latest             start                 About a minute ago  Up About a minute                                                                                webhook-tester
+0c397453f09d  ghcr.io/prymitive/karma:latest                                                About a minute ago  Up About a minute              8080/tcp                                                          karma
+e9e57fd6811a  us-central1-docker.pkg.dev/keephq/keep/keep-api:latest  gunicorn keep.api...  About a minute ago  Up About a minute                                                                                keep-backend
+1ba34c8c09a9  docker.io/minio/mc:latest                                                     About a minute ago  Exited (0) About a minute ago                                                                    minio-init
+e6a565f95207  us-central1-docker.pkg.dev/keephq/keep/keep-ui:latest                         About a minute ago  Up About a minute              3000/tcp                                                          keep-frontend
+4c90e80ed34d  docker.io/grafana/loki:3.3.2                            -config.file=/etc...  About a minute ago  Up About a minute              3100/tcp                                                          loki
+d534e21614ab  docker.io/grafana/tempo:2.10.1                          -config.file=/etc...  About a minute ago  Up About a minute                                                                                tempo
+c86d4f4e183f  docker.io/otel/opentelemetry-collector-contrib:0.119.0  --config=/etc/ote...  About a minute ago  Up About a minute              4317-4318/tcp, 55678-55679/tcp                                    otel-collector
+7ae579e9db9e  docker.io/grafana/grafana:12.3.0                                              About a minute ago  Up About a minute              3000/tcp                                                          grafana
+
 ```
 note: The minio-init container only runs when starting minio.
 
@@ -217,7 +221,7 @@ The Explore mode provides an advanced interface for ad-hoc analysis and troubles
 
 **Loki logs explore**
 
- The Loki datasource combined with LogQL makes it possible to efficiently filter log streams by labels, search for specific text patterns or regular expressions, and visualize log volumes alongside raw log lines. 
+ The Loki datasource combined with LogQL makes it possible to efficiently filter log streams by labels, search for specific text patterns or regular expressions, and visualize log volumes alongside raw log lines.
 ![Loki-explore](/images/explore-logs.png)
 
 **Prometheus metrics explore**
@@ -263,7 +267,7 @@ Grafana Alerting
 
 #### Grafana datasources
 
-Datasources in Grafana serve as the technical interface to the underlying data storage systems, allowing the application to retrieve data without persisting it itself. In this configuration, Prometheus, Loki and Tempo are defined as the primary sources for exposing metrics, log files and distributed traces, respectively. 
+Datasources in Grafana serve as the technical interface to the underlying data storage systems, allowing the application to retrieve data without persisting it itself. In this configuration, Prometheus, Loki and Tempo are defined as the primary sources for exposing metrics, log files and distributed traces, respectively.
 ![grafana-datasources](./images/grafana-datasource.png)
 
 The datasources for Prometheus, Loki and Tempo are configured in [./grafana-provisioning/dashboards/dashboard.yaml](./grafana-provisioning/datasources/datasources.yaml)
