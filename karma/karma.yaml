@@ -1,0 +1,142 @@
+# karma.yaml
+
+alertmanager:
+  interval: 15s
+  servers:
+    - name: Fedora-Alerts
+      uri: http://alertmanager:9093
+        # DeadMansSwitch for all prometheus instances
+      healthcheck:
+        filters:
+          prometheus-watchdog:
+            - alertname=Watchdog
+          loki-watchdog:
+            - alertname=LokiWatchdog
+      timeout: 10s
+      proxy: false
+
+log:
+  config: true
+  level: info
+  format: text
+  requests: false
+  timestamp: true
+
+# enable reading alert history from prometheus
+history:
+  enabled: true
+  timeout: 20s
+  workers: 30
+  rewrite:
+    - source: '(.*)'
+      uri: 'http://prometheus:9090'
+
+labels:
+  strip:
+    - "@receiver"  
+  color:
+    custom:
+      severity:
+        - value: critical
+          color: "#e74c3c" # Red
+        - value: warning
+          color: "#f39c12" # Orange
+        - value: none
+          color: "#95a5a6" # Gray
+        - value: info
+          color: "#3498db" # Blue
+        - value: error
+          color: "#cc0000" # Dark Red
+        - value_re: ".*"
+          color: "#ffff00" # Yellow
+      job:
+        - value: prometheus
+          color: "#ef4444" # Red
+        - value: node-exporter
+          color: "#10b981" # Emerald
+        - value: podman-exporter
+          color: "#f59e0b" # Amber
+        - value: alertmanager
+          color: "#3b82f6" # Blue
+        - value: grafana
+          color: "#f97316" # Orange
+        - value: loki
+          color: "#8b5cf6" # Violet
+        - value: alloy
+          color: "#06b6d4" # Cyan
+        - value: karma
+          color: "#d946ef" # Fuchsia
+        - value: blackbox-http
+          color: "#84cc16" # Lime
+        - value: blackbox_exporter
+          color: "#22c55e" # Green
+        - value: tempo
+          color: "#0ea5e9" # Sky Blue
+        - value: otel-collector
+          color: "#6366f1" # Indigo
+        - value: minio
+          color: "#ec4899" # Pink
+        - value: minio-job-bucket
+          color: "#f43f5e" # Rose
+        - value: minio-job-node
+          color: "#14b8a6" # Teal
+        - value: minio-job-resource
+          color: "#64748b" # Slate
+        - value: traefik
+          color: "#38bdf8" # Light Sky Blue
+        - value: keep
+          color: "#94a3b8" # Light Slate
+        - value_re: ".*"
+          color: "#d1d1e0" # Default fallback
+    unique:
+      - alertname
+      - channel
+      - container
+      - container_name
+      - container_id
+      - destination
+      - cluster
+      - instance
+      - job
+      - label
+      - message
+      - name
+      - namespace
+      - node
+      - pod
+      - pod_name
+      - pod_id
+      - project
+      - reset
+      - upstream
+      - url
+
+receivers:
+  strip:
+    - keep
+  keep:
+    - web-hook
+
+ui:
+  refresh: 20s
+  hideFiltersWhenIdle: true
+  animations: true
+  colorTitlebar: false
+  minimalGroupWidth: 420
+  alertsPerGroup: 5
+  collapseGroups: collapsedOnMobile
+  multiGridLabel: severity
+  multiGridSortReverse: false
+
+grid:
+  sorting:
+    order: label
+    reverse: false
+    label: severity
+    customValues:
+      labels:
+        severity:
+          critical: 1
+          error: 2
+          warning: 3
+          info: 4
