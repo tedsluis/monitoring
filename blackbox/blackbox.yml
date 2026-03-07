@@ -3,9 +3,40 @@ modules:
     prober: http
     timeout: 5s
     http:
-      valid_status_codes: [200, 201, 202, 204,301] 
+      valid_status_codes: [200, 201, 202, 204, 301, 302, 307, 308] 
       method: GET
-      no_follow_redirects: false
+      follow_redirects: true
       fail_if_ssl: false
       fail_if_not_ssl: false
+      preferred_ip_protocol: "ip4"
+
+  http_keep_api:
+    prober: http
+    timeout: 5s
+    http:
+      valid_status_codes: [200, 201, 202, 204]
+      method: GET
+      headers:
+        x-api-key: "585af6cc-5c07-427f-966f-a263473ad402"
+      follow_redirects: true
+      fail_if_ssl: false
+      fail_if_not_ssl: false
+      preferred_ip_protocol: "ip4"
+
+  http_keep_ui:
+    prober: http
+    timeout: 5s
+    http:
+      # Voor frontend accepteren we ook redirects en auth meldingen (30x, 401, 403)
+      valid_status_codes: [200, 201, 202, 204, 301, 302, 307, 308, 401, 403]
+      method: GET
+      follow_redirects: false
+      fail_if_ssl: false
+      fail_if_not_ssl: false
+      preferred_ip_protocol: "ip4"
+
+  tcp_connect:
+    prober: tcp
+    timeout: 5s
+    tcp:
       preferred_ip_protocol: "ip4"

@@ -92,6 +92,54 @@ scrape_configs:
       - target_label: __address__
         replacement: blackbox-exporter:9115
 
+  # Keep API HTTP probe with custom header
+  - job_name: 'blackbox-keep-api'
+    metrics_path: /probe
+    params:
+      module: [http_keep_api]
+    static_configs:
+      - targets:
+        - http://keep-backend:8080/metrics/processing
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+
+  # Keep Frontend HTTP probe
+  - job_name: 'blackbox-keep-ui'
+    metrics_path: /probe
+    params:
+      module: [http_keep_ui]
+    static_configs:
+      - targets:
+        - http://keep-frontend:3000/
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+
+  # TCP probe Postgres Database
+  - job_name: 'blackbox-tcp'
+    metrics_path: /probe
+    params:
+      module: [tcp_connect]
+    static_configs:
+      - targets:
+        - keep-db:5432
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+
   - job_name: 'blackbox_exporter'
     static_configs:
       - targets: ['blackbox-exporter:9115']
