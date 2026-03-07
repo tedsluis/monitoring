@@ -17,6 +17,10 @@ route:
       continue: true
 
     - receiver: 'web-hook'
+      group_by: ['alertname']
+      group_wait: 30s
+      group_interval: 30s
+      repeat_interval: 1h
 
 receivers:
 - name: "keep"
