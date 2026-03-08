@@ -30,6 +30,7 @@ The stack consists of the following services:
 | Blackbox          |  9115 | Performs HTTP/TCP health probes.                 |
 | Grafana           |  3000 | Dashboards and visualization.                    |
 | Karma             |  8080 | UI dashboard for Alertmanager notifications.     |
+| KeepHQ            |  3000 |                                                  |
 | Loki              |  3100 | Log aggregation (via MinIO S3).                  |
 | MinIO             |  9000 | S3 Object Storage API.                           |
 | MinIO Console     |  9001 | Web interface for storage management.            |
@@ -37,6 +38,7 @@ The stack consists of the following services:
 | Node-exporter     |  9100 | Host metrics collector.                          |
 | OpenTelemetry     |  8888 | Open Telemetry Collector.                        |
 | podman-exporter   |  9882 | podman metrics collector.                        |
+| postgres          |       | KeepHQ database                                  |
 | Prometheus        |  9090 | Time-series database for metrics.                |
 | Tempo             |  3200 | Distributed Tracing backend (via MinIO S3).      |
 | Traefik           |   443 | Reverse proxy.                                   |

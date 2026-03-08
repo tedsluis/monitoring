@@ -163,25 +163,23 @@ services:
     depends_on:
       - keep-db
     environment:
-      - DISABLE_POSTHOG=true
-      - LOG_LEVEL=DEBUG
-      - KEEP_APP_LOG_LEVEL=DEBUG
       # Database connectie
       - DATABASE_CONNECTION_STRING=postgresql://keep:keep@keep-db:5432/keep
-      - SECRET_MANAGER_TYPE=FILE
-      - SECRET_MANAGER_DIRECTORY=/state
+      - DISABLE_POSTHOG=true
+      - ENABLE_AI=true
+      - LOG_LEVEL=DEBUG
+      - KEEP_APP_LOG_LEVEL=DEBUG
       - KEEP_API_URL=https://keep-api.localhost
       - KEEP_API_KEY=585af6cc-5c07-427f-966f-a263473ad402
-      - PORT=8080
-      # --- AI Configuratie ---
-      # Verwijs naar je host machine vanuit de container via host.containers.internal
-      # Pas de poort aan als je vLLM of LM Studio (bijv. 1234 of 8000) gebruikt.
-      - OPENAI_API_BASE=http://host.containers.internal:11434/v1
-      - OPENAI_API_KEY=dummy-key # Verplicht voor de OpenAI library, ook al checkt je lokale LLM dit niet.
-      
-      # Optioneel: specificeer je lokale modelnaam (bijv. llama3, mistral, of qwen)
-      # - OPENAI_MODEL=llama3
       - KEEP_PROVIDERS_DIRECTORY=/config/providers
+      - KEEP_ENABLE_AI=true
+      - PORT=8080
+      - SECRET_MANAGER_TYPE=FILE
+      - SECRET_MANAGER_DIRECTORY=/state
+      # --- AI Configuratie ---
+      - OPENAI_BASE_URL=http://host.containers.internal:8111/v1
+      - OPENAI_API_KEY=dummy-key
+      - OPENAI_MODEL_NAME=gpt-5.1
       - PROMETHEUS_MULTIPROC_DIR=/prometheus_multiproc_dir
     volumes:
       - keep-state:/state:Z
@@ -206,8 +204,14 @@ services:
       - keep-backend
     environment:
       - API_URL=http://keep-backend:8080
+      - ENABLE_AI=true
+      - KEEP_ENABLE_AI=true
       - NEXTAUTH_URL=https://keep.localhost
       - NEXTAUTH_SECRET=keep # Pas dit aan voor een eigen veilige string
+      # --- AI Configuratie ---
+      - OPENAI_BASE_URL=http://host.containers.internal:8111/v1
+      - OPENAI_API_KEY=dummy-key
+      - OPENAI_MODEL_NAME=gpt-5.1
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.keep-ui.rule=Host(`keep.localhost`)"
