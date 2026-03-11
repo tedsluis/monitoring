@@ -1,51 +1,94 @@
-# Full Stack monitoring with Prometheus, Loki, Tempo and Grafana
-## Fedora Workstation & Podman Rootless
+# Full Stack Observability & Monitoring Platform
+## An Educational Lab for Prometheus, Loki, Tempo, Grafana, and Alerting
 
-This repository contains a complete observability stack, optimized for Fedora Workstation with rootless Podman. The stack combines metrics, logs and traces into one integrated environment with Grafana as the frontend.
-
-## Features
-
--   Metrics: Prometheus (v3.9) with Node Exporter & Podman Exporter.
--   Logs: Grafana Loki (v3.3) with storage on MinIO (S3).
--   Traces: Grafana Tempo (v2.10) with OpenTelemetry.
--   Grafana: (v12.3) as frontend for metrics, logging and tracing.
--   Grafana Dashboards and Datasources are automatically loaded (IaC).
--   Collection: Alloy and OpenTelemetry collector for collecting container and journald logs.
--   Storage: MinIO (S3 compatible) for long-term, efficient storage of logs and traces.
--   Alerting: Prometheus Alertmanager connected to Karma (alert dashboard) and Blackbox Exporter (health checks).
--   Karma: Dashboard for alerts.
--   Reverse proxy with TLS encryption: Traefik proxy with self-signed certificate.
--   Static webpage: NGINX.
--   Security: Fully compatible with SELinux and runs rootless (with specific fixes for socket access).
--   webhook-tester: receives alerts from alertmanager for inspection.
-
-## Architecture
-
-The stack consists of the following services:
-
-| Service           | Poort | Beschrijving                                     |
-|-------------------|-------|--------------------------------------------------|
-| Alertmanager      |  9093 | Processes and routes alerts.                     |
-| Alloy             | 12345 | Collector for logs (journald and podman logs).   |
-| Blackbox          |  9115 | Performs HTTP/TCP health probes.                 |
-| Grafana           |  3000 | Dashboards and visualization.                    |
-| Karma             |  8080 | UI dashboard for Alertmanager notifications.     |
-| KeepHQ            |  3000 |                                                  |
-| Loki              |  3100 | Log aggregation (via MinIO S3).                  |
-| MinIO             |  9000 | S3 Object Storage API.                           |
-| MinIO Console     |  9001 | Web interface for storage management.            |
-| NGINX             |    80 | Start page.                                      |
-| Node-exporter     |  9100 | Host metrics collector.                          |
-| OpenTelemetry     |  8888 | Open Telemetry Collector.                        |
-| podman-exporter   |  9882 | podman metrics collector.                        |
-| postgres          |       | KeepHQ database                                  |
-| Prometheus        |  9090 | Time-series database for metrics.                |
-| Tempo             |  3200 | Distributed Tracing backend (via MinIO S3).      |
-| Traefik           |   443 | Reverse proxy.                                   |
-| webhook-tester    |  5001 | Webhooks inspectie.                              |
+This repository contains a complete, production-like observability stack optimized for Fedora Workstation with rootless Podman. It is designed as an educational environment to help Developers and DevOps Engineers understand how modern monitoring tools interlock to provide comprehensive metrics, logging, tracing, and alerting capabilities.
 
 Diagram
 ![diagram](./images/diagram.png)
+
+## Table of Contents
+
+1. Educational Benefits
+2. Architecture & Data Flow
+3. Tooling & Functionality
+4. Prerequisites
+5. Installation & Startup
+6. Usage & Exploration (Screenshots)
+7. Configuration & Directory Structure
+8. Teardown & Cleanup
+
+## Educational Benefits
+
+Why use this stack? This environment is built to teach you:
+
+- **The Three Pillars of Observability**: How to seamlessly connect Metrics (Prometheus), Logs (Loki), and Traces (Tempo).
+- **Contextual Drill-down**: How to configure Grafana datasources so you can jump directly from a spike in a metric to the specific log line, and then to the exact application trace.
+- **Modern Collection**: Using Grafana Alloy and OpenTelemetry Collector as modern, vendor-neutral data pipelines.
+- **S3-Compatible Storage**: How Loki and Tempo use MinIO object storage for scalable, long-term data retention instead of local disks.
+- **Advanced Alerting Routing**: The flow of an alert from Prometheus -> Alertmanager -> KeepHQ / Karma / Webhook-tester.
+- **Secure Local Networking**: Running a complex stack via Traefik Reverse Proxy with TLS/SSL on local `.localhost` domains using rootless Podman.
+
+## Architecture & Data Flow
+
+The stack is designed around specific data flows:
+- **Metrics Flow**: Node-exporter, Podman-exporter, and Blackbox-exporter expose metrics -> Prometheus scrapes them -> Grafana visualizes them.
+- **Logging Flow**: System (journald) and Container logs -> Grafana Alloy collects them -> Pushed to Loki -> Stored in MinIO -> Visualized in Grafana.
+- **Tracing Flow**: Application traces -> OpenTelemetry Collector -> Pushed to Tempo -> Stored in MinIO -> Visualized in Grafana.
+- **Alerting Flow**: Prometheus evaluates alert.rules.yml -> Fires to Alertmanager -> Alertmanager routes to Karma (UI), KeepHQ (AIOps), and Webhook-tester.
+
+## Service Port Map
+
+| Service         | Internal Port | Public URL                          | Description                              |
+|-----------------|---------------|-------------------------------------|------------------------------------------|
+| Nginx           | 80            | https://localhost                   | Landing page portal                      |
+| Traefik         | 443 / 8082    | https://traefik.localhost           | Reverse proxy & Ingress routing          |
+| Grafana         | 3000          | https://grafana.localhost           | Main visualization & Dashboard UI        |
+| Prometheus      | 9090          | https://prometheus.localhost        | Time-series database                     |
+| Loki            | 3100          | https://loki.localhost              | Log aggregation engine                   |
+| Tempo           | 3200          | https://tempo.localhost             | Distributed Tracing backend              |
+| MinIO           | 9000 / 9001   | https://minio.localhost             | S3 Object Storage for Loki & Tempo       |
+| Alloy           | 12345         | https://alloy.localhost             | Log collection pipeline                  |
+| OTel Collector  | 4317 / 8888   | https://otel-collector.localhost    | Trace collection pipeline                |
+| Alertmanager    | 9093          | https://alertmanager.localhost      | Alert routing and deduplication          |
+| Karma           | 8080          | https://karma.localhost             | Alert visualization dashboard            |
+| KeepHQ          | 3000 / 8080   | https://keep.localhost              | Open-source AIOps and alert management   |
+| Webhook Tester  | 8080          | https://webhook-tester.localhost    | Endpoint for inspecting webhook payloads |
+| node-exporter   | 9100          | https://node-exporter.localhost     | Host metrics                             |
+| podman-exporter | 9882          | https://podman-exporter.localhost   | Container metrics                        |
+| Blackbox        | 9115          | https://blackbox-exporter.localhost | HTTP/TCP endpoint probe                  |
+
+
+## Tooling & Functionality
+
+**1. Visualization & Portal**
+   * Nginx (Portal): Serves as a static, central hub linking to all services and endpoints.
+   * Grafana (v12.3): The 'single pane of glass'. Dashboards and Datasources are loaded automatically via Infrastructure as Code (IaC).
+
+**2. Metrics (The "What is happening?")**
+   * Prometheus: Scrapes targets, stores time-series data, and evaluates alert rules.
+   * Exporters:
+     * Node Exporter: Collects host hardware and OS metrics.
+     * Podman Exporter: Collects metrics from rootless Podman containers.
+     * Blackbox Exporter: Probes endpoints over HTTP/TCP to monitor uptime.
+
+**3. Logging (The "Why is it happening?")**
+   * Grafana Loki: Highly efficient log aggregation system. Uses MinIO for storage.
+   * Grafana Alloy: The collector that reads journald and /var/run/podman.sock (Podman) and pushes logs to Loki.
+
+**4. Tracing (The "Where is it happening?")**
+   * Grafana Tempo: High-scale distributed tracing backend. Uses MinIO for storage.
+   * OpenTelemetry (OTel) Collector: Receives OTLP traces and forwards them to Tempo.
+
+**5. Storage & Infrastructure**
+   * MinIO: S3-compatible storage providing scalable object storage for Tempo and Loki data.
+   * PostgreSQL: Relational database backend for KeepHQ.
+   * Traefik: Reverse proxy that acts as the entry point, handling routing and TLS termination for all .localhost domains.
+
+**6. Alerting & AIOps**
+   * Alertmanager: Groups, routes, and throttles alerts from Prometheus and Loki.
+   * Karma: A clean, concise dashboard for viewing Alertmanager alerts.
+   * KeepHQ: Centralized alert management and AIOps platform.
+   * Webhook Tester: A simple tool to view the raw JSON payloads Alertmanager sends out.
 
 ## Prerequisites
 
@@ -53,28 +96,29 @@ Diagram
 -   Tools: podman and podman-compose.
 -   Podman Socket: The user socket must be active for the Podman Exporter and Alloy.
 
+Install requirements:
 ```bash
-# Install requirements\
-sudo dnf install podman podman-compose -y
-
-# Activate the Podman socket for your user (Rootless)\
-systemctl --user enable --now podman.socket
-
-# Check if the socket works
-ls -l /run/user/$(id -u)/podman/podman.sock
-
-# Enable using port 80
-sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
-net.ipv4.ip_unprivileged_port_start = 80
-echo "net.ipv4.ip_unprivileged_port_start=80" | sudo tee /etc/sysctl.d/99-rootless-ports.conf
-net.ipv4.ip_unprivileged_port_start=80
+   # Install packages
+   sudo dnf install podman podman-compose -y
+   
+   # Activate the Podman socket for your user (Rootless)\
+   systemctl --user enable --now podman.socket
+   
+   # Check if the socket works
+   ls -l /run/user/$(id -u)/podman/podman.sock
+   
+   # Enable using port 80
+   sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
+   net.ipv4.ip_unprivileged_port_start = 80
+   echo "net.ipv4.ip_unprivileged_port_start=80" | sudo tee /etc/sysctl.d/99-rootless-ports.conf
+   net.ipv4.ip_unprivileged_port_start=80
 ```
 
 ## Installation & Startup
 
 1.  Clone the repository:
 ```bash
-    git clone https://github.com/tedsluis/monitoring.git\
+    git clone https://github.com/tedsluis/monitoring.git
     cd monitoring
 ```
 
@@ -84,36 +128,37 @@ net.ipv4.ip_unprivileged_port_start=80
 ```
 The first time, the `minio-init` container will automatically create the required buckets (`loki-data` and `tempo-data`).
 
-3. Create certificate and trust CA:
+3. Generate Local TLS Certificates:
+To ensure secure connections (https://*.localhost) without browser warnings, run the certificate script. This generates a local CA and adds it to your Fedora Trust Store.
 ```bash
-$ ./renew-certs.sh
-=== Start Certificate Renewal (Version 3.2) ===
-Cleaning up old files...
-Generating SAN configuration...
-Generating Root CA...
-...+++++++++++++++++++++++++++++++++++++++*.....+....+...+..+.+....................+.......+...+++++++++++++++++++++++++++++++++++++++*.....+.......+.........+........++++++
-...+.....+++++++++++++++++++++++++++++++++++++++*...+......+...+..+....+......+......+..+.............+..+.+......+++++++++++++++++++++++++++++++++++++++*....+.........+......+.+..................+..+...................+.........+.....+....+..+.+.........+........+.+..+....+......+.........+......+...+.........+..+.............+.....+.......+........+......+.........+.......+......+..+.......+...+............+......+........+.........+...+....+........+.+..+...+.......+.....+....+...+..+..........+......+..+.+.........+..+........................+.......+...+..+.......+..+...+...+............+.+......+...+............+.....+.+.....+....+........+......+....+........+...+..........+......+...........+..........+.................++++++
------
-Generating Server Certificate...
-Certificate request self-signature ok
-subject=C=NL, ST=Utrecht, L=Utrecht, O=Bachstraat, OU=Home, CN=*.localhost
-Fixing permissions (chmod 644)...
-Updating Fedora Trust Store...
-Checking if System Bundle trusts the certificate...
-✓ SUCCESS: System bundle now trusts your certificate!
-Restarting Traefik...
-WARN[0010] StopSignal SIGTERM failed to stop container traefik in 10 seconds, resorting to SIGKILL
-traefik
-traefik
-7ca33df28db75aec091abf01850c21eca9b226f27e430ece68c43300772c0e48
-traefik
-=== Done! ===
-Test now with: curl -v https://grafana.localhost
+   ./renew-certs.sh
+   === Start Certificate Renewal (Version 3.2) ===
+   Cleaning up old files...
+   Generating SAN configuration...
+   Generating Root CA...
+   ...+++++++++++++++++++++++++++++++++++++++*.....+....+...+..+.+....................+.......+...+++++++++++++++++++++++++++++++++++++++*.....+.......+.........+........++++++
+   ...+.....+++++++++++++++++++++++++++++++++++++++*...+......+...+..+....+......+......+..+.............+..+.+......+++++++++++++++++++++++++++++++++++++++*....+.........+......+.+..................+..+...................+.........+.....+....+..+.+.........+........+.+..+....+......+.........+......+...+.........+..+.............+.....+.......+........+......+.........+.......+......+..+.......+...+............+......+........+.........+...+....+........+.+..+...+.......+.....+....+...+..+..........+......+..+.+.........+..+........................+.......+...+..+.......+..+...+...+............+.+......+...+............+.....+.+.....+....+........+......+....+........+...+..........+......+...........+..........+.................++++++
+   -----
+   Generating Server Certificate...
+   Certificate request self-signature ok
+   subject=C=NL, ST=Utrecht, L=Utrecht, O=Bachstraat, OU=Home, CN=*.localhost
+   Fixing permissions (chmod 644)...
+   Updating Fedora Trust Store...
+   Checking if System Bundle trusts the certificate...
+   ✓ SUCCESS: System bundle now trusts your certificate!
+   Restarting Traefik...
+   WARN[0010] StopSignal SIGTERM failed to stop container traefik in 10 seconds, resorting to SIGKILL
+   traefik
+   traefik
+   7ca33df28db75aec091abf01850c21eca9b226f27e430ece68c43300772c0e48
+   traefik
+   === Done! ===
+   Test now with: curl -v https://grafana.localhost
 ```
 
 4.  Check the status:
 ```bash
-$ podman ps -a
+podman ps -a
 CONTAINER ID  IMAGE                                                   COMMAND               CREATED             STATUS                         PORTS                                                             NAMES
 81c55c7b7b20  docker.io/keinstien/atlas:latest                        /config/scripts/a...  About an hour ago   Up About an hour               8888-8889/tcp                                                     atlas
 b5536a098b7e  quay.io/prometheus/alertmanager:v0.28.0                 --config.file=/et...  2 minutes ago       Up About a minute              9093/tcp                                                          alertmanager
@@ -142,20 +187,20 @@ note: The minio-init container only runs when starting minio.
 ## Stop, start or restart
 
 ```bash
-# stop all containers
-podman-compose down
-
-# start all containers
-podman-compose up -d
-
-# restart all containers
-podman-compose down && podman-compose up -d
-
-# restart a specific container and include changes from compose.yaml
-podman-compose up -d --force-recreate webhook-tester
-
-# restart a specific container without applying compose.yaml changes
-podman restart webhook-tester
+   # stop all containers
+   podman-compose down
+   
+   # start all containers
+   podman-compose up -d
+   
+   # restart all containers
+   podman-compose down && podman-compose up -d
+   
+   # restart a specific container and include changes from compose.yaml
+   podman-compose down webhook-tester && podman-compose up -d --force-recreate webhook-tester
+   
+   # restart a specific container without applying compose.yaml changes
+   podman restart webhook-tester
 ```
 
 ## Configuration
@@ -239,7 +284,7 @@ The Tempo datasource combined with TraceQL provides a detailed visualization of 
 
 To manually test the proxy path by sending a traceparent header, run this command in your terminal:
 ```bash
- curl -k -H "traceparent: 00-11112222333344445555666677778888-1111222233334444-01" https://grafana.localhost/api/health
+   curl -k -H "traceparent: 00-11112222333344445555666677778888-1111222233334444-01" https://grafana.localhost/api/health
 ```
 Next, in Grafana, go to Tempo Explore and search for the exact Trace ID: 11112222333344445555666677778888.
 If propagation works, you'll see a beautiful trace tree with the Traefik span at the top and the Grafana span below.
@@ -397,31 +442,31 @@ Treafik dashboard
 ## Remove everything
 
 ```bash
-# stop all containers
-$ podman-compose down
-
-# show volumes
-$ podman volume ls | grep monitoring
-local       monitoring_prometheus-data
-local       monitoring_loki-wal
-local       monitoring_tempo-wal
-local       monitoring_minio-data
-local       monitoring_grafana-data
-
-# remove volumes
-$ podman volume rm monitoring_prometheus-data monitoring_loki-wal monitoring_tempo-wal monitoring_minio-data monitoring_grafana-data
-
-# remove certificates
-$ rm /etc/pki/ca-trust/source/anchors/my-local-ca.pem
-$ rm /etc/pki/ca-trust/source/anchors/my-local-ca.crt
-$ sudo update-ca-trust extract
-
-# disable podman socket
-$ systemctl --user disable --now podman.socket
-
-# remove rootless ports
-sudo rm /etc/sysctl.d/99-rootless-ports.conf
-
-# remove monitoring repo
-$ rm -rf REPONAME
+   # stop all containers
+   podman-compose down
+   
+   # show volumes
+   podman volume ls | grep monitoring
+   local       monitoring_prometheus-data
+   local       monitoring_loki-wal
+   local       monitoring_tempo-wal
+   local       monitoring_minio-data
+   local       monitoring_grafana-data
+   
+   # remove volumes
+   podman volume rm monitoring_prometheus-data monitoring_loki-wal monitoring_tempo-wal monitoring_minio-data monitoring_grafana-data
+   
+   # remove certificates
+   rm /etc/pki/ca-trust/source/anchors/my-local-ca.pem
+   rm /etc/pki/ca-trust/source/anchors/my-local-ca.crt
+   sudo update-ca-trust extract
+   
+   # disable podman socket
+   systemctl --user disable --now podman.socket
+   
+   # remove rootless ports
+   sudo rm /etc/sysctl.d/99-rootless-ports.conf
+   
+   # remove monitoring repo
+   rm -rf REPONAME
 ```
