@@ -767,7 +767,7 @@ groups:
           severity: warning
         annotations:
           summary: "MinIO Disk Offline"
-          description: "Een disk in MinIO is niet bereikbaar."
+          description: "A disk in MinIO is not available."
 
   - name: tempo_alerts
     rules:
@@ -778,5 +778,5 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "Service {{ $labels.service }} is traag"
-          description: "De 95e percentiel latency van traces is hoger dan 2s."
+          summary: "Service {{ $labels.service }} is slow."
+          description: "The 95th percentile latency of traces is higher than 2s."

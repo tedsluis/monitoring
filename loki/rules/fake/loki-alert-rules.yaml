@@ -5,12 +5,12 @@ groups:
       - alert: CriticalErrorInLogs
         # Count the number of lines with "panic" or "fatal" per minute. If > 0, then alarm.
         expr: count_over_time({job="podman-containers"} |= "panic" [1m]) > 0
-        for: 0m # Direct vuren
+        for: 0m # Fire immediately
         labels:
           severity: critical
         annotations:
-          summary: "Panic gedetecteerd in {{ $labels.container_name }}"
-          description: "De container {{ $labels.container_name }} logt panics/crashes."
+          summary: "Panic detected in {{ $labels.container_name }}"
+          description: "The container {{ $labels.container_name }} is logging panics/crashes."
 
       # Example 2: Alert on high error rate
       - alert: HighErrorRate
@@ -21,12 +21,12 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "Veel errors in {{ $labels.container_name }}"
-          description: "Meer dan 10 errors per minuut gedetecteerd in de logs."
+          summary: "Many errors in {{ $labels.container_name }}"
+          description: "More than 10 errors per minute detected in the logs."
   - name: monitoring_log_alerts
     rules:
       # --- GENERIEKE ERROR CATCHER ---
-      # Dit kijkt naar ALLE containers in de monitoring stack
+      # Checks ALL containers in monitoring stack
       - alert: MonitoringStackErrors
         expr: |
           count_over_time({container_name=~"prometheus|loki|grafana|alertmanager|alloy"} |~ "(?i)error" [2m]) > 10
@@ -34,19 +34,19 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "Veel errors in monitoring stack: {{ $labels.container_name }}"
-          description: "Container {{ $labels.container_name }} logt meer dan 10 errors per 2 minuten."
+          summary: "Many errors in monitoring stack: {{ $labels.container_name }}"
+          description: "Container {{ $labels.container_name }} is logging more than 10 errors per 2 minutes."
 
       # --- SPECIFIEKE LOKI ERROR ---
       - alert: LokiIngestionError
-        # Check specifiek op fouten bij het wegschrijven van chunks
+        # Check for specific op failures while writing chunks
         expr: count_over_time({container_name="loki"} |= "failed to flush" [1m]) > 0
         for: 1m
         labels:
           severity: critical
         annotations:
-          summary: "Loki kan data niet wegschrijven"
-          description: "Loki logt 'failed to flush'. Check disk ruimte of permissies!"
+          summary: "Loki cannot write data"
+          description: "Loki is logging 'failed to flush'. Check disk space or permissions!"
 
       # --- SPECIFIEKE ALLOY ERROR ---
       - alert: AlloyPipelineBlocked
@@ -54,8 +54,8 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "Alloy Pipeline Fout"
-          description: "Een onderdeel van de Alloy pipeline werkt niet goed."
+          summary: "Alloy Pipeline Error"
+          description: "A component of the Alloy pipeline is not working correctly."
   - name: loki_watchdog
     rules:
       # 1. The Standard Watchdog
