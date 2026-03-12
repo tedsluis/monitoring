@@ -451,14 +451,14 @@
         }
 
         async function openKeepMetrics(event) {
-            event.preventDefault(); // Voorkom dat de browser naar '#' navigeert
+            event.preventDefault(); // Prevent the browser navigates to '#'
             
-            // Open alvast een nieuw, leeg tabblad met een laad-berichtje
+            // Open a new, empty tab with a loading message
             const newWindow = window.open('', '_blank');
-            newWindow.document.write('<body style="background: #0f172a; color: #f8fafc; font-family: monospace; padding: 20px;">Laden van metrics...</body>');
+            newWindow.document.write('<body style="background: #0f172a; color: #f8fafc; font-family: monospace; padding: 20px;">Loading metrics...</body>');
             
             try {
-                // Doe het verzoek mèt de juiste API-key header
+                // Make the request with the correct API key header
                 const response = await fetch('https://keep-api.localhost/metrics/processing', {
                     headers: {
                         'x-api-key': '585af6cc-5c07-427f-966f-a263473ad402'
@@ -469,13 +469,13 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                // Lees de metrics tekst uit
+                // Read the metrics text
                 const text = await response.text();
                 
-                // Schrijf de resultaten naar het nieuwe tabblad
+                // Write the results to the new tab
                 newWindow.document.body.innerHTML = '<pre style="white-space: pre-wrap; word-wrap: break-word;">' + text + '</pre>';
             } catch (error) {
-                newWindow.document.body.innerHTML = '<div style="color: #ef4444;">Fout bij het ophalen van metrics: ' + error.message + '</div>';
+                newWindow.document.body.innerHTML = '<div style="color: #ef4444;">Error fetching metrics: ' + error.message + '</div>';
             }
         }
     </script>

@@ -53,7 +53,7 @@ datasources:
           - key: 'job'
             value: 'job'
             
-      # FIX: Enable TraceQL Metrics via Prometheus! 
+      # Enable TraceQL Metrics via Prometheus! 
       # This stops the 500 errors in Grafana Drilldown.
       traceqlMetrics:
         datasourceUid: prometheus

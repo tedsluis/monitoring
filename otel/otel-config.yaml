@@ -10,18 +10,18 @@ processors:
   batch:
 
 exporters:
-  # Stuur Traces naar Tempo
+  # Send Traces to Tempo
   otlp/tempo:
     endpoint: tempo:4317
     tls:
       insecure: true
 
-  # (Optioneel) Logging naar stdout voor debuggen
+  # (Optional) For debugging logging to stdout
   debug:
     verbosity: detailed
 
 service:
-  # Monitor de collector zelf (metrics op poort 8888)
+  # Monitor the collector itself (metrics op poort 8888)
   telemetry:
     metrics:
       address: 0.0.0.0:8888
