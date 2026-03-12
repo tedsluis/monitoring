@@ -599,14 +599,14 @@ groups:
     rules:
       # --- ALLOY ---
       - alert: AlloyUnhealthy
-        # Alloy exposeert 'alloy_component_health' (0=healthy, 1=unhealthy)
+        # Alloy exposes 'alloy_component_health' (0=healthy, 1=unhealthy)
         expr: alloy_component_health == 1
         for: 2m
         labels:
           severity: warning
         annotations:
           summary: "Alloy component ongezond"
-          description: "Component {{ $labels.component_id }} in Alloy rapporteert een error."
+          description: "Component {{ $labels.component_id }} in Alloy reports a error."
 
       - alert: GrafanaAlloyServiceDown
         expr: count by (instance) (alloy_build_info) unless count by (instance) (alloy_build_info offset 2m)  
@@ -772,7 +772,7 @@ groups:
   - name: tempo_alerts
     rules:
       - alert: HighSpanLatency
-        # Alarmeer als 95e percentiel latency > 2s
+        # Warning if 95e percentiel latency > 2s
         expr: histogram_quantile(0.95, sum(rate(traces_spanmetrics_latency_bucket[5m])) by (le, service)) > 2
         for: 2m
         labels:
