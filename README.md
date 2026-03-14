@@ -1,7 +1,7 @@
 # Full Stack Observability & Monitoring Platform
 ## An Educational Lab for Prometheus, Loki, Tempo, Grafana, and Alerting
 
-This repository contains a complete, production-like observability stack optimized for Fedora Workstation with rootless Podman. It is designed as an educational environment to help Developers and DevOps Engineers understand how modern monitoring tools interlock to provide comprehensive metrics, logging, tracing, and alerting capabilities.
+This repository contains a complete, production-like observability stack optimized for Fedora Workstation with rootless Podman. It is designed as an educational environment to help Developers and DevOps Engineers understand how modern monitoring tools interlock to provide comprehensive metrics, logging, tracing, and alerting capabilities. The entire stack is automatically configured upon startup, including pre-provisioned Grafana dashboards, datasources, and alerting rules.
 
 Diagram
 ![diagram](./images/diagram.png)
@@ -10,14 +10,14 @@ Diagram
 
 1. Educational Benefits
 2. Architecture & Data Flow
-3. Tooling & Functionality
-4. Prerequisites
-5. Installation & Startup
-6. Usage & Exploration (Screenshots)
-7. Configuration & Directory Structure
+3. Service Port Map
+4. Tooling & Functionality
+5. Prerequisites
+6. Installation & Startup
+7. Usage & Exploration (Screenshots)
 8. Teardown & Cleanup
 
-## Educational Benefits
+## 1. Educational Benefits
 
 Why use this stack? This environment is built to teach you:
 
@@ -28,7 +28,7 @@ Why use this stack? This environment is built to teach you:
 - **Advanced Alerting Routing**: The flow of an alert from Prometheus -> Alertmanager -> KeepHQ / Karma / Webhook-tester.
 - **Secure Local Networking**: Running a complex stack via Traefik Reverse Proxy with TLS/SSL on local `.localhost` domains using rootless Podman.
 
-## Architecture & Data Flow
+## 2. Architecture & Data Flow
 
 The stack is designed around specific data flows:
 - **Metrics Flow**: Node-exporter, Podman-exporter, and Blackbox-exporter expose metrics -> Prometheus scrapes them -> Grafana visualizes them.
@@ -36,7 +36,7 @@ The stack is designed around specific data flows:
 - **Tracing Flow**: Application traces -> OpenTelemetry Collector -> Pushed to Tempo -> Stored in MinIO -> Visualized in Grafana.
 - **Alerting Flow**: Prometheus evaluates alert.rules.yml -> Fires to Alertmanager -> Alertmanager routes to Karma (UI), KeepHQ (AIOps), and Webhook-tester.
 
-## Service Port Map
+## 3. Service Port Map
 
 | Service         | Internal Port | Public URL                          | Description                              |
 |-----------------|---------------|-------------------------------------|------------------------------------------|
@@ -58,7 +58,7 @@ The stack is designed around specific data flows:
 | Blackbox        | 9115          | https://blackbox-exporter.localhost | HTTP/TCP endpoint probe                  |
 
 
-## Tooling & Functionality
+## 4. Tooling & Functionality
 
 **1. Visualization & Portal**
    * Nginx (Portal): Serves as a static, central hub linking to all services and endpoints.
@@ -90,7 +90,7 @@ The stack is designed around specific data flows:
    * KeepHQ: Centralized alert management and AIOps platform.
    * Webhook Tester: A simple tool to view the raw JSON payloads Alertmanager sends out.
 
-## Prerequisites
+## 5. Prerequisites
 
 -   OS: Fedora Linux (tested on Fedora 43+).
 -   Tools: podman and podman-compose.
@@ -114,21 +114,21 @@ Install requirements:
    net.ipv4.ip_unprivileged_port_start=80
 ```
 
-## Installation & Startup
+## 6. Installation & Startup
 
-1.  Clone the repository:
+### 6.1 Clone the repository
 ```bash
     git clone https://github.com/tedsluis/monitoring.git
     cd monitoring
 ```
 
-2.  Start the stack:
+### 6.2 Start the stack
 ```bash
     podman-compose up -d
 ```
 The first time, the `minio-init` container will automatically create the required buckets (`loki-data` and `tempo-data`).
 
-3. Generate Local TLS Certificates:
+### 6.3 Generate Local TLS Certificates
 To ensure secure connections (https://*.localhost) without browser warnings, run the certificate script. This generates a local CA and adds it to your Fedora Trust Store.
 ```bash
    ./renew-certs.sh
@@ -156,7 +156,7 @@ To ensure secure connections (https://*.localhost) without browser warnings, run
    Test now with: curl -v https://grafana.localhost
 ```
 
-4.  Check the status:
+### 6.4 Check the status
 ```bash
 podman ps -a
 CONTAINER ID  IMAGE                                                   COMMAND               CREATED             STATUS                         PORTS                                                             NAMES
@@ -184,7 +184,7 @@ c86d4f4e183f  docker.io/otel/opentelemetry-collector-contrib:0.119.0  --config=/
 ```
 note: The minio-init container only runs when starting minio.
 
-## Stop, start or restart
+### 6.5 Stop, start or restart
 
 ```bash
    # stop all containers
@@ -203,37 +203,9 @@ note: The minio-init container only runs when starting minio.
    podman restart webhook-tester
 ```
 
-## Configuration
+## 7. Usage
 
-The configuration is divided into folders per component. Thanks to Grafana Provisioning, datasources are automatically loaded.
-
-### Directory structure
-
--   `alertmanager/`: Routing of notifications.
--   `alloy/`: Pipeline configuration for reading journald and the podman.socket.
--   `blackbox/`: Definitions for HTTP health checks.
--   `grafana-provisioning/`: Automatically links Prometheus, Loki, and Tempo to Grafana.
--   `grafana-provisioning/dashboards/json`: Grafana dashboards.
--   `grafana-provisioning/datasources`: automatic datasource configuration.
--   `landing-page/`: index.html and nginx config.
--   `loki/`: Configuration for Loki (S3 backend) and recording rules.
--   `otel`: OpenTelemetry configuration.
--   `prometheus/`: prometheus.yml and alert.rules.yml.
--   `tempo/`: Configuration for Tempo (S3 backend).
--   `traefik/`: traefik.yaml
--   `traefik/certs`: certificates.
--   `traefik/dynamic`: dynamic Traefik configuration.
-
-### Login credentials (Defaults)
-
-| Service | Username | Password | Note                             |
-|---------|----------------|------------|----------------------------------------|
-| Grafana | admin          | admin      | You can change this after first login! |
-| MinIO   | minio          | minio123   | Can be changed in compose.yml          |
-
-## Usage
-
-### 1. NGINX start page
+### 7.1 NGINX start page
 
 Go to https://localhost
 
@@ -249,20 +221,67 @@ Go to https://localhost
 
 ![startpagina4](./images/startpagina4.png)
 
-### 2. Dashboards (Grafana)
+### 7.2 Login credentials (Defaults)
+
+| Service | Username       | Password   | Note                                   |
+|---------|----------------|------------|----------------------------------------|
+| Grafana | admin          | admin      | You can change this after first login. |
+| MinIO   | minio          | minio123   | Can be changed in compose.yml          |
+
+### 7.3 Prometheus Metrics
+
+Go to https://prometheus.localhost
+
+- `/query`:  metrics querier.
+- `/alerts`: alert rule overview
+- `/targets`: status of the scrape targets.
+- `/config`: full prometheus configuration.
+
+Prometheus UI - alert rules overview
+![prometheus](images/prometheus.png)
+
+Prometheus dashboard
+![prometheus-dashboard](./images/prometheus-dashboard.png)
+
+### 7.4 Loki
+
+Loki dashboard
+![loki-metrics-dashboard](/images/loki-metrics-dashboard.png)
+
+Loki logging dashboard
+![loki-logs-dashboard](./images/loki-logs-dashboards.png)
+
+### 7.5 Tempo & OpenTelemetry-collector
+
+
+### 7.6 Alertmanager
+
+Go to https://alertmanager.localhost
+
+Alertmanager UI
+![alertmanager](/images/alertmanager.png)
+
+Alertmanager dashboard
+![alertmanager-dashboard](./images/alertmanager-metrics-dashboard.png)
+
+- Overview of current alerts
+- Ability to silence alerts.
+
+
+### 7.7 Dashboards (Grafana)
 
 Go to https://grafana.localhost
 
 Grafana is the central visual heart of this stack and functions as a 'single pane of glass' for all data. The open-source platform connects to Prometheus (metrics), Loki (logs) and Tempo (traces), enabling deep system insight through dashboards and the Explore mode. Thanks to automated provisioning, datasources and dashboards are loaded at startup, so everything works without manual configuration.
 
-#### Dashboards
+#### 7.7.1 Dashboards
 
 This repo contains a number of Grafana dashboards stored in [./grafana-provisioning/dashboards/json/](./grafana-provisioning/dashboards/json/) in JSON format.
 
 Grafana Dashboards
 ![grafana-dashboarden](./images/grafana-dashboards.png)
 
-#### Explore
+#### 7.7.2 Explore
 
 The Explore mode provides an advanced interface for ad-hoc analysis and troubleshooting, where users can execute queries directly. Explore thus facilitates rapid incident diagnosis and root-cause analysis, without the need to configure predefined dashboards in advance.
 
@@ -292,7 +311,7 @@ If propagation works, you'll see a beautiful trace tree with the Traefik span at
 Explore trace - service graph
 ![traces-explore](/images/explore-traces-service-graph.png)
 
-#### Drilldown
+#### 7.7.3 Drilldown
 
 The drill-down functionality within Grafana offers the ability to connect in-depth error analysis through metrics, logs and traces contextually with each other. From an anomaly in a metrics dashboard, you can directly navigate to the correlated log lines in Loki, and then use automatically detected trace IDs to switch to detailed request spans in Tempo. This integration eliminates the need to manually synchronize timestamps and identifiers between different datasources, significantly increasing the efficiency of root cause analysis and performance optimization.
 
@@ -305,14 +324,14 @@ Logs drilldown
 Traces drilldown
 ![traces-drilldown](/images/drilldown-breakdown.png)
 
-#### Grafana alerts
+#### 7.7.4 Grafana alerts
 
 Grafana Alerting provides a central interface for monitoring alerts. This module aggregates alert rules from both Prometheus (for metrics) and Loki (for log data), creating an overview of the operational status. Through this dashboard you can analyze the real-time status of alerts (‘Pending’ or ‘Firing’), examine the underlying query definitions, and gain insight into the evaluation criteria that safeguard the platform’s stability and availability.
 
 Grafana Alerting
 ![grafana-alerting](/images/grafana-alerts.png)
 
-#### Grafana datasources
+#### 7.7.5 Grafana datasources
 
 Datasources in Grafana serve as the technical interface to the underlying data storage systems, allowing the application to retrieve data without persisting it itself. In this configuration, Prometheus, Loki and Tempo are defined as the primary sources for exposing metrics, log files and distributed traces, respectively.
 ![grafana-datasources](./images/grafana-datasource.png)
@@ -320,35 +339,7 @@ Datasources in Grafana serve as the technical interface to the underlying data s
 The datasources for Prometheus, Loki and Tempo are configured in [./grafana-provisioning/dashboards/dashboard.yaml](./grafana-provisioning/datasources/datasources.yaml)
 
 
-### 3. Prometheus Metrics
-
-Go to https://prometheus.localhost
-
-- `/query`:  metrics querier.
-- `/alerts`: alert rule overview
-- `/targets`: status of the scrape targets.
-- `/config`: full prometheus configuration.
-
-Prometheus UI - alert rules overview
-![prometheus](images/prometheus.png)
-
-Prometheus dashboard
-![prometheus-dashboard](./images/prometheus-dashboard.png)
-
-### 4. Alertmanager
-
-Go to https://alertmanager.localhost
-
-Alertmanager UI
-![alertmanager](/images/alertmanager.png)
-
-Alertmanager dashboard
-![alertmanager-dashboard](./images/alertmanager-metrics-dashboard.png)
-
-- Overview of current alerts
-- Ability to silence alerts.
-
-### 5. Karma Alert Dashboard
+### 7.8 Karma Alert Dashboard
 
 Go to https://karma.localhost
 
@@ -357,7 +348,16 @@ Here you see an overview of all active warnings (e.g., "Disk almost full", "Cont
 Karma UI
 ![karma](images/karma.png)
 
-### 6. Storage (MinIO)
+### 7.9 webhook-tester
+
+Go to https://webhook-tester.localhost
+
+Alertmanager sends the alerts to the webhook-tester
+
+Webhook-tester UI
+![webhook-tester-ui](/images/webhook-tester.png)
+
+### 7.10 Storage (MinIO)
 
 Go to https://minio.localhost
 
@@ -378,16 +378,7 @@ Minio node dashboard
 
 Here you can see how much data Loki and Tempo are using in their buckets.
 
-### 7. webhook-tester
-
-Go to https://webhook-tester.localhost
-
-Alertmanager sends the alerts to the webhook-tester
-
-Webhook-tester UI
-![webhook-tester-ui](/images/webhook-tester.png)
-
-### 8. Alloy exporter
+### 7.11 Alloy exporter
 
 https://alloy.localhost
 
@@ -397,39 +388,24 @@ Alloy
 Alloy Graph
 ![alloy-graph](./images/alloy-graph.png)
 
-### 9. Blackbox exporter
+### 7.12 Blackbox exporter
 
 https://blackbox.localhost
 
 Blackbox dashboard
 ![blackbox-dashboard](/images/blackbox-dashboard.png)
 
-### 10. Loki
-
-Loki dashboard
-![loki-metrics-dashboard](/images/loki-metrics-dashboard.png)
-
-Loki logging dashboard
-![loki-logs-dashboard](./images/loki-logs-dashboards.png)
-
-### 11. Tempo
-
-
-
-### 12. Otel-collector
-
-
-### 13. node-exporter
+### 7.13 node-exporter
 
 nodes-exporter-full
 ![nodes-exporter-full-dashboard](/images/node-exporter-dashbaord.png)
 
-### 14. podman-exporter
+### 7.14 podman-exporter
 
 podman-exporter
 ![podman-exporter-dashboard](/images/podman-exporter-dashboard.png)
 
-### 15. Traefik
+### 7.15 Traefik
 
 Go to: https://traefik.localhost
 
@@ -439,7 +415,9 @@ Treafik
 Treafik dashboard
 ![traefik](/images/traefik.dashboard.png)
 
-## Remove everything
+## 8. Teardown & Cleanup
+
+This sections explains how to remove everthing.
 
 ```bash
    # stop all containers
@@ -452,9 +430,11 @@ Treafik dashboard
    local       monitoring_tempo-wal
    local       monitoring_minio-data
    local       monitoring_grafana-data
+   local       monitoring_keep-db-data
+   local       monitoring_keep-state
    
    # remove volumes
-   podman volume rm monitoring_prometheus-data monitoring_loki-wal monitoring_tempo-wal monitoring_minio-data monitoring_grafana-data
+   podman volume rm monitoring_prometheus-data monitoring_loki-wal monitoring_tempo-wal monitoring_minio-data monitoring_grafana-data monitoring_keep-db-data monitoring_keep-state
    
    # remove certificates
    rm /etc/pki/ca-trust/source/anchors/my-local-ca.pem

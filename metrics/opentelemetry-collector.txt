@@ -1,0 +1,76 @@
+# HELP otelcol_exporter_queue_capacity Fixed capacity of the retry queue (in batches) [alpha]
+# TYPE otelcol_exporter_queue_capacity gauge
+otelcol_exporter_queue_capacity{data_type="traces",exporter="otlp/tempo",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0"} 1000
+# HELP otelcol_exporter_queue_size Current size of the retry queue (in batches) [alpha]
+# TYPE otelcol_exporter_queue_size gauge
+otelcol_exporter_queue_size{data_type="traces",exporter="otlp/tempo",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0"} 0
+# HELP otelcol_exporter_send_failed_spans Number of spans in failed attempts to send to destination. [alpha]
+# TYPE otelcol_exporter_send_failed_spans counter
+otelcol_exporter_send_failed_spans{exporter="otlp/tempo",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0"} 0
+# HELP otelcol_exporter_sent_spans Number of spans successfully sent to destination. [alpha]
+# TYPE otelcol_exporter_sent_spans counter
+otelcol_exporter_sent_spans{exporter="otlp/tempo",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0"} 90213
+# HELP otelcol_process_cpu_seconds Total CPU user and system time in seconds [alpha]
+# TYPE otelcol_process_cpu_seconds counter
+otelcol_process_cpu_seconds{service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0"} 21.55
+# HELP otelcol_process_memory_rss Total physical memory (resident set size) [alpha]
+# TYPE otelcol_process_memory_rss gauge
+otelcol_process_memory_rss{service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0"} 5.4562816e+07
+# HELP otelcol_process_runtime_heap_alloc_bytes Bytes of allocated heap objects (see 'go doc runtime.MemStats.HeapAlloc') [alpha]
+# TYPE otelcol_process_runtime_heap_alloc_bytes gauge
+otelcol_process_runtime_heap_alloc_bytes{service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0"} 2.3200728e+07
+# HELP otelcol_process_runtime_total_alloc_bytes Cumulative bytes allocated for heap objects (see 'go doc runtime.MemStats.TotalAlloc') [alpha]
+# TYPE otelcol_process_runtime_total_alloc_bytes counter
+otelcol_process_runtime_total_alloc_bytes{service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0"} 4.817196e+08
+# HELP otelcol_process_runtime_total_sys_memory_bytes Total bytes of memory obtained from the OS (see 'go doc runtime.MemStats.Sys') [alpha]
+# TYPE otelcol_process_runtime_total_sys_memory_bytes gauge
+otelcol_process_runtime_total_sys_memory_bytes{service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0"} 6.6213128e+07
+# HELP otelcol_process_uptime Uptime of the process [alpha]
+# TYPE otelcol_process_uptime counter
+otelcol_process_uptime{service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0"} 6928.282089032
+# HELP otelcol_processor_batch_batch_send_size Number of units in the batch
+# TYPE otelcol_processor_batch_batch_send_size histogram
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="10"} 618
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="25"} 1298
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="50"} 1369
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="75"} 1425
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="100"} 1452
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="250"} 1505
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="500"} 1534
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="750"} 1627
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="1000"} 1627
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="2000"} 1628
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="3000"} 1628
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="4000"} 1628
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="5000"} 1628
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="6000"} 1628
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="7000"} 1628
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="8000"} 1628
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="9000"} 1628
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="10000"} 1628
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="20000"} 1628
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="30000"} 1628
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="50000"} 1628
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="100000"} 1628
+otelcol_processor_batch_batch_send_size_bucket{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",le="+Inf"} 1628
+otelcol_processor_batch_batch_send_size_sum{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0"} 90213
+otelcol_processor_batch_batch_send_size_count{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0"} 1628
+# HELP otelcol_processor_batch_metadata_cardinality Number of distinct metadata value combinations being processed
+# TYPE otelcol_processor_batch_metadata_cardinality gauge
+otelcol_processor_batch_metadata_cardinality{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0"} 1
+# HELP otelcol_processor_batch_timeout_trigger_send Number of times the batch was sent due to a timeout trigger
+# TYPE otelcol_processor_batch_timeout_trigger_send counter
+otelcol_processor_batch_timeout_trigger_send{processor="batch",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0"} 1628
+# HELP otelcol_receiver_accepted_spans Number of spans successfully pushed into the pipeline. [alpha]
+# TYPE otelcol_receiver_accepted_spans counter
+otelcol_receiver_accepted_spans{receiver="otlp",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",transport="grpc"} 90213
+# HELP otelcol_receiver_refused_spans Number of spans that could not be pushed into the pipeline. [alpha]
+# TYPE otelcol_receiver_refused_spans counter
+otelcol_receiver_refused_spans{receiver="otlp",service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0",transport="grpc"} 0
+# HELP promhttp_metric_handler_errors_total Total number of internal errors encountered by the promhttp metric handler.
+# TYPE promhttp_metric_handler_errors_total counter
+promhttp_metric_handler_errors_total{cause="encoding"} 0
+promhttp_metric_handler_errors_total{cause="gathering"} 0
+# HELP target_info Target metadata
+# TYPE target_info gauge
+target_info{service_instance_id="7c1fdfb8-5db0-43bc-a1b0-e209f9e54cc3",service_name="otelcol-contrib",service_version="0.119.0"} 1
