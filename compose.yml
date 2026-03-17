@@ -31,7 +31,7 @@ services:
   # Alloy
   # ---------------------------------------------------------
   alloy:
-    image: docker.io/grafana/alloy:v1.14.0
+    image: docker.io/grafana/alloy:v1.14.0@sha256:f50931848bd8178774521767bb46b905e1a081301950ff28d7623c9db7c01076
     container_name: alloy
     user: "0:0"
     networks:
@@ -79,7 +79,7 @@ services:
   # Grafana
   # ---------------------------------------------------------
   grafana:
-    image: docker.io/grafana/grafana:12.3.0
+    image: docker.io/grafana/grafana:12.3.0@sha256:70d9599b186ce287be0d2c5ba9a78acb2e86c1a68c9c41449454d0fc3eeb84e8
     container_name: grafana
     user: "472:472"
     networks:
@@ -222,7 +222,7 @@ services:
   # Loki
   # ---------------------------------------------------------
   loki:
-    image: docker.io/grafana/loki:3.3.2
+    image: docker.io/grafana/loki:3.3.2@sha256:8af2de1abbdd7aa92b27c9bcc96f0f4140c9096b507c77921ffddf1c6ad6c48f
     container_name: loki
     user: "0:0"
     networks:
@@ -419,7 +419,7 @@ services:
   # Tempo
   # ---------------------------------------------------------
   tempo:
-    image: docker.io/grafana/tempo:2.10.1
+    image: docker.io/grafana/tempo:2.10.1@sha256:9371af1b75b4e057eb77f22dc4dd4d9176cd6985e29f181527be6723b7f29c41
     container_name: tempo
     command: 
       - "-config.file=/etc/tempo.yaml"
