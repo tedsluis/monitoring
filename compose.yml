@@ -139,7 +139,7 @@ services:
   # Keep Database (PostgreSQL)
   # ---------------------------------------------------------
   keep-db:
-    image: docker.io/library/postgres:15-alpine
+    image: docker.io/library/postgres:15-alpine@sha256:fceb6f86328c36f2438fae3b851b0cc57c4a7e69a58c866d9ce24281f2cf0c9c
     container_name: keep-db
     networks:
       - monitoring-net
@@ -155,7 +155,7 @@ services:
   # Keep Backend (API & AIOps Engine)
   # ---------------------------------------------------------
   keep-backend:
-    image: us-central1-docker.pkg.dev/keephq/keep/keep-api:0.50.0
+    image: us-central1-docker.pkg.dev/keephq/keep/keep-api:0.50.0@sha256:f7db94b535789807986b6382ab880bdccb66a81aa75bb86448f136a795050067
     container_name: keep-backend
     user: "0:0"
     networks:
@@ -196,7 +196,7 @@ services:
   # Keep Frontend (UI)
   # ---------------------------------------------------------
   keep-frontend:
-    image: us-central1-docker.pkg.dev/keephq/keep/keep-ui:0.50.0
+    image: us-central1-docker.pkg.dev/keephq/keep/keep-ui:0.50.0@sha256:2b3f31c02a1dda34f1e0148acf1333e6b6b09c5fc6b7bcd3b615e7b74d070273
     container_name: keep-frontend
     networks:
       - monitoring-net
