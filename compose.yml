@@ -10,7 +10,7 @@ services:
   # Alertmanager
   # ---------------------------------------------------------
   alertmanager:
-    image: quay.io/prometheus/alertmanager:v0.28.0@sha256:d5155cfac40a6d9250ffc97c19db2c5e190c7bc57c6b67125c94903358f8c7d8
+    image: quay.io/prometheus/alertmanager:v0.31.1@sha256:88b605de9aba0410775c1eb3438f951115054e0d307f23f274a4c705f51630c1
     container_name: alertmanager
     user: "65534:65534"
     networks:
@@ -31,7 +31,7 @@ services:
   # Alloy
   # ---------------------------------------------------------
   alloy:
-    image: docker.io/grafana/alloy:v1.14.0
+    image: docker.io/grafana/alloy:v1.14.1@sha256:8f5666aebb871ba43ee2d65159c5d1c26c903720efafaf2d9ed4e237afc3bc88
     container_name: alloy
     user: "0:0"
     networks:
@@ -60,7 +60,7 @@ services:
   # Blackbox Exporter
   # ---------------------------------------------------------
   blackbox-exporter:
-    image: quay.io/prometheus/blackbox-exporter:v0.28.0
+    image: quay.io/prometheus/blackbox-exporter:v0.28.0@sha256:e753ff9f3fc458d02cca5eddab5a77e1c175eee484a8925ac7d524f04366c2fc
     container_name: blackbox-exporter
     networks:
       - monitoring-net
@@ -79,7 +79,7 @@ services:
   # Grafana
   # ---------------------------------------------------------
   grafana:
-    image: docker.io/grafana/grafana:12.3.0
+    image: docker.io/grafana/grafana:12.4.1@sha256:e932bd6ed0e026595b08483cd0141e5103e1ab7ff8604839ff899b8dc54cabcb
     container_name: grafana
     user: "472:472"
     networks:
@@ -118,7 +118,7 @@ services:
   # Karma
   # ---------------------------------------------------------
   karma:
-    image: ghcr.io/prymitive/karma:v0.127
+    image: ghcr.io/prymitive/karma:v0.128@sha256:cae0afb8d083756a7a44413480847fa59c072659d909734924a10640e1de600d
     container_name: karma
     networks:
       - monitoring-net
@@ -139,7 +139,7 @@ services:
   # Keep Database (PostgreSQL)
   # ---------------------------------------------------------
   keep-db:
-    image: docker.io/library/postgres:15-alpine
+    image: docker.io/library/postgres:18-alpine@sha256:4da1a4828be12604092fa55311276f08f9224a74a62dcb4708bd7439e2a03911
     container_name: keep-db
     networks:
       - monitoring-net
@@ -155,7 +155,7 @@ services:
   # Keep Backend (API & AIOps Engine)
   # ---------------------------------------------------------
   keep-backend:
-    image: us-central1-docker.pkg.dev/keephq/keep/keep-api:0.50.0
+    image: us-central1-docker.pkg.dev/keephq/keep/keep-api:0.50.0@sha256:f7db94b535789807986b6382ab880bdccb66a81aa75bb86448f136a795050067
     container_name: keep-backend
     user: "0:0"
     networks:
@@ -196,7 +196,7 @@ services:
   # Keep Frontend (UI)
   # ---------------------------------------------------------
   keep-frontend:
-    image: us-central1-docker.pkg.dev/keephq/keep/keep-ui:0.50.0
+    image: us-central1-docker.pkg.dev/keephq/keep/keep-ui:0.50.0@sha256:2b3f31c02a1dda34f1e0148acf1333e6b6b09c5fc6b7bcd3b615e7b74d070273
     container_name: keep-frontend
     networks:
       - monitoring-net
@@ -222,7 +222,7 @@ services:
   # Loki
   # ---------------------------------------------------------
   loki:
-    image: docker.io/grafana/loki:3.3.2
+    image: docker.io/grafana/loki:3.6.7@sha256:3c8fd3570dd9219951a60d3f919c7f31923d10baee578b77bc26c4a0b32d092d
     container_name: loki
     user: "0:0"
     networks:
@@ -248,7 +248,7 @@ services:
   # Minio (S3 Compatible Storage)
   # ---------------------------------------------------------
   minio:
-    image: docker.io/minio/minio:latest
+    image: docker.io/minio/minio:latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
     container_name: minio
     user: "0:0"
     networks:
@@ -287,7 +287,7 @@ services:
   # MinIO Init
   # ---------------------------------------------------------
   minio-init:
-    image: docker.io/minio/mc
+    image: docker.io/minio/mc@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727
     container_name: minio-init
     networks:
       - monitoring-net
@@ -307,7 +307,7 @@ services:
   # NGINX (Static HTML)
   # ---------------------------------------------------------
   nginx:
-    image: docker.io/library/nginx:alpine
+    image: docker.io/library/nginx:alpine@sha256:f46cb72c7df02710e693e863a983ac42f6a9579058a59a35f1ae36c9958e4ce0
     container_name: nginx
     networks:
       - monitoring-net
@@ -326,7 +326,7 @@ services:
   # Node Exporter (EXCEPTION!)
   # ---------------------------------------------------------
   node-exporter:
-    image: quay.io/prometheus/node-exporter:v1.10.0
+    image: quay.io/prometheus/node-exporter:v1.10.2@sha256:337ff1d356b68d39cef853e8c6345de11ce7556bb34cda8bd205bcf2ed30b565
     container_name: node-exporter
     command:
       - '--path.rootfs=/host'
@@ -342,7 +342,7 @@ services:
   # OpenTelemetry Collector
   # ---------------------------------------------------------
   otel-collector:
-    image: docker.io/otel/opentelemetry-collector-contrib:0.119.0
+    image: docker.io/otel/opentelemetry-collector-contrib:0.147.0@sha256:e7c92c715f28ff142f3bcaccd4fc5603cf4c71276ef09954a38eb4038500a5a5
     container_name: otel-collector
     command: ["--config=/etc/otel-config.yaml"]
     networks:
@@ -369,7 +369,7 @@ services:
   # Podman Exporter
   # ---------------------------------------------------------
   podman-exporter:
-    image: quay.io/navidys/prometheus-podman-exporter:v1.20.0
+    image: quay.io/navidys/prometheus-podman-exporter:v1.21.0@sha256:2ebb9e09101d8cc1e28e3f306b56a722450918e628208435201ed39bd62403cb
     container_name: podman-exporter
     user: "0:0"
     networks:
@@ -391,7 +391,7 @@ services:
   # Prometheus
   # ---------------------------------------------------------
   prometheus:
-    image: quay.io/prometheus/prometheus:v3.9.0@sha256:3ea2ed3b8cdfe3ff78aa05473a7ad36b916bdf2464c83b06bcd37c1a67620233
+    image: quay.io/prometheus/prometheus:v3.10.0@sha256:7571a304e67fbd794be02422b13627dc7de822152f74e99e2bef95d29eceecde
     container_name: prometheus
     user: "65534:65534"
     networks:
@@ -419,7 +419,7 @@ services:
   # Tempo
   # ---------------------------------------------------------
   tempo:
-    image: docker.io/grafana/tempo:2.10.1
+    image: docker.io/grafana/tempo:2.10.3@sha256:cac9de2ac9f6da8efca5b64b690a7cb8c786a0c49cac7b4517dd1b0089a6c703
     container_name: tempo
     command: 
       - "-config.file=/etc/tempo.yaml"
@@ -447,7 +447,7 @@ services:
   # Traefik (Reverse Proxy & Ingress)
   # ---------------------------------------------------------
   traefik:
-    image: docker.io/library/traefik:v3.6.8
+    image: docker.io/library/traefik:v3.6.10@sha256:c549d482c55d7a797398562064f35428cc53e748d84d7190997930e7b31bcc32
     container_name: traefik
     security_opt:
       - label=disable
@@ -483,7 +483,7 @@ services:
   # Webhook Tester
   # ---------------------------------------------------------
   webhook-tester:
-    image: docker.io/tarampampam/webhook-tester:2.2.5
+    image: docker.io/tarampampam/webhook-tester:2.2.6@sha256:7df929897b150aec5b60d77529ae863f69238cf74f0e47c161258fcc185f3e0c
     container_name: webhook-tester
     networks:
       - monitoring-net
