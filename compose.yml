@@ -248,7 +248,7 @@ services:
   # Minio (S3 Compatible Storage)
   # ---------------------------------------------------------
   minio:
-    image: docker.io/minio/minio:latest
+    image: docker.io/minio/minio:latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
     container_name: minio
     user: "0:0"
     networks:
@@ -287,7 +287,7 @@ services:
   # MinIO Init
   # ---------------------------------------------------------
   minio-init:
-    image: docker.io/minio/mc
+    image: docker.io/minio/mc@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727
     container_name: minio-init
     networks:
       - monitoring-net
@@ -307,7 +307,7 @@ services:
   # NGINX (Static HTML)
   # ---------------------------------------------------------
   nginx:
-    image: docker.io/library/nginx:alpine
+    image: docker.io/library/nginx:alpine@sha256:f46cb72c7df02710e693e863a983ac42f6a9579058a59a35f1ae36c9958e4ce0
     container_name: nginx
     networks:
       - monitoring-net
