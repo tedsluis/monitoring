@@ -31,7 +31,7 @@ services:
   # Alloy
   # ---------------------------------------------------------
   alloy:
-    image: grafana/alloy:latest
+    image: docker.io/grafana/alloy:v1.14.0
     container_name: alloy
     user: "0:0"
     networks:
@@ -60,7 +60,7 @@ services:
   # Blackbox Exporter
   # ---------------------------------------------------------
   blackbox-exporter:
-    image: quay.io/prometheus/blackbox-exporter:latest
+    image: quay.io/prometheus/blackbox-exporter:v0.28.0
     container_name: blackbox-exporter
     networks:
       - monitoring-net
@@ -79,7 +79,7 @@ services:
   # Grafana
   # ---------------------------------------------------------
   grafana:
-    image: grafana/grafana:12.3.0
+    image: docker.io/grafana/grafana:12.3.0
     container_name: grafana
     user: "472:472"
     networks:
@@ -118,7 +118,7 @@ services:
   # Karma
   # ---------------------------------------------------------
   karma:
-    image: ghcr.io/prymitive/karma:latest
+    image: ghcr.io/prymitive/karma:v0.127
     container_name: karma
     networks:
       - monitoring-net
@@ -139,7 +139,7 @@ services:
   # Keep Database (PostgreSQL)
   # ---------------------------------------------------------
   keep-db:
-    image: postgres:15-alpine
+    image: docker.io/library/postgres:15-alpine
     container_name: keep-db
     networks:
       - monitoring-net
@@ -155,7 +155,7 @@ services:
   # Keep Backend (API & AIOps Engine)
   # ---------------------------------------------------------
   keep-backend:
-    image: us-central1-docker.pkg.dev/keephq/keep/keep-api:latest
+    image: us-central1-docker.pkg.dev/keephq/keep/keep-api:0.50.0
     container_name: keep-backend
     user: "0:0"
     networks:
@@ -196,7 +196,7 @@ services:
   # Keep Frontend (UI)
   # ---------------------------------------------------------
   keep-frontend:
-    image: us-central1-docker.pkg.dev/keephq/keep/keep-ui:latest
+    image: us-central1-docker.pkg.dev/keephq/keep/keep-ui:0.50.0
     container_name: keep-frontend
     networks:
       - monitoring-net
@@ -207,7 +207,7 @@ services:
       - ENABLE_AI=true
       - KEEP_ENABLE_AI=true
       - NEXTAUTH_URL=https://keep.localhost
-      - NEXTAUTH_SECRET=keep # Pas dit aan voor een eigen veilige string
+      - NEXTAUTH_SECRET=keep
       # --- AI Configuratie ---
       - OPENAI_BASE_URL=http://host.containers.internal:8111/v1
       - OPENAI_API_KEY=dummy-key
@@ -222,7 +222,7 @@ services:
   # Loki
   # ---------------------------------------------------------
   loki:
-    image: grafana/loki:3.3.2
+    image: docker.io/grafana/loki:3.3.2
     container_name: loki
     user: "0:0"
     networks:
@@ -248,7 +248,7 @@ services:
   # Minio (S3 Compatible Storage)
   # ---------------------------------------------------------
   minio:
-    image: minio/minio:latest
+    image: docker.io/minio/minio:latest
     container_name: minio
     user: "0:0"
     networks:
@@ -287,7 +287,7 @@ services:
   # MinIO Init
   # ---------------------------------------------------------
   minio-init:
-    image: minio/mc
+    image: docker.io/minio/mc
     container_name: minio-init
     networks:
       - monitoring-net
@@ -342,7 +342,7 @@ services:
   # OpenTelemetry Collector
   # ---------------------------------------------------------
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.119.0
+    image: docker.io/otel/opentelemetry-collector-contrib:0.119.0
     container_name: otel-collector
     command: ["--config=/etc/otel-config.yaml"]
     networks:
@@ -369,7 +369,7 @@ services:
   # Podman Exporter
   # ---------------------------------------------------------
   podman-exporter:
-    image: quay.io/navidys/prometheus-podman-exporter:latest
+    image: quay.io/navidys/prometheus-podman-exporter:v1.20.0
     container_name: podman-exporter
     user: "0:0"
     networks:
@@ -419,7 +419,7 @@ services:
   # Tempo
   # ---------------------------------------------------------
   tempo:
-    image: grafana/tempo:2.10.1
+    image: docker.io/grafana/tempo:2.10.1
     container_name: tempo
     command: 
       - "-config.file=/etc/tempo.yaml"
@@ -447,7 +447,7 @@ services:
   # Traefik (Reverse Proxy & Ingress)
   # ---------------------------------------------------------
   traefik:
-    image: traefik:v3.6.8
+    image: docker.io/library/traefik:v3.6.8
     container_name: traefik
     security_opt:
       - label=disable
@@ -483,7 +483,7 @@ services:
   # Webhook Tester
   # ---------------------------------------------------------
   webhook-tester:
-    image: tarampampam/webhook-tester:latest
+    image: docker.io/tarampampam/webhook-tester:2.2.5
     container_name: webhook-tester
     networks:
       - monitoring-net

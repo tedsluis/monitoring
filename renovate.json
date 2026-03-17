@@ -1,0 +1,59 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "docker:pinDigests",
+    ":dependencyDashboard",
+    ":semanticCommits"
+  ],
+  "assignees": ["tedsluis"],
+  "osvVulnerabilityAlerts": true,
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 0,
+  "labels": ["dependencies"],
+  "commitMessageAction": "Update",
+  "commitMessageTopic": "{{depName}}",
+  "packageRules": [
+    {
+      "matchPackageNames": ["docker.io/library/postgres", 
+                            "us-central1-docker.pkg.dev/keephq/keep/keep-api", "us-central1-docker.pkg.dev/keephq/keep/keep-ui"
+        ],
+      "groupName": "KeepHQ Stack",
+      "commitMessageTopic": "KeepHQ containers"
+    },
+    {
+      "matchPackageNames": ["docker.io/grafana/grafana", 
+                            "docker.io/grafana/loki", 
+                            "docker.io/grafana/tempo", 
+                            "docker.io/grafana/alloy"
+        ],
+      "groupName": "Grafana Labs Stack",
+      "commitMessageTopic": "Grafana ecosystem"
+    },
+    {
+      "matchPackageNames": ["quay.io/prometheus/prometheus", 
+                            "quay.io/prometheus/alertmanager"
+        ],
+      "groupName": "Prometheus Stack",
+      "commitMessageTopic": "Prometheus ecosystem"
+    },
+    {
+      "matchPackageNames": [
+        "quay.io/prometheus/blackbox-exporter", 
+        "quay.io/prometheus/node-exporter", 
+        "quay.io/navidys/prometheus-podman-exporter"
+      ],
+      "groupName": "Prometheus Exporters",
+      "commitMessageTopic": "Exporters"
+    },
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Minor & Patch updates",
+      "groupSlug": "minor-patch"
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "labels": ["major-update", "requires-testing"]
+    }
+  ]
+}

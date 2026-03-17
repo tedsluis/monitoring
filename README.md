@@ -155,6 +155,7 @@ To ensure secure connections (https://*.localhost) without browser warnings, run
    === Done! ===
    Test now with: curl -v https://grafana.localhost
 ```
+**note:** If you try `https://localhost` in your web browser, make sure you restart your browser first!
 
 ### 6.4 Check the status
 ```bash
@@ -230,42 +231,100 @@ Go to https://localhost
 
 ### 7.3 Prometheus Metrics
 
+Prometheus is a time-series database that records numeric data, such as CPU usage, network traffic, or application-specific. Prometheus operates on a pull-based model; it actively "scrapes" (fetches) metrics over HTTP from designated target endpoints at regular intervals (in our case every 15 seconds). Once the data is ingested, users can leverage its query language, PromQL, to slice, dice, and aggregate the metrics for visualization in tools like Grafana, or evaluate them against custom rules to trigger real-time notifications via Alertmanager when thresholds are breached.
+
 Go to https://prometheus.localhost
 
-- `/query`:  metrics querier.
-- `/alerts`: alert rule overview
-- `/targets`: status of the scrape targets.
-- `/config`: full prometheus configuration.
+| Endpoint paths | Description                    |
+|----------------|--------------------------------|
+| `/query`       | metrics querier.               |
+| `/alerts`      | alert rule overview.           |
+| `/targets`     | status of the scrape targets.  |
+| `/config`      | full prometheus configuration. |
 
-Prometheus UI - alert rules overview
+
+Example Prometheus UI - alert rules overview
 ![prometheus](images/prometheus.png)
+
+
+| configuration        | configuration file                                           |
+|----------------------|--------------------------------------------------------------|
+| scrape target        | [./prometheus/prometheus.yml](./prometheus/prometheus.yml)   |
+| alert rules          | [./prometheus/alert.rules.yml](./prometheus/alert.rules.yml) |
+
+Prometheus exposes and scrapes its own metrics. Using these metrics you can monitor prometheus, see below:
 
 Prometheus dashboard
 ![prometheus-dashboard](./images/prometheus-dashboard.png)
 
 ### 7.4 Loki
 
-Loki dashboard
-![loki-metrics-dashboard](/images/loki-metrics-dashboard.png)
+Grafana Loki is a log aggregation system inspired by Prometheus. Unlike traditional logging systems (such as the Elastic Search) that index the full text of every log line, Loki only indexes the metadata (labels) attached to each log stream. This unique design choice makes it exceptionally lightweight, cost-effective, and fast to operate. 
+
+In a typical workflow, a collector like Grafana Alloy gathers logs from your containers or system journals and pushes them to Loki. Loki then compresses this data into chunks and stores it efficiently in an object storage backend like MinIO. Users can seamlessly search and analyze these logs in Grafana using LogQL (Loki Query Language), leveraging the exact same labels used in Prometheus to instantly correlate metrics spikes with their underlying log events.
+
+Loki does not include a built-in user interface. Instead, it relies entirely on Grafana to serve as the unified dashboard for exploring and analyzing your logs, for example:
 
 Loki logging dashboard
 ![loki-logs-dashboard](./images/loki-logs-dashboards.png)
 
-### 7.5 Tempo & OpenTelemetry-collector
 
+| configuration        | configuration file                                                                 |
+|----------------------|------------------------------------------------------------------------------------|
+| Loki config          | [./loki/loki-config.yaml](./loki/loki-config.yaml)                                 |
+| Loki alert rules     | [./loki/rules/fake/loki-alert-rules.yaml](./loki/rules/fake/loki-alert-rules.yaml) |
+
+Like most modern container, Loki exposes prometheus metrics too, which are used to monitor Loki using the dashboard below:
+
+Loki dashboard
+![loki-metrics-dashboard](/images/loki-metrics-dashboard.png)
+
+### 7.5 Tempo
+
+Grafana Tempo is a tracing backend designed to track the flow of requests as they travel through complex architectures and microservices. It helps developers and operators pinpoint exactly where latency, bottlenecks, or errors are occurring in a system. Unlike older tracing tools that require heavy, complex databases for indexing, Tempo is exceptionally cost-effective because it only requires a basic object storage backend (like MinIO or S3) to store the raw trace data. 
+
+In a typical setup, an OpenTelemetry Collector gathers traces from your applications and pushes them to Tempo. Within Grafana, users can visualize these request lifecycles using TraceQL, and seamlessly jump directly from a log line in Loki to the exact corresponding trace span in Tempo for rapid root cause analysis.
+
+Loki does not include a built-in user interface. Instead, it relies entirely on Grafana to serve as the unified dashboard for exploring and analyzing your logs, for example:
+
+Tempo Tracing dashboard
+![tempo-dashboard](./images/)
+
+| configuration        | configuration file                         |
+|----------------------|--------------------------------------------|
+| Tempo config         | [./tempo/tempo.yaml](./tempo/tempo.yaml)   |
+
+Tempo exposes prometheus metrics too, which are used to monitor Loki using the dashboard below:
+
+![Tempo-dashboard](./images/tempo-dashboard.png)
 
 ### 7.6 Alertmanager
 
+Alertmanager is a alert routing and management component that works hand-in-hand with Prometheus and Loki. While Prometheus and Loki are responsible for evaluating metric and logging thresholds and firing raw alerts, Alertmanager takes over to handle the complex logistics of notifications. It deduplicates and intelligently groups related alerts together, preventing engineers from being overwhelmed by "alert fatigue" during major system outages. Once grouped, it routes these notifications to the appropriate downstream receivers, such as Karma for visualization, KeepHQ for AIOps, or webhook-tester for debugging. 
+
+Alertmanager also supports advanced operational features like silencing (temporarily muting specific alerts) and inhibition (suppressing lower-priority alerts if a related high-priority alert is already active), ensuring that teams only receive the most actionable signals.
+
 Go to https://alertmanager.localhost
+
+| Path        | Description                                    |
+|-------------|------------------------------------------------|
+| /#/alerts   | Overview of current alerts                     |
+| /#/silences | Ability to silence alerts                      |
+| /#/status   | Alertmanager status and configuration overview |
+| /#/settings | Alertmanager UI settings                       |
+
 
 Alertmanager UI
 ![alertmanager](/images/alertmanager.png)
 
+| configuration        | configuration file                                                  |
+|----------------------|---------------------------------------------------------------------|
+| Alertmanager config  | [./alertmanager/alertmanager.yml](./alertmanager/alertmanager.yml) |
+
+Alertmanager exposes prometheus metrics too, which are used to monitor Alertmanager using the dashboard below:
+
 Alertmanager dashboard
 ![alertmanager-dashboard](./images/alertmanager-metrics-dashboard.png)
-
-- Overview of current alerts
-- Ability to silence alerts.
 
 
 ### 7.7 Dashboards (Grafana)
@@ -357,7 +416,9 @@ Alertmanager sends the alerts to the webhook-tester
 Webhook-tester UI
 ![webhook-tester-ui](/images/webhook-tester.png)
 
-### 7.10 Storage (MinIO)
+### 7.10 KeepHQ
+
+### 7.11 Storage (MinIO)
 
 Go to https://minio.localhost
 
@@ -378,7 +439,7 @@ Minio node dashboard
 
 Here you can see how much data Loki and Tempo are using in their buckets.
 
-### 7.11 Alloy exporter
+### 7.12 Alloy exporter
 
 https://alloy.localhost
 
@@ -388,24 +449,29 @@ Alloy
 Alloy Graph
 ![alloy-graph](./images/alloy-graph.png)
 
-### 7.12 Blackbox exporter
+### 7.13 Blackbox exporter
 
 https://blackbox.localhost
 
 Blackbox dashboard
 ![blackbox-dashboard](/images/blackbox-dashboard.png)
 
-### 7.13 node-exporter
+### 7.14 node-exporter
 
 nodes-exporter-full
 ![nodes-exporter-full-dashboard](/images/node-exporter-dashbaord.png)
 
-### 7.14 podman-exporter
+### 7.15 podman-exporter
 
 podman-exporter
 ![podman-exporter-dashboard](/images/podman-exporter-dashboard.png)
 
-### 7.15 Traefik
+### 7.16 OpenTelemetry-collector
+
+OpenTelemetry-collector
+![opentelemetry-collector-dashboard](/images/opentelemetry-collector-dashboard.png)
+
+### 7.17 Traefik
 
 Go to: https://traefik.localhost
 
@@ -437,8 +503,8 @@ This sections explains how to remove everthing.
    podman volume rm monitoring_prometheus-data monitoring_loki-wal monitoring_tempo-wal monitoring_minio-data monitoring_grafana-data monitoring_keep-db-data monitoring_keep-state
    
    # remove certificates
-   rm /etc/pki/ca-trust/source/anchors/my-local-ca.pem
-   rm /etc/pki/ca-trust/source/anchors/my-local-ca.crt
+   sudo rm /etc/pki/ca-trust/source/anchors/my-local-ca.pem
+   sudo rm /etc/pki/ca-trust/source/anchors/my-local-ca.crt
    sudo update-ca-trust extract
    
    # disable podman socket
@@ -448,5 +514,5 @@ This sections explains how to remove everthing.
    sudo rm /etc/sysctl.d/99-rootless-ports.conf
    
    # remove monitoring repo
-   rm -rf REPONAME
+   rm -rf path-to-your-repo/monitoring
 ```
