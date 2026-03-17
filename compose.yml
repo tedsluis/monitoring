@@ -60,7 +60,7 @@ services:
   # Blackbox Exporter
   # ---------------------------------------------------------
   blackbox-exporter:
-    image: quay.io/prometheus/blackbox-exporter:v0.28.0
+    image: quay.io/prometheus/blackbox-exporter:v0.28.0@sha256:e753ff9f3fc458d02cca5eddab5a77e1c175eee484a8925ac7d524f04366c2fc
     container_name: blackbox-exporter
     networks:
       - monitoring-net
@@ -326,7 +326,7 @@ services:
   # Node Exporter (EXCEPTION!)
   # ---------------------------------------------------------
   node-exporter:
-    image: quay.io/prometheus/node-exporter:v1.10.0
+    image: quay.io/prometheus/node-exporter:v1.10.0@sha256:d464a7e3af9bbd7748e6c48c5d10e646450d8aab2f4732fbac1ae54af9e87b0e
     container_name: node-exporter
     command:
       - '--path.rootfs=/host'
@@ -369,7 +369,7 @@ services:
   # Podman Exporter
   # ---------------------------------------------------------
   podman-exporter:
-    image: quay.io/navidys/prometheus-podman-exporter:v1.20.0
+    image: quay.io/navidys/prometheus-podman-exporter:v1.20.0@sha256:14ce7addbc7348875b3f74a6002def96b66e2b1eb5efb4bdecf8037b868ae0ee
     container_name: podman-exporter
     user: "0:0"
     networks:
