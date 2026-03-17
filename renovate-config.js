@@ -9,8 +9,5 @@ module.exports = {
   onboarding: false,
   
   // Zorgt ervoor dat Renovate zoekt naar renovate.json in de root van je repo
-  requireConfig: 'optional',
-  
-  // Handig voor debugging tijdens handmatige runs
-  logLevel: 'info' 
+  requireConfig: 'optional'
 };
