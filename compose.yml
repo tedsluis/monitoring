@@ -148,7 +148,7 @@ services:
       - POSTGRES_PASSWORD=keep
       - POSTGRES_DB=keep
     volumes:
-      - keep-db-data:/var/lib/postgresql/data:Z
+      - keep-db-data:/var/lib/postgresql:Z
     restart: unless-stopped
 
   # ---------------------------------------------------------
