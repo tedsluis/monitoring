@@ -1,13 +1,13 @@
 // renovate-config.js
-// Dit is de configuratie voor de Renovate bot zelf (de "runner").
+// This is the configuration for the Renovate bot itself (the "runner").
 module.exports = {
   platform: 'github',
-  // Zet hier jouw GitHub repository neer (aanpassen indien nodig)
+  // Put your GitHub repository here (adjust if needed)
   repositories: ['tedsluis/monitoring'],
   
-  // Omdat we de boel zelf beheren, slaan we de automatische onboarding over
+  // Because we manage things ourselves, skip the automatic onboarding
   onboarding: false,
   
-  // Zorgt ervoor dat Renovate zoekt naar renovate.json in de root van je repo
+  // Ensures Renovate looks for renovate.json in the root of your repo
   requireConfig: 'optional'
 };
