@@ -155,7 +155,7 @@ services:
   # Keep Backend (API & AIOps Engine)
   # ---------------------------------------------------------
   keep-backend:
-    image: us-central1-docker.pkg.dev/keephq/keep/keep-api:0.50.0@sha256:f7db94b535789807986b6382ab880bdccb66a81aa75bb86448f136a795050067
+    image: us-central1-docker.pkg.dev/keephq/keep/keep-api:0.51.0@sha256:0e95b90210f2caeaf6a654daec274cfe43101cf1c4cdbc9cd1fec1a99e791af6
     container_name: keep-backend
     user: "0:0"
     networks:
@@ -196,7 +196,7 @@ services:
   # Keep Frontend (UI)
   # ---------------------------------------------------------
   keep-frontend:
-    image: us-central1-docker.pkg.dev/keephq/keep/keep-ui:0.50.0@sha256:2b3f31c02a1dda34f1e0148acf1333e6b6b09c5fc6b7bcd3b615e7b74d070273
+    image: us-central1-docker.pkg.dev/keephq/keep/keep-ui:0.51.0@sha256:2041f65c7bbd64c2a800a4d11eedf0e99b89debfd6b88f0bbb109443eb6bcc23
     container_name: keep-frontend
     networks:
       - monitoring-net
