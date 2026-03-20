@@ -26,6 +26,9 @@ Create the labels once in your GitHub repository:
 ```bash
 gh label create "test-passed" --color "0E8A16" --description "Automated smoke test passed"
 gh label create "test-failed" --color "D93F0B" --description "Automated smoke test failed"
+✓ Label "test-passed" created in tedsluis/monitoring
+✓ Label "test-failed" created in tedsluis/monitoring
+
 ```
 
 Step 4: Run scripts
