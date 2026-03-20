@@ -17,10 +17,8 @@
   "prCreation": "immediate",
   "platformAutomerge": false,
   "vulnerabilityAlerts": {
-    "labels": ["security"],
-    "prPriority": 10
+    "labels": ["security"]
   },
-  "releaseNotes": "full",
   "prBodyTemplate": "{{{header}}}\n\n{{{table}}}\n\n{{{notes}}}\n\n{{{changelogs}}}\n\n{{{configDescription}}}\n\n{{{footer}}}",
   "packageRules": [
     {
