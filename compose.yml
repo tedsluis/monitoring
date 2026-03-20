@@ -342,7 +342,7 @@ services:
   # OpenTelemetry Collector
   # ---------------------------------------------------------
   otel-collector:
-    image: docker.io/otel/opentelemetry-collector-contrib:0.147.0@sha256:e7c92c715f28ff142f3bcaccd4fc5603cf4c71276ef09954a38eb4038500a5a5
+    image: docker.io/otel/opentelemetry-collector-contrib:0.148.0@sha256:8164eab2e6bca9c9b0837a8d2f118a6618489008a839db7f9d6510e66be3923c
     container_name: otel-collector
     command: ["--config=/etc/otel-config.yaml"]
     networks:
@@ -447,7 +447,7 @@ services:
   # Traefik (Reverse Proxy & Ingress)
   # ---------------------------------------------------------
   traefik:
-    image: docker.io/library/traefik:v3.6.10@sha256:c549d482c55d7a797398562064f35428cc53e748d84d7190997930e7b31bcc32
+    image: docker.io/library/traefik:v3.6.11@sha256:37f515ab3fe37979ca6abec9fbb2437acebee8086bb7914f1353faeec27fdb5e
     container_name: traefik
     security_opt:
       - label=disable
