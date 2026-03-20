@@ -26,7 +26,7 @@ trap 'rm -f "$LOCK_FILE"' EXIT
 echo "🔄 Starting Renovate PR Poller at $(date)"
 
 # Fetch open PRs from the renovate bot
-PRS=$(gh pr list --repo "$REPO" --state open --author "app/renovate" --json number,headRefName,headRepository,updatedAt --jq '.[] | "\(.number) \(.headRefName) \(.updatedAt)"' || echo "")
+PRS=$(gh pr list --repo "$REPO" --state open --label "renovate" --json number,headRefName,headRepository,updatedAt --jq '.[] | "\(.number) \(.headRefName) \(.updatedAt)"' || echo "")
 
 if [ -z "$PRS" ]; then
     echo "No open Renovate PRs found."
