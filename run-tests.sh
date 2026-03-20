@@ -31,14 +31,33 @@ CURL_CMD="podman run --rm --network $NETWORK docker.io/curlimages/curl:latest"
 echo "🔍 Test: Prometheus API & Targets (Internal via container:9090)"
 $CURL_CMD -sSf -o /dev/null http://prometheus:9090/-/healthy || { echo "❌ Prometheus is not healthy"; exit 1; }
 
-# Fetch JSON locally via curl and parse it with local 'jq'
-FAILED_TARGETS=$($CURL_CMD -s http://prometheus:9090/api/v1/targets | jq '[.data.activeTargets[] | select(.health == "down")] | length')
+# Retry loop for Prometheus Targets (Max 2 minutes wait)
+MAX_RETRIES=12
+RETRY_COUNT=0
+FAILED_TARGETS=1
+
+echo "⏳ Waiting for all Prometheus targets to be UP (max 2 min)..."
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    # Query the targets. Ignore health='up'. Count the rest (down or unknown)
+    TARGET_JSON=$($CURL_CMD -s http://prometheus:9090/api/v1/targets || echo "{}")
+    FAILED_TARGETS=$(echo "$TARGET_JSON" | jq '[.data.activeTargets[]? | select(.health != "up")] | length' 2>/dev/null || echo "1")
+    
+    if [ "$FAILED_TARGETS" == "0" ]; then
+        echo "✅ All Prometheus targets are UP."
+        break
+    else
+        echo "⚠️ Still $FAILED_TARGETS target(s) DOWN or not scraped yet. Retrying in 10s... ($((RETRY_COUNT+1))/$MAX_RETRIES)"
+        sleep 10
+        RETRY_COUNT=$((RETRY_COUNT+1))
+    fi
+done
 
 if [ "$FAILED_TARGETS" != "0" ]; then
-    echo "❌ Error: $FAILED_TARGETS Prometheus targets are DOWN (or fetch failed)."
+    echo "❌ Error: After 2 minutes, there are still targets DOWN."
+    # Print exactly WHICH targets are failing (super useful for your GitHub issue!)
+    echo "$TARGET_JSON" | jq '.data.activeTargets[]? | select(.health != "up") | {job: .labels.job, instance: .labels.instance, health: .health, error: .lastError}'
     exit 1
 fi
-echo "✅ Prometheus targets are UP."
 
 echo "🔍 Test: Grafana API (Internal via container:3000)"
 $CURL_CMD -sSf -o /dev/null http://grafana:3000/api/health || { echo "❌ Grafana API unreachable"; exit 1; }
