@@ -92,18 +92,36 @@ Check out the PR branch and run podman-compose up -d.
 Run run-tests.sh.
 
 ```bash
-$ ./run-tests.sh
-⏳ Wachten tot services zijn opgestart (30s)...
-🔍 Smoketest: Draaien alle gedefinieerde containers?
-✅ Alle containers draaien.
-🔌 Gebruik intern netwerk: monitoring_monitoring-net
-🔍 Test: Prometheus API & Targets (Intern via container:9090)
-✅ Prometheus targets zijn UP.
-🔍 Test: Grafana API (Intern via container:3000)
-✅ Grafana is bereikbaar.
-🔍 Test: Alertmanager (Intern via container:9093)
-✅ Alertmanager is bereikbaar.
-🎉 Alle tests zijn succesvol afgerond!
+$ ./run-tests.sh 
+========================================
+🚀 Starting Automated Validation Suite
+========================================
+⏳ [WAIT] Allowing services to initialize (waiting 30 seconds)...
+🔍 [CHECK] Smoketest: Are all defined containers running?
+   [INFO] Expected container count from compose.yml: ~19
+   [INFO] Currently running matched containers: 18
+✅ [SUCCESS] All required containers are running.
+🔍 [CHECK] Identifying internal Podman network...
+🔌 [INFO] Using internal network: monitoring_monitoring-net
+   [INFO] Using ephemeral curl container for internal API testing.
+----------------------------------------
+🔍 [TEST] Prometheus API & Base Health (Internal via prometheus:9090)
+   [INFO] Executing HTTP GET http://prometheus:9090/-/healthy
+✅ [SUCCESS] Prometheus API is reachable and reports healthy.
+----------------------------------------
+🔍 [TEST] Prometheus Targets (Max 2 minutes wait)
+   [INFO] Fetching Prometheus targets (Attempt 1/12)...
+✅ [SUCCESS] All Prometheus targets are UP and successfully scraped.
+----------------------------------------
+🔍 [TEST] Grafana API (Internal via grafana:3000)
+   [INFO] Executing HTTP GET http://grafana:3000/api/health
+✅ [SUCCESS] Grafana is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Alertmanager (Internal via alertmanager:9093)
+   [INFO] Executing HTTP GET http://alertmanager:9093/-/healthy
+✅ [SUCCESS] Alertmanager is reachable and healthy.
+========================================
+🎉 [COMPLETE] All tests completed successfully! Stack is stable.
 ```
 
 Update GitHub depending on the result.
