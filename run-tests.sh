@@ -38,9 +38,12 @@ FAILED_TARGETS=1
 
 echo "⏳ Waiting for all Prometheus targets to be UP (max 2 min)..."
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    # Query the targets. Ignore health='up'. Count the rest (down or unknown)
-    TARGET_JSON=$($CURL_CMD -s http://prometheus:9090/api/v1/targets || echo "{}")
-    FAILED_TARGETS=$(echo "$TARGET_JSON" | jq '[.data.activeTargets[]? | select(.health != "up")] | length' 2>/dev/null || echo "1")
+    # Query the targets. If the call fails, return an error JSON.
+    TARGET_JSON=$($CURL_CMD -s http://prometheus:9090/api/v1/targets || echo '{"status":"error"}')
+    
+    # Use jq to check if the API is successful AND if there are targets that are not 'up'.
+    # If there are no activeTargets yet or the API returns an error, this results in 1 (fail).
+    FAILED_TARGETS=$(echo "$TARGET_JSON" | jq -e 'if .status == "success" and (.data.activeTargets | length) > 0 then [.data.activeTargets[] | select(.health != "up")] | length else 1 end' 2>/dev/null || echo "1")
     
     if [ "$FAILED_TARGETS" == "0" ]; then
         echo "✅ All Prometheus targets are UP."
