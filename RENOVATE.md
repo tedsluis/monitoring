@@ -1,0 +1,94 @@
+# Automated Testing of Renovate PRs
+
+This guide describes how to convert your local Fedora server into an automated test environment. A poller checks out pending Renovate Pull Requests, starts them, validates them, and reports back to GitHub with labels, comments, and (on failure) issues.
+
+Step 1: Preparations on Fedora
+
+Make sure the required command-line tools are installed:
+```bash
+sudo dnf install jq gh -y
+```
+
+Step 2: GitHub Authentication
+
+The GitHub CLI (gh) requires a token with permissions for repos and issues.
+Since this is an automated process, we authenticate gh securely in a session:
+
+Create a (classic) Personal Access Token in GitHub with the repo scope and add it in environment variable `export GITHUB_COM_TOKEN='pat_*****************************************'`.
+
+```bash
+echo "$GITHUB_COM_TOKEN" | gh auth login --with-token
+```
+
+Step 3: Add labels
+
+Create the labels once in your GitHub repository:
+```bash
+gh label create "test-passed" --color "0E8A16" --description "Automated smoke test passed"
+gh label create "test-failed" --color "D93F0B" --description "Automated smoke test failed"
+```
+
+Step 4: Run scripts
+
+Place run-tests.sh and poll-renovate-prs.sh in your /monitoring directory.
+
+Step 5: Test the script manually
+
+Before running the poller in the background, it is crucial to verify this manually once Renovate has created a PR:
+
+```bash
+./poll-renovate-prs.sh
+```
+
+The script will:
+
+Fetch PRs.
+
+Check out the PR branch and run podman-compose up -d.
+
+Run run-tests.sh.
+
+```bash
+$ ./run-tests.sh
+⏳ Wachten tot services zijn opgestart (30s)...
+🔍 Smoketest: Draaien alle gedefinieerde containers?
+✅ Alle containers draaien.
+🔌 Gebruik intern netwerk: monitoring_monitoring-net
+🔍 Test: Prometheus API & Targets (Intern via container:9090)
+✅ Prometheus targets zijn UP.
+🔍 Test: Grafana API (Intern via container:3000)
+✅ Grafana is bereikbaar.
+🔍 Test: Alertmanager (Intern via container:9093)
+✅ Alertmanager is bereikbaar.
+🎉 Alle tests zijn succesvol afgerond!
+```
+
+Update GitHub depending on the result.
+
+Always roll back cleanly (git checkout main) and start the stable stack.
+
+Step 6: Automation (Cron / Systemd)
+
+To have this work autonomously, set up a cronjob. We choose every 15 minutes (to stay well within API rate limits and avoid unnecessary server load).
+
+Open your crontab:
+```bash
+crontab -e
+```
+
+Add the following lines (adjust the paths to your actual locations):
+```bash
+# Run the poller every 15 minutes
+*/15 * * * * cd /home/tedsluis/monitoring && ./poll-renovate-prs.sh >> /tmp/renovate-poller.log 2>&1
+
+# Clean up old downloaded podman images weekly on Sunday night at 03:00
+0 3 * * 0 podman image prune -a -f
+```
+
+Operation & Rollback Guarantee
+
+Locking: If tests take long, the /tmp/renovate-poller.lock file prevents a new cronjob from running through the old one.
+
+State Management: The pr_state.json file keeps track of which commit SHA was tested. Does Renovate push a fix to the PR? Then the script sees a changed SHA and runs the test again.
+
+Rollback: Regardless of whether a test passes or fails, the script always ends with a git checkout to your base branch (usually main) and forces a rebuild of your stable containers. Your production stack is therefore offline for at most a few minutes per PR test.

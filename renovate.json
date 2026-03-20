@@ -6,34 +6,35 @@
     ":dependencyDashboard",
     ":semanticCommits"
   ],
+  "prBodyColumns": ["Package", "Update", "Type", "New value", "Compatibility", "Notes"],
+  "prBodyNotes": [
+    "🔍 **Automatically tested** on local Fedora monitoring stack",
+    "Stack components: Prometheus, Grafana, Loki, Tempo, Alertmanager, Alloy, KeepHQ"
+  ],
+  "commitMessageExtra": "- monitoring stack update",
+  "labels": ["renovate", "dependencies"],
   "assignees": ["tedsluis"],
-  "osvVulnerabilityAlerts": true,
-  "prHourlyLimit": 0,
-  "prConcurrentLimit": 0,
-  "labels": ["dependencies"],
-  "commitMessageAction": "Update",
-  "commitMessageTopic": "{{depName}}",
+  "prCreation": "immediate",
+  "platformAutomerge": false,
+  "vulnerabilityAlerts": {
+    "labels": ["security"],
+    "prPriority": 10
+  },
+  "releaseNotes": "full",
+  "prBodyTemplate": "{{{header}}}\n\n{{{table}}}\n\n{{{notes}}}\n\n{{{changelogs}}}\n\n{{{configDescription}}}\n\n{{{footer}}}",
   "packageRules": [
     {
-      "matchPackageNames": ["docker.io/library/postgres", 
-                            "us-central1-docker.pkg.dev/keephq/keep/keep-api", "us-central1-docker.pkg.dev/keephq/keep/keep-ui"
-        ],
+      "matchPackageNames": ["postgres", "us-central1-docker.pkg.dev/keephq/keep/keep-api", "us-central1-docker.pkg.dev/keephq/keep/keep-ui"],
       "groupName": "KeepHQ Stack",
       "commitMessageTopic": "KeepHQ containers"
     },
     {
-      "matchPackageNames": ["docker.io/grafana/grafana", 
-                            "docker.io/grafana/loki", 
-                            "docker.io/grafana/tempo", 
-                            "docker.io/grafana/alloy"
-        ],
+      "matchPackageNames": ["grafana/grafana", "grafana/loki", "grafana/tempo", "grafana/alloy"],
       "groupName": "Grafana Labs Stack",
       "commitMessageTopic": "Grafana ecosystem"
     },
     {
-      "matchPackageNames": ["quay.io/prometheus/prometheus", 
-                            "quay.io/prometheus/alertmanager"
-        ],
+      "matchPackageNames": ["quay.io/prometheus/prometheus", "quay.io/prometheus/alertmanager"],
       "groupName": "Prometheus Stack",
       "commitMessageTopic": "Prometheus ecosystem"
     },
