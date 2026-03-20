@@ -33,6 +33,46 @@ gh label create "test-failed" --color "D93F0B" --description "Automated smoke te
 
 Step 4: Run scripts
 
+```bash
+$ ./renovate.sh 
+🚀 Starting Mend Renovate via Podman...
+ INFO: Renovate started
+       "renovateVersion": "43.77.7"
+ INFO: Repository started (repository=tedsluis/monitoring)
+       "renovateVersion": "43.77.7"
+ INFO: Dependency extraction complete (repository=tedsluis/monitoring, baseBranch=main)
+       "stats": {
+         "managers": {"docker-compose": {"fileCount": 1, "depCount": 19}},
+         "total": {"fileCount": 1, "depCount": 19}
+       }
+(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+ INFO: Branch created (repository=tedsluis/monitoring, branch=renovate/minor-patch)
+       "commitSha": "59d1762b5e73eb4e4161d2fc06adf3ddcb6e508c"
+ INFO: PR created (repository=tedsluis/monitoring, branch=renovate/minor-patch)
+       "pr": 11,
+       "prTitle": "chore(deps): update minor & patch updates",
+       "labels": []
+ INFO: Repository finished (repository=tedsluis/monitoring)
+       "cloned": true,
+       "durationMs": 107365,
+       "result": "done",
+       "status": "activated",
+       "enabled": true,
+       "onboarded": true
+ INFO: Renovate was run at log level "info". Set LOG_LEVEL=debug in environment variables to see extended debug logs.
+✅ Renovate run is complete. Check your GitHub repository for possible Pull Requests!
+```
+
 Place run-tests.sh and poll-renovate-prs.sh in your /monitoring directory.
 
 Step 5: Test the script manually
