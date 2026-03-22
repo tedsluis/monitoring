@@ -2,6 +2,9 @@
 # run-tests.sh - Runs validations on the monitoring stack via an internal ephemeral container
 set -e
 
+# Disable the "Executing external compose provider" warning
+export PODMAN_COMPOSE_WARNING_LOGS=false
+
 echo "========================================"
 echo "🚀 Starting Automated Validation Suite"
 echo "========================================"

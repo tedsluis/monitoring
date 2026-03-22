@@ -88,12 +88,9 @@ services:
       - 3000
     restart: unless-stopped
     depends_on:
-      prometheus:
-        condition: service_started
-      loki:
-        condition: service_healthy
-      tempo:
-        condition: service_healthy
+      - prometheus
+      - loki
+      - tempo
     environment:
       - GF_SERVER_ROOT_URL=https://grafana.localhost
       - GF_SERVER_DOMAIN=grafana.localhost
@@ -232,15 +229,12 @@ services:
   loki:
     image: docker.io/grafana/loki:3.6.7@sha256:3c8fd3570dd9219951a60d3f919c7f31923d10baee578b77bc26c4a0b32d092d
     container_name: loki
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://loki:3100/ready"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    user: "0:0"
     networks:
       - monitoring-net
-    command: -config.file=/etc/loki/loki-config.yaml
+    command: 
+      - "-config.file=/etc/loki/loki-config.yaml"
+      # - "-health"
+      # - "-health.url=http://localhost:3100/ready"
     restart: unless-stopped
     depends_on:
       minio:
@@ -434,13 +428,10 @@ services:
   tempo:
     image: docker.io/grafana/tempo:2.10.3@sha256:cac9de2ac9f6da8efca5b64b690a7cb8c786a0c49cac7b4517dd1b0089a6c703
     container_name: tempo
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://tempo:3200/ready"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     command: 
       - "-config.file=/etc/tempo.yaml"
+      # - "-health"
+      # - "-health.url=http://localhost:3200/ready"
     user: "0:0"
     networks:
       - monitoring-net
