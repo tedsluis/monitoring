@@ -6,6 +6,8 @@
     ":dependencyDashboard",
     ":semanticCommits"
   ],
+  "prConcurrentLimit": 2,
+  "minimumReleaseAge": "3 days",
   "prBodyColumns": ["Package", "Update", "Type", "New value", "Compatibility", "Notes"],
   "prBodyNotes": [
     "🔍 **Automatically tested** on local Fedora monitoring stack",
@@ -23,24 +25,43 @@
     {
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "Minor & Patch updates",
-      "groupSlug": "minor-patch"
+      "groupSlug": "minor-patch-other"
     },
     {
       "matchUpdateTypes": ["major"],
       "labels": ["major-update", "requires-testing"]
     },
     {
-      "matchDepNames": ["docker.io/library/postgres", "us-central1-docker.pkg.dev/keephq/keep/keep-api", "us-central1-docker.pkg.dev/keephq/keep/keep-ui"],
+      "matchDepNames": ["docker.io/minio/minio", "docker.io/minio/mc"],
+      "enabled": false
+    },
+    {
+      "matchDepNames": [
+        "docker.io/library/postgres", 
+        "us-central1-docker.pkg.dev/keephq/keep/keep-api", 
+        "us-central1-docker.pkg.dev/keephq/keep/keep-ui"
+      ],
+      "matchUpdateTypes": ["minor", "patch"],
       "groupName": "KeepHQ Stack",
       "commitMessageTopic": "KeepHQ containers"
     },
     {
-      "matchDepNames": ["docker.io/grafana/grafana", "docker.io/grafana/loki", "docker.io/grafana/tempo", "docker.io/grafana/alloy"],
+      "matchDepNames": [
+        "docker.io/grafana/grafana", 
+        "docker.io/grafana/loki", 
+        "docker.io/grafana/tempo", 
+        "docker.io/grafana/alloy"
+      ],
+      "matchUpdateTypes": ["minor", "patch"],
       "groupName": "Grafana Labs Stack",
       "commitMessageTopic": "Grafana ecosystem"
     },
     {
-      "matchDepNames": ["quay.io/prometheus/prometheus", "quay.io/prometheus/alertmanager"],
+      "matchDepNames": [
+        "quay.io/prometheus/prometheus", 
+        "quay.io/prometheus/alertmanager"
+      ],
+      "matchUpdateTypes": ["minor", "patch"],
       "groupName": "Prometheus Stack",
       "commitMessageTopic": "Prometheus ecosystem"
     },
@@ -50,8 +71,28 @@
         "quay.io/prometheus/node-exporter", 
         "quay.io/navidys/prometheus-podman-exporter"
       ],
+      "matchUpdateTypes": ["minor", "patch"],
       "groupName": "Prometheus Exporters",
       "commitMessageTopic": "Exporters"
+    },
+    {
+      "matchDepNames": [
+        "docker.io/library/traefik", 
+        "docker.io/library/nginx"
+      ],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Infrastructure & Routing",
+      "commitMessageTopic": "Infra containers"
+    },
+    {
+      "matchDepNames": [
+        "docker.io/otel/opentelemetry-collector-contrib", 
+        "ghcr.io/prymitive/karma", 
+        "docker.io/tarampampam/webhook-tester"
+      ],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Observability Extras",
+      "commitMessageTopic": "Observability tools"
     }
   ]
 }
