@@ -88,9 +88,12 @@ services:
       - 3000
     restart: unless-stopped
     depends_on:
-      - prometheus
-      - loki
-      - tempo
+      prometheus:
+        condition: service_started
+      loki:
+        condition: service_healthy
+      tempo:
+        condition: service_healthy
     environment:
       - GF_SERVER_ROOT_URL=https://grafana.localhost
       - GF_SERVER_DOMAIN=grafana.localhost
@@ -141,6 +144,11 @@ services:
   keep-db:
     image: docker.io/library/postgres:18-alpine@sha256:4da1a4828be12604092fa55311276f08f9224a74a62dcb4708bd7439e2a03911
     container_name: keep-db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keep -d keep"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - monitoring-net
     environment:
@@ -224,6 +232,11 @@ services:
   loki:
     image: docker.io/grafana/loki:3.6.7@sha256:3c8fd3570dd9219951a60d3f919c7f31923d10baee578b77bc26c4a0b32d092d
     container_name: loki
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://loki:3100/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     user: "0:0"
     networks:
       - monitoring-net
@@ -421,6 +434,11 @@ services:
   tempo:
     image: docker.io/grafana/tempo:2.10.3@sha256:cac9de2ac9f6da8efca5b64b690a7cb8c786a0c49cac7b4517dd1b0089a6c703
     container_name: tempo
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://tempo:3200/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     command: 
       - "-config.file=/etc/tempo.yaml"
     user: "0:0"
