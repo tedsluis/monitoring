@@ -11,7 +11,6 @@
     "🔍 **Automatically tested** on local Fedora monitoring stack",
     "Stack components: Prometheus, Grafana, Loki, Tempo, Alertmanager, Alloy, KeepHQ"
   ],
-  "commitMessageExtra": "- monitoring stack update",
   "labels": ["renovate", "dependencies"],
   "assignees": ["tedsluis"],
   "prCreation": "immediate",
@@ -22,30 +21,6 @@
   "prBodyTemplate": "{{{header}}}\n\n{{{table}}}\n\n{{{notes}}}\n\n{{{changelogs}}}\n\n{{{configDescription}}}\n\n{{{footer}}}",
   "packageRules": [
     {
-      "matchPackageNames": ["postgres", "us-central1-docker.pkg.dev/keephq/keep/keep-api", "us-central1-docker.pkg.dev/keephq/keep/keep-ui"],
-      "groupName": "KeepHQ Stack",
-      "commitMessageTopic": "KeepHQ containers"
-    },
-    {
-      "matchPackageNames": ["grafana/grafana", "grafana/loki", "grafana/tempo", "grafana/alloy"],
-      "groupName": "Grafana Labs Stack",
-      "commitMessageTopic": "Grafana ecosystem"
-    },
-    {
-      "matchPackageNames": ["quay.io/prometheus/prometheus", "quay.io/prometheus/alertmanager"],
-      "groupName": "Prometheus Stack",
-      "commitMessageTopic": "Prometheus ecosystem"
-    },
-    {
-      "matchPackageNames": [
-        "quay.io/prometheus/blackbox-exporter", 
-        "quay.io/prometheus/node-exporter", 
-        "quay.io/navidys/prometheus-podman-exporter"
-      ],
-      "groupName": "Prometheus Exporters",
-      "commitMessageTopic": "Exporters"
-    },
-    {
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "Minor & Patch updates",
       "groupSlug": "minor-patch"
@@ -53,6 +28,30 @@
     {
       "matchUpdateTypes": ["major"],
       "labels": ["major-update", "requires-testing"]
+    },
+    {
+      "matchDepNames": ["docker.io/library/postgres", "us-central1-docker.pkg.dev/keephq/keep/keep-api", "us-central1-docker.pkg.dev/keephq/keep/keep-ui"],
+      "groupName": "KeepHQ Stack",
+      "commitMessageTopic": "KeepHQ containers"
+    },
+    {
+      "matchDepNames": ["docker.io/grafana/grafana", "docker.io/grafana/loki", "docker.io/grafana/tempo", "docker.io/grafana/alloy"],
+      "groupName": "Grafana Labs Stack",
+      "commitMessageTopic": "Grafana ecosystem"
+    },
+    {
+      "matchDepNames": ["quay.io/prometheus/prometheus", "quay.io/prometheus/alertmanager"],
+      "groupName": "Prometheus Stack",
+      "commitMessageTopic": "Prometheus ecosystem"
+    },
+    {
+      "matchDepNames": [
+        "quay.io/prometheus/blackbox-exporter", 
+        "quay.io/prometheus/node-exporter", 
+        "quay.io/navidys/prometheus-podman-exporter"
+      ],
+      "groupName": "Prometheus Exporters",
+      "commitMessageTopic": "Exporters"
     }
   ]
 }
