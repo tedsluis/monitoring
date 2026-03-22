@@ -6,27 +6,50 @@ echo "========================================"
 echo "🚀 Starting Automated Validation Suite"
 echo "========================================"
 
-echo "⏳ [WAIT] Allowing services to initialize (waiting 30 seconds)..."
-sleep 30
+# Geef podman een paar seconden om de processen te registreren
+sleep 5 
 
 echo "🔍 [CHECK] Smoketest: Are all defined containers running?"
-# Get the expected number of services from compose.yml
 EXPECTED_COUNT=$(grep -c 'container_name:' compose.yml || echo 19)
-echo "   [INFO] Expected container count from compose.yml: ~${EXPECTED_COUNT}"
+echo "   [INFO] Expected container count from compose.yml: ${EXPECTED_COUNT}"
 
-RUNNING_CONTAINERS=$(podman ps --format "{{.Names}}" | grep -E 'alertmanager|alloy|blackbox-exporter|grafana|karma|keep-db|keep-backend|keep-frontend|loki|minio|nginx|node-exporter|otel-collector|podman-exporter|prometheus|tempo|traefik|webhook-tester')
-RUNNING_COUNT=$(echo "$RUNNING_CONTAINERS" | wc -l)
-echo "   [INFO] Currently running matched containers: ${RUNNING_COUNT}"
+# Gebruik de robuuste compose-ps commando's en strip witregels
+RUNNING_COUNT=$(podman compose ps -q | wc -l | tr -d ' ')
+echo "   [INFO] Currently running containers: ${RUNNING_COUNT}"
 
-if [ "$RUNNING_COUNT" -lt 18 ]; then
-    echo "❌ [ERROR] Not all containers are running. Expected ~18+, found $RUNNING_COUNT"
-    echo "   [DEBUG] Dumping 'podman ps -a' for troubleshooting:"
-    podman ps -a
+if [ "$RUNNING_COUNT" -lt "$EXPECTED_COUNT" ]; then
+    echo "❌ [ERROR] Not all containers are running. Expected $EXPECTED_COUNT, found $RUNNING_COUNT"
+    echo "   [DEBUG] Dumping 'podman compose ps' for troubleshooting:"
+    podman compose ps
     exit 1
 fi
 echo "✅ [SUCCESS] All required containers are running."
 
-# Find the actual name of the internal Podman network (usually monitoring_monitoring-net)
+echo "----------------------------------------"
+echo "⏳ [WAIT] Checking container health status (Minio, Loki, Tempo)..."
+
+# Wacht slim op de containers met een native healthcheck
+for service in minio loki tempo keep-db; do
+    echo "   [INFO] Waiting for $service to become healthy..."
+    for i in {1..12}; do
+        # Podman inspect leest de native container health status uit
+        STATUS=$(podman inspect -f '{{.State.Health.Status}}' $service 2>/dev/null || echo "unknown")
+        
+        if [ "$STATUS" == "healthy" ]; then
+            echo "   [SUCCESS] $service is healthy!"
+            break
+        fi
+        
+        if [ "$i" -eq 12 ]; then
+            echo "❌ [ERROR] $service failed to become healthy within 60 seconds. Final status: $STATUS"
+            podman logs --tail 20 $service
+            exit 1
+        fi
+        sleep 5
+    done
+done
+
+# Find the actual name of the internal Podman network
 echo "🔍 [CHECK] Identifying internal Podman network..."
 NETWORK=$(podman network ls --format "{{.Name}}" | grep "monitoring-net" | head -n 1)
 if [ -z "$NETWORK" ]; then
@@ -35,13 +58,11 @@ if [ -z "$NETWORK" ]; then
 fi
 echo "🔌 [INFO] Using internal network: $NETWORK"
 
-# Base curl command with the ephemeral container
 CURL_CMD="podman run --rm --network $NETWORK docker.io/curlimages/curl:latest"
 echo "   [INFO] Using ephemeral curl container for internal API testing."
 
 echo "----------------------------------------"
-echo "🔍 [TEST] Prometheus API & Base Health (Internal via prometheus:9090)"
-echo "   [INFO] Executing HTTP GET http://prometheus:9090/-/healthy"
+echo "🔍 [TEST] Prometheus API & Base Health"
 $CURL_CMD -sSf -o /dev/null http://prometheus:9090/-/healthy || { echo "❌ [ERROR] Prometheus is not healthy"; exit 1; }
 echo "✅ [SUCCESS] Prometheus API is reachable and reports healthy."
 
@@ -53,11 +74,8 @@ FAILED_TARGETS=1
 
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
     echo "   [INFO] Fetching Prometheus targets (Attempt $((RETRY_COUNT+1))/$MAX_RETRIES)..."
-    # Query the targets. If the call fails, return an error JSON.
     TARGET_JSON=$($CURL_CMD -s http://prometheus:9090/api/v1/targets || echo '{"status":"error"}')
     
-    # Use jq to check if the API is successful AND if there are targets that are not 'up'.
-    # If there are no activeTargets yet or the API returns an error, this results in 1 (fail).
     FAILED_TARGETS=$(echo "$TARGET_JSON" | jq -e 'if .status == "success" and (.data.activeTargets | length) > 0 then [.data.activeTargets[] | select(.health != "up")] | length else 1 end' 2>/dev/null || echo "1")
     
     if [ "$FAILED_TARGETS" == "0" ]; then
@@ -72,23 +90,29 @@ done
 
 if [ "$FAILED_TARGETS" != "0" ]; then
     echo "❌ [ERROR] After 2 minutes, there are still targets DOWN or inaccessible."
-    echo "   [DEBUG] Dumping failed target details for GitHub Issue:"
-    # Print exactly WHICH targets are failing
     echo "$TARGET_JSON" | jq '.data.activeTargets[]? | select(.health != "up") | {job: .labels.job, instance: .labels.instance, health: .health, error: .lastError}'
     exit 1
 fi
 
 echo "----------------------------------------"
-echo "🔍 [TEST] Grafana API (Internal via grafana:3000)"
-echo "   [INFO] Executing HTTP GET http://grafana:3000/api/health"
+echo "🔍 [TEST] Grafana API"
 $CURL_CMD -sSf -o /dev/null http://grafana:3000/api/health || { echo "❌ [ERROR] Grafana API unreachable"; exit 1; }
 echo "✅ [SUCCESS] Grafana is reachable and healthy."
 
 echo "----------------------------------------"
-echo "🔍 [TEST] Alertmanager (Internal via alertmanager:9093)"
-echo "   [INFO] Executing HTTP GET http://alertmanager:9093/-/healthy"
+echo "🔍 [TEST] Alertmanager"
 $CURL_CMD -sSf -o /dev/null http://alertmanager:9093/-/healthy || { echo "❌ [ERROR] Alertmanager is not healthy"; exit 1; }
 echo "✅ [SUCCESS] Alertmanager is reachable and healthy."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Keep API"
+$CURL_CMD -sSf -o /dev/null http://keep-backend:8080/health || { echo "❌ [ERROR] Keep API is not healthy"; exit 1; }
+echo "✅ [SUCCESS] Keep API is reachable and healthy."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Traefik Routing (using Nginx)"
+$CURL_CMD -sSf -H "Host: localhost" -o /dev/null http://traefik:80 || { echo "❌ [ERROR] Traefik routing is failing"; exit 1; }
+echo "✅ [SUCCESS] Traefik is routing requests correctly."
 
 echo "========================================"
 echo "🎉 [COMPLETE] All tests completed successfully! Stack is stable."
