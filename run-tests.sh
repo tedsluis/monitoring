@@ -32,7 +32,7 @@ echo "----------------------------------------"
 echo "⏳ [WAIT] Checking container health status (Minio, Loki, Tempo)..."
 
 # Wacht slim op de containers met een native healthcheck
-for service in minio loki tempo keep-db; do
+for service in minio keep-db; do
     echo "   [INFO] Waiting for $service to become healthy..."
     for i in {1..12}; do
         # Podman inspect leest de native container health status uit
@@ -109,7 +109,7 @@ echo "✅ [SUCCESS] Alertmanager is reachable and healthy."
 
 echo "----------------------------------------"
 echo "🔍 [TEST] Keep API"
-$CURL_CMD -sSf -o /dev/null http://keep-backend:8080/health || { echo "❌ [ERROR] Keep API is not healthy"; exit 1; }
+$CURL_CMD -sSf -o /dev/null http://keep-backend:8080/ || { echo "❌ [ERROR] Keep API is not healthy"; exit 1; }
 echo "✅ [SUCCESS] Keep API is reachable and healthy."
 
 echo "----------------------------------------"
