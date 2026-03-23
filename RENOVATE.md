@@ -33,6 +33,49 @@ gh label create "test-failed" --color "D93F0B" --description "Automated smoke te
 
 Step 4: Run scripts
 
+run tests:
+```bash
+$ ./run-tests.sh
+========================================
+🚀 Starting Automated Validation Suite
+========================================
+🔍 [CHECK] Smoketest: Are all defined containers running?
+   [INFO] Expected container count from compose.yml: 19
+   [INFO] Currently running containers: 19
+✅ [SUCCESS] All required containers are running.
+----------------------------------------
+⏳ [WAIT] Checking container health status (Minio, Loki, Tempo)...
+   [INFO] Waiting for minio to become healthy...
+   [SUCCESS] minio is healthy!
+   [INFO] Waiting for keep-db to become healthy...
+   [SUCCESS] keep-db is healthy!
+🔍 [CHECK] Identifying internal Podman network...
+🔌 [INFO] Using internal network: monitoring_monitoring-net
+   [INFO] Using ephemeral curl container for internal API testing.
+----------------------------------------
+🔍 [TEST] Prometheus API & Base Health
+✅ [SUCCESS] Prometheus API is reachable and reports healthy.
+----------------------------------------
+🔍 [TEST] Prometheus Targets (Max 2 minutes wait)
+   [INFO] Fetching Prometheus targets (Attempt 1/12)...
+✅ [SUCCESS] All Prometheus targets are UP and successfully scraped.
+----------------------------------------
+🔍 [TEST] Grafana API
+✅ [SUCCESS] Grafana is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Alertmanager
+✅ [SUCCESS] Alertmanager is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Keep API
+✅ [SUCCESS] Keep API is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Traefik Routing (using Nginx)
+✅ [SUCCESS] Traefik is routing requests correctly.
+========================================
+🎉 [COMPLETE] All tests completed successfully! Stack is stable.
+```
+
+Run renovate:
 ```bash
 $ ./renovate.sh 
 🚀 Starting Mend Renovate via Podman...
@@ -56,15 +99,16 @@ $ ./renovate.sh
 (node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
 (node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
 (node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
- INFO: Branch created (repository=tedsluis/monitoring, branch=renovate/minor-patch)
-       "commitSha": "59d1762b5e73eb4e4161d2fc06adf3ddcb6e508c"
- INFO: PR created (repository=tedsluis/monitoring, branch=renovate/minor-patch)
-       "pr": 11,
-       "prTitle": "chore(deps): update minor & patch updates",
+ INFO: Branch created (repository=tedsluis/monitoring, branch=renovate/observability-extras)
+       "commitSha": "4f91d4452a4dedd2b53a374838356c4e4c171017"
+ INFO: PR created (repository=tedsluis/monitoring, branch=renovate/observability-extras)
+       "pr": 16,
+       "prTitle": "chore(deps): update observability tools to v0.148.0",
        "labels": []
+ INFO: Deleting orphan branch (repository=tedsluis/monitoring, branch=renovate/minor-patch)
  INFO: Repository finished (repository=tedsluis/monitoring)
        "cloned": true,
-       "durationMs": 107365,
+       "durationMs": 61442,
        "result": "done",
        "status": "activated",
        "enabled": true,
@@ -73,53 +117,114 @@ $ ./renovate.sh
 ✅ Renovate run is complete. Check your GitHub repository for possible Pull Requests!
 ```
 
-Place run-tests.sh and poll-renovate-prs.sh in your /monitoring directory.
 
-Step 5: Test the script manually
-
-Before running the poller in the background, it is crucial to verify this manually once Renovate has created a PR:
 
 ```bash
-./poll-renovate-prs.sh
+$ ./poll-renovate-prs.sh
+[INFO] Verifying required directories and state files...
+🔄 Starting Renovate PR Poller at Mon Mar 23 07:05:12 AM CET 2026
+[INFO] Fetching open Pull Requests with the label 'renovate' from tedsluis/monitoring...
+----------------------------------------
+📌 Inspecting PR #16 (Branch: renovate/observability-extras)
+[INFO] Fetching the latest commit SHA for PR #16...
+[DEBUG] Current PR SHA: 4f91d4452a4dedd2b53a374838356c4e4c171017
+[DEBUG] Last tested SHA: None
+[DEBUG] Current status in state file: None
+⚙️ New or updated PR found. Starting test cycle...
+[INFO] Base branch identified as: main (SHA: cdfd04b67e96370410aafd7496e22b4f4253997a)
+[INFO] Executing git operations: fetching and checking out branch 'renovate/observability-extras'...
+remote: Enumerating objects: 5, done.
+remote: Counting objects: 100% (5/5), done.
+remote: Compressing objects: 100% (1/1), done.
+remote: Total 3 (delta 2), reused 3 (delta 2), pack-reused 0 (from 0)
+Unpacking objects: 100% (3/3), 384 bytes | 384.00 KiB/s, done.
+From github.com:tedsluis/monitoring
+ * branch            renovate/observability-extras -> FETCH_HEAD
+ * [new branch]      renovate/observability-extras -> origin/renovate/observability-extras
+branch 'renovate/observability-extras' set up to track 'origin/renovate/observability-extras'.
+Switched to a new branch 'renovate/observability-extras'
+From github.com:tedsluis/monitoring
+ * branch            renovate/observability-extras -> FETCH_HEAD
+Already up to date.
+🚀 Starting containers for PR #16...
+[INFO] Running 'podman-compose pull' to ensure all images are up to date...
+[INFO] Tearing down any existing stack (timeout 30s)...  
+[INFO] Bringing up the new stack with '--force-recreate'...
+🔬 Running tests... (Output will be heavily logged in /home/tedsluis/monitoring/test-logs/pr-16-1774245969.log)
+✅ Test passed for PR #16!
+https://github.com/tedsluis/monitoring/pull/16
+https://github.com/tedsluis/monitoring/pull/16#issuecomment-4108234413
+🔀 Merging PR #16 into main...
+✓ Merged pull request tedsluis/monitoring#16 (chore(deps): update observability tools to v0.148.0)
+✓ Deleted remote branch renovate/observability-extras
+✅ PR successfully merged!
+[INFO] Bringing down the test stack...
+[INFO] Syncing local base branch (main) with origin...
+Switched to branch 'main'
+Your branch is up to date with 'origin/main'.
+remote: Enumerating objects: 1, done.
+remote: Counting objects: 100% (1/1), done.
+remote: Total 1 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+Unpacking objects: 100% (1/1), 932 bytes | 466.00 KiB/s, done.
+From github.com:tedsluis/monitoring
+   cdfd04b..9ef55c7  main       -> origin/main
+HEAD is now at 9ef55c7 Merge pull request #16 from tedsluis/renovate/observability-extras
+========================================
+🚀 PRs have been successfully merged!
+The production (main) stack is now being permanently updated...
+[INFO] Checking out main branch and fetching latest changes...
+Already on 'main'
+Your branch is up to date with 'origin/main'.
+From github.com:tedsluis/monitoring
+ * branch            main       -> FETCH_HEAD
+HEAD is now at 9ef55c7 Merge pull request #16 from tedsluis/renovate/observability-extras
+⬇️ Pulling new images on main...
+🔄 Restarting stack with latest main branch...
+🎉 Main stack successfully updated and running on the latest versions!
+https://github.com/tedsluis/monitoring/pull/16#issuecomment-4108240074
+[INFO] Performing safe image cleanup (removing untagged images older than 7 days)...
+✅ Poller run completed at Mon Mar 23 07:08:21 AM CET 2026.
 ```
 
-The script will:
 
-Fetch PRs.
-
-Check out the PR branch and run podman-compose up -d.
-
-Run run-tests.sh.
 
 ```bash
 $ ./run-tests.sh 
 ========================================
 🚀 Starting Automated Validation Suite
 ========================================
-⏳ [WAIT] Allowing services to initialize (waiting 30 seconds)...
 🔍 [CHECK] Smoketest: Are all defined containers running?
-   [INFO] Expected container count from compose.yml: ~19
-   [INFO] Currently running matched containers: 18
+   [INFO] Expected container count from compose.yml: 19
+   [INFO] Currently running containers: 19
 ✅ [SUCCESS] All required containers are running.
+----------------------------------------
+⏳ [WAIT] Checking container health status (Minio, Loki, Tempo)...
+   [INFO] Waiting for minio to become healthy...
+   [SUCCESS] minio is healthy!
+   [INFO] Waiting for keep-db to become healthy...
+   [SUCCESS] keep-db is healthy!
 🔍 [CHECK] Identifying internal Podman network...
 🔌 [INFO] Using internal network: monitoring_monitoring-net
    [INFO] Using ephemeral curl container for internal API testing.
 ----------------------------------------
-🔍 [TEST] Prometheus API & Base Health (Internal via prometheus:9090)
-   [INFO] Executing HTTP GET http://prometheus:9090/-/healthy
+🔍 [TEST] Prometheus API & Base Health
 ✅ [SUCCESS] Prometheus API is reachable and reports healthy.
 ----------------------------------------
 🔍 [TEST] Prometheus Targets (Max 2 minutes wait)
    [INFO] Fetching Prometheus targets (Attempt 1/12)...
 ✅ [SUCCESS] All Prometheus targets are UP and successfully scraped.
 ----------------------------------------
-🔍 [TEST] Grafana API (Internal via grafana:3000)
-   [INFO] Executing HTTP GET http://grafana:3000/api/health
+🔍 [TEST] Grafana API
 ✅ [SUCCESS] Grafana is reachable and healthy.
 ----------------------------------------
-🔍 [TEST] Alertmanager (Internal via alertmanager:9093)
-   [INFO] Executing HTTP GET http://alertmanager:9093/-/healthy
+🔍 [TEST] Alertmanager
 ✅ [SUCCESS] Alertmanager is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Keep API
+✅ [SUCCESS] Keep API is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Traefik Routing (using Nginx)
+✅ [SUCCESS] Traefik is routing requests correctly.
 ========================================
 🎉 [COMPLETE] All tests completed successfully! Stack is stable.
 ```
