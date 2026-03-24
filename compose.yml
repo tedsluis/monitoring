@@ -368,13 +368,13 @@ services:
       retries: 3
     command:
       - '--path.rootfs=/host'
-      - '/run/udev/data:/run/udev/data:ro'
     # MUST STAY ON HOST NETWORK
     pid: host
     network_mode: host
     restart: unless-stopped
     volumes:
       - '/:/host:ro,rslave'
+      - '/run/udev/data:/run/udev/data:ro'
     # Note: Traefik config for this is in traefik/dynamic/services.yaml
 
   # ---------------------------------------------------------
