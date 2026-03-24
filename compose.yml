@@ -220,7 +220,7 @@ services:
     image: us-central1-docker.pkg.dev/keephq/keep/keep-ui:0.51.0@sha256:2041f65c7bbd64c2a800a4d11eedf0e99b89debfd6b88f0bbb109443eb6bcc23
     container_name: keep-frontend
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1"]
+      test: ["CMD-SHELL", "wget -q --tries=1 --spider http://127.0.0.1:3000 || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -362,7 +362,7 @@ services:
     image: quay.io/prometheus/node-exporter:v1.10.2@sha256:337ff1d356b68d39cef853e8c6345de11ce7556bb34cda8bd205bcf2ed30b565
     container_name: node-exporter
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --tries=1 --spider http://127.0.0.1:9100/-/healthy || exit 1"]
+      test: ["CMD-SHELL", "wget -q --tries=1 --spider http://host.containers.internal:9100/ || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -502,7 +502,7 @@ services:
     image: docker.io/library/traefik:v3.6.11@sha256:acfc80650104f0194a15f73dc1648f517561bc1645391a15705332a064cfc33c
     container_name: traefik
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --tries=1 --spider http://127.0.0.1:8080/ping || exit 1"]
+      test: ["CMD-SHELL", "wget -q --tries=1 --spider http://127.0.0.1:8082/ping || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
