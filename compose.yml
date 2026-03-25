@@ -220,10 +220,11 @@ services:
     image: us-central1-docker.pkg.dev/keephq/keep/keep-ui:0.51.0@sha256:2041f65c7bbd64c2a800a4d11eedf0e99b89debfd6b88f0bbb109443eb6bcc23
     container_name: keep-frontend
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --tries=1 --spider http://127.0.0.1:3000 || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://keep-frontend:3000/api/healthcheck || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
     networks:
       - monitoring-net
     depends_on:
