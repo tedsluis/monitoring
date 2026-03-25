@@ -254,8 +254,6 @@ services:
       - monitoring-net
     command: 
       - "-config.file=/etc/loki/loki-config.yaml"
-      # - "-health"
-      # - "-health.url=http://localhost:3100/ready"
     restart: unless-stopped
     depends_on:
       minio:
@@ -265,7 +263,7 @@ services:
     volumes:
       - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml:Z
       - ./loki/rules:/loki/rules:Z
-      - loki-wal:/loki/wal:Z
+      - loki-wal:/loki/wal:Z,U
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.loki.rule=Host(`loki.localhost`)"
