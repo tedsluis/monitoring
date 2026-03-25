@@ -13,7 +13,7 @@ services:
     image: quay.io/prometheus/alertmanager:v0.31.1@sha256:88b605de9aba0410775c1eb3438f951115054e0d307f23f274a4c705f51630c1
     container_name: alertmanager
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --tries=1 --spider http://127.0.0.1:9093/-/healthy || exit 1"]
+      test: ["CMD-SHELL", "http_proxy= HTTP_PROXY= wget -q --tries=1 --spider http://127.0.0.1:9093/-/healthy || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -88,7 +88,7 @@ services:
     image: docker.io/grafana/grafana:12.4.1@sha256:e932bd6ed0e026595b08483cd0141e5103e1ab7ff8604839ff899b8dc54cabcb
     container_name: grafana
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1"]
+      test: ["CMD-SHELL", "http_proxy= HTTP_PROXY= wget -q --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -174,7 +174,7 @@ services:
     image: us-central1-docker.pkg.dev/keephq/keep/keep-api:0.51.0@sha256:0e95b90210f2caeaf6a654daec274cfe43101cf1c4cdbc9cd1fec1a99e791af6
     container_name: keep-backend
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --tries=1 --spider http://127.0.0.1:8080/healthcheck || exit 1"]
+      test: ["CMD-SHELL", "http_proxy= HTTP_PROXY= wget -q --tries=1 --spider http://127.0.0.1:8080/healthcheck || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -220,7 +220,7 @@ services:
     image: us-central1-docker.pkg.dev/keephq/keep/keep-ui:0.51.0@sha256:2041f65c7bbd64c2a800a4d11eedf0e99b89debfd6b88f0bbb109443eb6bcc23
     container_name: keep-frontend
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://keep-frontend:3000/api/healthcheck || exit 1"]
+      test: ["CMD-SHELL", "http_proxy= HTTP_PROXY= wget -q --spider http://keep-frontend:3000/api/healthcheck || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -251,6 +251,11 @@ services:
   loki:
     image: docker.io/grafana/loki:3.6.7@sha256:3c8fd3570dd9219951a60d3f919c7f31923d10baee578b77bc26c4a0b32d092d
     container_name: loki
+    environment:
+      - http_proxy=
+      - https_proxy=
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
     networks:
       - monitoring-net
     command: 
@@ -337,7 +342,7 @@ services:
     image: docker.io/library/nginx:alpine@sha256:f46cb72c7df02710e693e863a983ac42f6a9579058a59a35f1ae36c9958e4ce0
     container_name: nginx
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --tries=1 --spider http://127.0.0.1:80/ || exit 1"]
+      test: ["CMD-SHELL", "http_proxy= HTTP_PROXY= wget -q --tries=1 --spider http://127.0.0.1:80/ || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -361,7 +366,7 @@ services:
     image: quay.io/prometheus/node-exporter:v1.10.2@sha256:337ff1d356b68d39cef853e8c6345de11ce7556bb34cda8bd205bcf2ed30b565
     container_name: node-exporter
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --tries=1 --spider http://host.containers.internal:9100/ || exit 1"]
+      test: ["CMD-SHELL", "http_proxy= HTTP_PROXY= wget -q --tries=1 --spider http://host.containers.internal:9100/ || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -410,7 +415,7 @@ services:
     image: quay.io/navidys/prometheus-podman-exporter:v1.21.0@sha256:2ebb9e09101d8cc1e28e3f306b56a722450918e628208435201ed39bd62403cb
     container_name: podman-exporter
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --tries=1 --spider http://127.0.0.1:9882/metrics || exit 1"]
+      test: ["CMD-SHELL", "http_proxy= HTTP_PROXY= wget -q --tries=1 --spider http://127.0.0.1:9882/metrics || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -438,7 +443,7 @@ services:
     container_name: prometheus
     user: "65534:65534"
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --tries=1 --spider http://127.0.0.1:9090/-/healthy || exit 1"]
+      test: ["CMD-SHELL", "http_proxy= HTTP_PROXY= wget -q --tries=1 --spider http://127.0.0.1:9090/-/healthy || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -501,7 +506,7 @@ services:
     image: docker.io/library/traefik:v3.6.11@sha256:acfc80650104f0194a15f73dc1648f517561bc1645391a15705332a064cfc33c
     container_name: traefik
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --tries=1 --spider http://127.0.0.1:8082/ping || exit 1"]
+      test: ["CMD-SHELL", "http_proxy= HTTP_PROXY= wget -q --tries=1 --spider http://127.0.0.1:8082/ping || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
