@@ -20,7 +20,7 @@ podman run --rm \
     -e GITHUB_COM_TOKEN="${GITHUB_COM_TOKEN}" \
     -e RENOVATE_GIT_AUTHOR="Ted Sluis <ted.sluis@gmail.com>" \
     -e LOG_LEVEL="info" \
-    -e NODE_OPTIONS="--dns-result-order=ipv4first" \
+    -e NODE_OPTIONS="--trace-warnings --dns-result-order=ipv4first" \
     -v "$(pwd)/renovate-config.js:/usr/src/app/config.js:Z" \
     ghcr.io/renovatebot/renovate:latest
 
