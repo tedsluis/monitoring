@@ -4,7 +4,7 @@ groups:
       # Example 1: Alert immediately on critical errors
       - alert: CriticalErrorInLogs
         # Count the number of lines with "panic" or "fatal" per minute. If > 0, then alarm.
-        expr: count_over_time({job="podman-containers"} |= "panic" [1m]) > 0
+        expr: count_over_time({job="podman-containers"} |= "panic" != "count_over_time" [1m]) > 0
         for: 0m # Fire immediately
         labels:
           severity: critical
@@ -40,7 +40,7 @@ groups:
       # --- SPECIFIEKE LOKI ERROR ---
       - alert: LokiIngestionError
         # Check for specific op failures while writing chunks
-        expr: count_over_time({container_name="loki"} |= "failed to flush" [1m]) > 0
+        expr: count_over_time({container_name="loki"} |= "failed to flush" != "count_over_time" [1m]) > 0
         for: 1m
         labels:
           severity: critical
@@ -50,7 +50,7 @@ groups:
 
       # --- SPECIFIEKE ALLOY ERROR ---
       - alert: AlloyPipelineBlocked
-        expr: count_over_time({container_name="alloy"} |= "component evaluation failed" [1m]) > 0
+        expr: count_over_time({container_name="alloy"} |= "component evaluation failed" != "count_over_time" [1m]) > 0
         labels:
           severity: warning
         annotations:
