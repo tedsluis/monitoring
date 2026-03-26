@@ -35,7 +35,7 @@ Step 4: Run scripts
 
 run tests:
 ```bash
-$ ./run-tests.sh
+$ ./run-tests.sh 
 ========================================
 🚀 Starting Automated Validation Suite
 ========================================
@@ -71,6 +71,42 @@ $ ./run-tests.sh
 ----------------------------------------
 🔍 [TEST] Traefik Routing (using Nginx)
 ✅ [SUCCESS] Traefik is routing requests correctly.
+----------------------------------------
+🔍 [TEST] Alloy
+✅ [SUCCESS] Alloy is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Blackbox Exporter
+✅ [SUCCESS] Blackbox Exporter is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Karma Dashboard
+✅ [SUCCESS] Karma is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Keep Frontend
+✅ [SUCCESS] Keep Frontend is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Loki
+✅ [SUCCESS] Loki is reachable and healthy.
+----------------------------------------
+🔍 [TEST] MinIO
+✅ [SUCCESS] MinIO is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Nginx
+✅ [SUCCESS] Nginx is reachable.
+----------------------------------------
+🔍 [TEST] Node Exporter
+✅ [SUCCESS] Node Exporter is reachable.
+----------------------------------------
+🔍 [TEST] OpenTelemetry Collector
+✅ [SUCCESS] OTel Collector is reachable.
+----------------------------------------
+🔍 [TEST] Podman Exporter
+✅ [SUCCESS] Podman Exporter is reachable.
+----------------------------------------
+🔍 [TEST] Tempo
+✅ [SUCCESS] Tempo is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Webhook Tester
+✅ [SUCCESS] Webhook Tester is reachable.
 ========================================
 🎉 [COMPLETE] All tests completed successfully! Stack is stable.
 ```
@@ -117,8 +153,7 @@ $ ./renovate.sh
 ✅ Renovate run is complete. Check your GitHub repository for possible Pull Requests!
 ```
 
-
-
+Check pull requests:
 ```bash
 $ ./poll-renovate-prs.sh
 [INFO] Verifying required directories and state files...
@@ -186,8 +221,7 @@ https://github.com/tedsluis/monitoring/pull/16#issuecomment-4108240074
 ✅ Poller run completed at Mon Mar 23 07:08:21 AM CET 2026.
 ```
 
-
-
+Run tests:
 ```bash
 $ ./run-tests.sh 
 ========================================
@@ -225,6 +259,42 @@ $ ./run-tests.sh
 ----------------------------------------
 🔍 [TEST] Traefik Routing (using Nginx)
 ✅ [SUCCESS] Traefik is routing requests correctly.
+----------------------------------------
+🔍 [TEST] Alloy
+✅ [SUCCESS] Alloy is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Blackbox Exporter
+✅ [SUCCESS] Blackbox Exporter is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Karma Dashboard
+✅ [SUCCESS] Karma is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Keep Frontend
+✅ [SUCCESS] Keep Frontend is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Loki
+✅ [SUCCESS] Loki is reachable and healthy.
+----------------------------------------
+🔍 [TEST] MinIO
+✅ [SUCCESS] MinIO is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Nginx
+✅ [SUCCESS] Nginx is reachable.
+----------------------------------------
+🔍 [TEST] Node Exporter
+✅ [SUCCESS] Node Exporter is reachable.
+----------------------------------------
+🔍 [TEST] OpenTelemetry Collector
+✅ [SUCCESS] OTel Collector is reachable.
+----------------------------------------
+🔍 [TEST] Podman Exporter
+✅ [SUCCESS] Podman Exporter is reachable.
+----------------------------------------
+🔍 [TEST] Tempo
+✅ [SUCCESS] Tempo is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Webhook Tester
+✅ [SUCCESS] Webhook Tester is reachable.
 ========================================
 🎉 [COMPLETE] All tests completed successfully! Stack is stable.
 ```
