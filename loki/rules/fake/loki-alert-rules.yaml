@@ -16,7 +16,7 @@ groups:
       - alert: HighErrorRate
         # If there are more than 10 errors per minute
         # (?i) makes it case-insensitive (Error, error, ERROR)
-        expr: count_over_time({job="podman-containers"} |~ "(?i)error" [1m]) > 10
+        expr: count_over_time({job="podman-containers"} |~ "(?i)error" != "count_over_time" [1m]) > 10
         for: 2m
         labels:
           severity: warning
