@@ -9,14 +9,14 @@ echo "========================================"
 echo "🚀 Starting Automated Validation Suite"
 echo "========================================"
 
-# Geef podman een paar seconden om de processen te registreren
+# Give podman a few seconds to register the processes
 sleep 5 
 
 echo "🔍 [CHECK] Smoketest: Are all defined containers running?"
 EXPECTED_COUNT=$(grep -c 'container_name:' compose.yml || echo 19)
 echo "   [INFO] Expected container count from compose.yml: ${EXPECTED_COUNT}"
 
-# Gebruik de robuuste compose-ps commando's en strip witregels
+# Use the robust compose-ps commands and strip blank lines
 RUNNING_COUNT=$(podman compose ps -q | wc -l | tr -d ' ')
 echo "   [INFO] Currently running containers: ${RUNNING_COUNT}"
 
@@ -31,11 +31,11 @@ echo "✅ [SUCCESS] All required containers are running."
 echo "----------------------------------------"
 echo "⏳ [WAIT] Checking container health status (Minio, Loki, Tempo)..."
 
-# Wacht slim op de containers met een native healthcheck
+# Wait smartly for the containers with a native healthcheck
 for service in minio keep-db; do
     echo "   [INFO] Waiting for $service to become healthy..."
     for i in {1..12}; do
-        # Podman inspect leest de native container health status uit
+        # Podman inspect reads the native container health status
         STATUS=$(podman inspect -f '{{.State.Health.Status}}' $service 2>/dev/null || echo "unknown")
         
         if [ "$STATUS" == "healthy" ]; then
@@ -116,6 +116,67 @@ echo "----------------------------------------"
 echo "🔍 [TEST] Traefik Routing (using Nginx)"
 $CURL_CMD -sSf -H "Host: localhost" -o /dev/null http://traefik:80 || { echo "❌ [ERROR] Traefik routing is failing"; exit 1; }
 echo "✅ [SUCCESS] Traefik is routing requests correctly."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Alloy"
+$CURL_CMD -sSf -o /dev/null http://alloy:12345/-/healthy || { echo "❌ [ERROR] Alloy is not healthy"; exit 1; }
+echo "✅ [SUCCESS] Alloy is reachable and healthy."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Blackbox Exporter"
+$CURL_CMD -sSf -o /dev/null http://blackbox-exporter:9115/-/healthy || { echo "❌ [ERROR] Blackbox Exporter is not healthy"; exit 1; }
+echo "✅ [SUCCESS] Blackbox Exporter is reachable and healthy."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Karma Dashboard"
+$CURL_CMD -sSf -o /dev/null http://karma:8080/health || { echo "❌ [ERROR] Karma is not healthy"; exit 1; }
+echo "✅ [SUCCESS] Karma is reachable and healthy."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Keep Frontend"
+$CURL_CMD -sSf -o /dev/null http://keep-frontend:3000/api/healthcheck || { echo "❌ [ERROR] Keep Frontend is not healthy"; exit 1; }
+echo "✅ [SUCCESS] Keep Frontend is reachable and healthy."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Loki"
+$CURL_CMD -sSf -o /dev/null http://loki:3100/ready || { echo "❌ [ERROR] Loki is not healthy"; exit 1; }
+echo "✅ [SUCCESS] Loki is reachable and healthy."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] MinIO"
+$CURL_CMD -sSf -o /dev/null http://minio:9000/minio/health/live || { echo "❌ [ERROR] MinIO is not healthy"; exit 1; }
+echo "✅ [SUCCESS] MinIO is reachable and healthy."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Nginx"
+$CURL_CMD -sSf -o /dev/null http://nginx:80/ || { echo "❌ [ERROR] Nginx is not healthy"; exit 1; }
+echo "✅ [SUCCESS] Nginx is reachable."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Node Exporter"
+# Note: node-exporter runs on the host network
+$CURL_CMD -sSf -o /dev/null http://host.containers.internal:9100/ || { echo "❌ [ERROR] Node Exporter is not healthy"; exit 1; }
+echo "✅ [SUCCESS] Node Exporter is reachable."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] OpenTelemetry Collector"
+$CURL_CMD -sSf -o /dev/null http://otel-collector:8888/metrics || { echo "❌ [ERROR] OTel Collector is not healthy"; exit 1; }
+echo "✅ [SUCCESS] OTel Collector is reachable."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Podman Exporter"
+$CURL_CMD -sSf -o /dev/null http://podman-exporter:9882/metrics || { echo "❌ [ERROR] Podman Exporter is not healthy"; exit 1; }
+echo "✅ [SUCCESS] Podman Exporter is reachable."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Tempo"
+$CURL_CMD -sSf -o /dev/null http://tempo:3200/ready || { echo "❌ [ERROR] Tempo is not healthy"; exit 1; }
+echo "✅ [SUCCESS] Tempo is reachable and healthy."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Webhook Tester"
+$CURL_CMD -sSf -o /dev/null http://webhook-tester:8080/ || { echo "❌ [ERROR] Webhook Tester is not healthy"; exit 1; }
+echo "✅ [SUCCESS] Webhook Tester is reachable."
 
 echo "========================================"
 echo "🎉 [COMPLETE] All tests completed successfully! Stack is stable."
