@@ -79,14 +79,14 @@
 
         /* Tab Content Area */
         .tab-content {
-            display: none; /* Hidden by default */
+            display: none;
             width: 100%;
             max-width: 1200px;
             animation: fadeIn 0.3s ease-in-out;
         }
 
         .tab-content.active {
-            display: block; /* Zichtbaar als actief */
+            display: block;
         }
 
         @keyframes fadeIn {
@@ -132,8 +132,23 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
         }
 
+        /* Nieuwe Card Header voor logo + titel */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-icon {
+            width: 28px;
+            height: 28px;
+            color: var(--card-accent);
+            flex-shrink: 0;
+        }
+
         .card h2 {
-            margin: 0 0 0.5rem 0;
+            margin: 0;
             font-size: 1.25rem;
             color: var(--card-accent);
         }
@@ -180,47 +195,74 @@
     <div id="tab-services" class="tab-content active">
         <div class="grid">
             <a href="https://alertmanager.localhost" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>Alertmanager</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                    <h2>Alertmanager</h2>
+                </div>
                 <p>Management and routing of Prometheus alerts.</p>
                 <div class="port-badge">alertmanager.localhost</div>
             </a>
             <a href="https://alloy.localhost" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>Alloy</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"/><path d="m15 9 6-6"/></svg>
+                    <h2>Alloy</h2>
+                </div>
                 <p>OpenTelemetry Collector & Log pipeline.</p>
                 <div class="port-badge">alloy.localhost</div>
             </a>
             <a href="https://grafana.localhost" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>Grafana</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                    <h2>Grafana</h2>
+                </div>
                 <p>Data visualization, dashboards and metrics explorer.</p>
                 <div class="port-badge">grafana.localhost</div>
             </a>
             <a href="https://karma.localhost" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>Karma</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                    <h2>Karma</h2>
+                </div>
                 <p>Advanced dashboard for Alertmanager.</p>
                 <div class="port-badge">karma.localhost</div>
             </a>
             <a href="https://keep.localhost" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>KeepHQ</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <h2>KeepHQ</h2>
+                </div>
                 <p>Alert management and notification center.</p>
                 <div class="port-badge">keep.localhost</div>
             </a>
             <a href="https://minio.localhost" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>MinIO console</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                    <h2>MinIO console</h2>
+                </div>
                 <p>S3-compatible object storage for logs and traces.</p>
                 <div class="port-badge">minio.localhost</div>
             </a>
             <a href="https://prometheus.localhost" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>Prometheus</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    <h2>Prometheus</h2>
+                </div>
                 <p>Time-series database and metrics scraping.</p>
                 <div class="port-badge">prometheus.localhost</div>
             </a>
             <a href="https://traefik.localhost/dashboard/" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>Traefik</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg>
+                    <h2>Traefik</h2>
+                </div>
                 <p>Reverse proxy status, routers and services overview.</p>
                 <div class="port-badge">traefik.localhost</div>
             </a>
             <a href="https://webhook-tester.localhost/s/65ae26f0-131e-4390-8daa-bdaec17e77c2" class="card core" target="_blank" rel="noopener noreferrer">
-                <h2>Webhook tester</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    <h2>Webhook tester</h2>
+                </div>
                 <p>Test environment for incoming Alertmanager webhooks.</p>
                 <div class="port-badge">webhook-tester.localhost</div>
             </a>
@@ -231,87 +273,138 @@
     <div id="tab-exporters" class="tab-content">
         <div class="grid">
             <a href="https://alertmanager.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
-                <h2>Alertmanager exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                    <h2>Alertmanager exporter</h2>
+                </div>
                 <p>Alertmanager metrics.</p>
                 <div class="port-badge">alertmanager.localhost/metrics</div>
             </a>
             <a href="https://alloy.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
-                <h2>Alloy exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"/><path d="m15 9 6-6"/></svg>
+                    <h2>Alloy exporter</h2>
+                </div>
                 <p>Alloy metrics endpoint.</p>
                 <div class="port-badge">alloy.localhost/metrics</div>
             </a>
             <a href="https://blackbox.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
-                <h2>Blackbox exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                    <h2>Blackbox exporter</h2>
+                </div>
                 <p>Endpoint probing (HTTP, ICMP, DNS health checks).</p>
                 <div class="port-badge">blackbox.localhost/metrics</div>
             </a>
             <a href="https://grafana.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
-                <h2>Grafana exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                    <h2>Grafana exporter</h2>
+                </div>
                 <p>Grafana Metrics.</p>
                 <div class="port-badge">grafana.localhost/metrics</div>
             </a>
             <a href="https://karma.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
-                <h2>Karma exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                    <h2>Karma exporter</h2>
+                </div>
                 <p>Karma Metrics.</p>
                 <div class="port-badge">karma.localhost/metrics</div>
             </a>
             <a href="#" onclick="openKeepMetrics(event)" class="card exporter">
-                <h2>KeepHQ exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <h2>KeepHQ exporter</h2>
+                </div>
                 <p>KeepHQ metrics.</p>
                 <div class="port-badge">keep-api.localhost/metrics/processing</div>
             </a>
             <a href="https://loki.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
-                <h2>Loki exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+                    <h2>Loki exporter</h2>
+                </div>
                 <p>Loki metrics.</p>
                 <div class="port-badge">loki.localhost/metrics</div>
             </a>
             <a href="https://s3.localhost/minio/v2/metrics/cluster" class="card exporter" target="_blank" rel="noopener noreferrer">
-                <h2>MinIO cluster exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                    <h2>MinIO cluster exporter</h2>
+                </div>
                 <p>Raw Prometheus metrics for MinIO cluster status.</p>
                 <div class="port-badge">s3.localhost/minio/v2/metrics/cluster</div>
             </a>
             <a href="https://s3.localhost/minio/v2/metrics/bucket" class="card exporter" target="_blank" rel="noopener noreferrer">
-                <h2>MinIO bucket exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                    <h2>MinIO bucket exporter</h2>
+                </div>
                 <p>Raw Prometheus metrics per individual MinIO bucket.</p>
                 <div class="port-badge">s3.localhost/minio/v2/metrics/bucket</div>
             </a>
             <a href="https://s3.localhost/minio/v2/metrics/node" class="card exporter" target="_blank" rel="noopener noreferrer">
-                <h2>MinIO node exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                    <h2>MinIO node exporter</h2>
+                </div>
                 <p>Raw Prometheus metrics for storage nodes.</p>
                 <div class="port-badge">s3.localhost/minio/v2/metrics/node</div>
             </a>
             <a href="https://s3.localhost/minio/v2/metrics/resource" class="card exporter" target="_blank" rel="noopener noreferrer">
-                <h2>MinIO resource exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                    <h2>MinIO resource exporter</h2>
+                </div>
                 <p>Raw Prometheus metrics for MinIO system resources.</p>
                 <div class="port-badge">s3.localhost/minio/v2/metrics/resource</div>
             </a>
             <a href="https://node-exporter.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
-                <h2>Node exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>
+                    <h2>Node exporter</h2>
+                </div>
                 <p>Host metrics (CPU, RAM, Disk, Network).</p>
                 <div class="port-badge">node-exporter.localhost/metrics</div>
             </a>
             <a href="https://otel-collector.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
-                <h2>OTel Collector exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                    <h2>OTel Collector exporter</h2>
+                </div>
                 <p>OpenTelemetry Collector metrics.</p>
                 <div class="port-badge">otel-collector.localhost/metrics</div>
             </a>
             <a href="https://podman-exporter.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
-                <h2>Podman exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+                    <h2>Podman exporter</h2>
+                </div>
                 <p>Metrics of running Podman containers.</p>
                 <div class="port-badge">podman-exporter.localhost/metrics</div>
             </a>
             <a href="https://prometheus.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
-                <h2>Prometheus exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    <h2>Prometheus exporter</h2>
+                </div>
                 <p>Prometheus metrics.</p>
                 <div class="port-badge">prometheus.localhost/metrics</div>
             </a>
             <a href="https://tempo.localhost/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
-                <h2>Tempo exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <h2>Tempo exporter</h2>
+                </div>
                 <p>Tempo metrics.</p>
                 <div class="port-badge">tempo.localhost/metrics</div>
             </a>
             <a href="https://traefik-metrics.localhost" class="card exporter" target="_blank" rel="noopener noreferrer">
-                <h2>Traefik exporter</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg>
+                    <h2>Traefik exporter</h2>
+                </div>
                 <p>Traefik metrics.</p>
                 <div class="port-badge">traefik-metrics.localhost</div>
             </a>
@@ -322,72 +415,114 @@
     <div id="tab-dashboards" class="tab-content">
         <div class="grid">
             <a href="https://grafana.localhost/d/alertmanager-dashboard/alertmanager-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
-                <h2>Alertmanager dashboard</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                    <h2>Alertmanager dashboard</h2>
+                </div>
                 <p>Grafana view of active alerts and notification status.</p>
                 <div class="port-badge">grafana.localhost/d/alertmanager...</div>
             </a>
             <a href="https://grafana.localhost/d/blackbox-dashboard/blackbox-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
-                <h2>Blackbox dashboard</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                    <h2>Blackbox dashboard</h2>
+                </div>
                 <p>Detailed uptime and response times of network probes.</p>
                 <div class="port-badge">grafana.localhost/d/blackbox...</div>
             </a>
             <a href="https://grafana.localhost/d/grafana-internals-dashboard/grafana-internals-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
-                <h2>Grafana internals dashboard</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                    <h2>Grafana internals dashboard</h2>
+                </div>
                 <p>Detailed information about internal Grafana components.</p>
                 <div class="port-badge">grafana.localhost/d/grafana...</div>
             </a>
             <a href="https://grafana.localhost/d/keep/keep-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
-                <h2>Keep HQdashboard</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <h2>Keep HQ dashboard</h2>
+                </div>
                 <p>Detailed information about internal KeepHQ components.</p>
                 <div class="port-badge">grafana.localhost/d/keep...</div>
             </a>
             <a href="https://grafana.localhost/d/loki-global-metrics-dashboard/loki-global-metrics-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
-                <h2>Loki metrics dashboard</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+                    <h2>Loki metrics dashboard</h2>
+                </div>
                 <p>Detailed information about Loki metrics.</p>
                 <div class="port-badge">grafana.localhost/d/loki-global...</div>
             </a>
             <a href="https://grafana.localhost/d/loki-logs-dashboard/loki-logs-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
-                <h2>Loki logs dashboard</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+                    <h2>Loki logs dashboard</h2>
+                </div>
                 <p>Detailed logs.</p>
                 <div class="port-badge">grafana.localhost/d/loki-logs...</div>
             </a>
             <a href="https://grafana.localhost/d/minio-dashboard/minio-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
-                <h2>MinIO overview dashboard</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                    <h2>MinIO overview dashboard</h2>
+                </div>
                 <p>S3 storage usage, node health and network performance.</p>
                 <div class="port-badge">grafana.localhost/d/minio...</div>
             </a>
             <a href="https://grafana.localhost/d/minio-bucket-dashboard/minio-bucket-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
-                <h2>MinIO bucket dashboard</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                    <h2>MinIO bucket dashboard</h2>
+                </div>
                 <p>S3 bucket usage and performance.</p>
                 <div class="port-badge">grafana.localhost/d/minio-bucket...</div>
             </a>
             <a href="https://grafana.localhost/d/minio-node-dashboard/minio-node-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
-                <h2>MinIO node dashboard</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                    <h2>MinIO node dashboard</h2>
+                </div>
                 <p>S3 node usage, node health and performance.</p>
                 <div class="port-badge">grafana.localhost/d/minio-node...</div>
             </a>
             <a href="https://grafana.localhost/d/node-exporter-full-dashboard/node-exporter-full-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
-                <h2>Node exporter dashboard</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>
+                    <h2>Node exporter dashboard</h2>
+                </div>
                 <p>Detailed information about node performance.</p>
                 <div class="port-badge">grafana.localhost/d/node-exporter-full...</div>
             </a>
             <a href="https://grafana.localhost/d/opentelemetry-tempo/opentelemetry-and-tempo" class="card dashboard" target="_blank" rel="noopener noreferrer">
-                <h2>OpenTelemetry & Tempo dashboard</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                    <h2>OpenTelemetry & Tempo</h2>
+                </div>
                 <p>Detailed information about OpenTelemetry and Tempo.</p>
                 <div class="port-badge">grafana.localhost/d/opentelemetry-tempo...</div>
             </a>
             <a href="https://grafana.localhost/d/podman-exporter-dashboard/podman-exporter-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
-                <h2>Podman exporter dashboard</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+                    <h2>Podman exporter dashboard</h2>
+                </div>
                 <p>Detailed information about Podman containers.</p>
                 <div class="port-badge">grafana.localhost/d/podman-exporter...</div>
             </a>
             <a href="https://grafana.localhost/d/prometheus-stats-dashboard/prometheus-stats-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
-                <h2>Prometheus stats dashboard</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    <h2>Prometheus stats dashboard</h2>
+                </div>
                 <p>Detailed information about Prometheus statistics.</p>
                 <div class="port-badge">grafana.localhost/d/prometheus-stats...</div>
             </a>
             <a href="https://grafana.localhost/d/traefik-dashboard/traefik-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
-                <h2>Traefik dashboard</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg>
+                    <h2>Traefik dashboard</h2>
+                </div>
                 <p>Detailed information about Traefik.</p>
                 <div class="port-badge">grafana.localhost/d/traefik...</div>
             </a>
@@ -398,32 +533,50 @@
     <div id="tab-explore" class="tab-content">
         <div class="grid">
             <a href="https://grafana.localhost/explore?schemaVersion=1&panes=%7B%2234m%22%3A%7B%22datasource%22%3A%22prometheus%22%2C%22queries%22%3A%5B%7B%22refId%22%3A%22A%22%2C%22expr%22%3A%22%22%2C%22range%22%3Atrue%2C%22instant%22%3Atrue%2C%22datasource%22%3A%7B%22type%22%3A%22prometheus%22%2C%22uid%22%3A%22prometheus%22%7D%7D%5D%2C%22range%22%3A%7B%22from%22%3A%22now-1h%22%2C%22to%22%3A%22now%22%7D%2C%22compact%22%3Afalse%7D%7D&orgId=1" class="card explore" target="_blank" rel="noopener noreferrer">
-                <h2>Explore: Prometheus</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    <h2>Explore: Prometheus Metrics</h2>
+                </div>
                 <p>Direct access to the Grafana Explore view for investigating metrics.</p>
                 <div class="port-badge">grafana.localhost/explore (metrics)</div>
             </a>
             <a href="https://grafana.localhost/explore?schemaVersion=1&panes=%7B%2234m%22:%7B%22datasource%22:%22loki%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22expr%22:%22%22,%22queryType%22:%22range%22,%22datasource%22:%7B%22type%22:%22loki%22,%22uid%22:%22loki%22%7D,%22editorMode%22:%22builder%22,%22direction%22:%22backward%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D,%22compact%22:false%7D%7D&orgId=1" class="card explore" target="_blank" rel="noopener noreferrer">
-                <h2>Explore: Loki</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+                    <h2>Explore: Loki Logs</h2>
+                </div>
                 <p>Direct access to the Grafana Explore view for searching through log files.</p>
                 <div class="port-badge">grafana.localhost/explore (logs)</div>
             </a>
             <a href="https://grafana.localhost/explore?schemaVersion=1&panes=%7B%2234m%22:%7B%22datasource%22:%22tempo%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22tempo%22,%22uid%22:%22tempo%22%7D%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D,%22compact%22:false%7D%7D&orgId=1" class="card explore" target="_blank" rel="noopener noreferrer">
-                <h2>Explore: Tempo</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <h2>Explore: Tempo Traces</h2>
+                </div>
                 <p>Direct access to the Grafana Explore view for analyzing traces.</p>
                 <div class="port-badge">grafana.localhost/explore (traces)</div>
             </a>
             <a href="https://grafana.localhost/a/grafana-metricsdrilldown-app/drilldown?from=now-1h&to=now&timezone=browser&var-metrics_filters=&var-filters=&var-labelsWingman=%28none%29&layout=grid&filters-rule=&filters-prefix=&filters-suffix=&search_txt=&var-metrics-reducer-sort-by=default&filters-recent=&var-ds=prometheus&var-other_metric_filters=" class="card explore" target="_blank" rel="noopener noreferrer">
-                <h2>App: Metrics Drilldown</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    <h2>Drilldown: Prometheus Metrics</h2>
+                </div>
                 <p>Grafana application for advanced Prometheus metrics exploration.</p>
                 <div class="port-badge">grafana.localhost/a/metricsdrilldown</div>
             </a>
             <a href="https://grafana.localhost/a/grafana-lokiexplore-app/explore?patterns=%5B%5D&from=now-15m&to=now&timezone=browser&var-lineFormat=&var-ds=loki&var-filters=&var-fields=&var-levels=&var-metadata=&var-jsonFields=&var-all-fields=&var-patterns=&var-lineFilterV2=&var-lineFilters=&var-primary_label=service_name%7C%3D~%7C.%2B" class="card explore" target="_blank" rel="noopener noreferrer">
-                <h2>App: Loki Logs Explore</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+                    <h2>Drilldown: Loki Logs</h2>
+                </div>
                 <p>Specialized Grafana application for filtering and searching Loki logs.</p>
                 <div class="port-badge">grafana.localhost/a/lokiexplore</div>
             </a>
             <a href="https://grafana.localhost/a/grafana-exploretraces-app/explore?from=now-30m&to=now&timezone=browser&var-ds=tempo&var-primarySignal=nestedSetParent%3C0&var-filters=&var-metric=rate&var-groupBy=resource.service.name&var-spanListColumns=&var-latencyThreshold=&var-partialLatencyThreshold=&var-durationPercentiles=0.9&actionView=breakdown" class="card explore" target="_blank" rel="noopener noreferrer">
-                <h2>App: Traces Explore</h2>
+                <div class="card-header">
+                    <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <h2>Drilldown: Tempo Traces</h2>
+                </div>
                 <p>Grafana application for in-depth trace and performance analysis with Tempo.</p>
                 <div class="port-badge">grafana.localhost/a/exploretraces</div>
             </a>
