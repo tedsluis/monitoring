@@ -1,5 +1,6 @@
 // ==============================================================================
 // OUTPUT: LOKI
+// Defines the destination for all processed logs
 // ==============================================================================
 loki.write "local_loki" {
   endpoint {
@@ -9,7 +10,7 @@ loki.write "local_loki" {
 
 // ==============================================================================
 // STREAM 1: CONTAINER LOGS (VIA PODMAN SOCKET)
-// This provides rich metadata like pod_name
+// Discovers containers and extracts rich metadata (e.g., pod_name, image)
 // ==============================================================================
 
 // 1. Discover all containers via the socket
@@ -17,15 +18,28 @@ discovery.docker "podman_containers" {
   host = "unix:///var/run/docker.sock"
 }
 
-// 2. Enrich metadata (Here we get the Pod Name)
+// 2. Enrich metadata with useful labels for filtering in Grafana
 discovery.relabel "podman_metadata" {
   targets = discovery.docker.podman_containers.targets
 
-  // Container Name: Remove the slash (/) that docker API adds (e.g. /my-app -> my-app)
+  // Container Name: Remove the slash (/) that the docker API adds (e.g. /my-app -> my-app)
   rule {
     source_labels = ["__meta_docker_container_name"]
     regex         = "/(.*)"
     target_label  = "container_name"
+  }
+
+  // Container ID: Extract the short container ID (first 12 chars) for precise debugging
+  rule {
+    source_labels = ["__meta_docker_container_id"]
+    regex         = "(.{12}).*" 
+    target_label  = "container_id"
+  }
+
+  // Image Name: Extract the image used by the container
+  rule {
+    source_labels = ["__meta_docker_image_name"]
+    target_label  = "image"
   }
 
   // POD NAME: Podman sets the pod name in the label 'io.kubernetes.pod.name'
@@ -34,20 +48,20 @@ discovery.relabel "podman_metadata" {
     target_label  = "pod_name"
   }
   
-  // Alternative Pod Name (some versions use io.podman.pod.name)
+  // Alternative Pod Name (some Podman versions use io.podman.pod.name)
   rule {
     source_labels = ["__meta_docker_container_label_io_podman_pod_name"]
     target_label  = "pod_name"
   }
 
-  // Docker Compose Project (if you don't use pods, but compose groups)
+  // Docker Compose Project (useful if you use compose groups instead of pods)
   rule {
     source_labels = ["__meta_docker_container_label_com_docker_compose_project"]
     target_label  = "project"
   }
 }
 
-// 3. Read the logs from the containers
+// 3. Read the logs from the discovered containers
 loki.source.docker "podman_stream" {
   host       = "unix:///var/run/docker.sock"
   targets    = discovery.relabel.podman_metadata.output
@@ -60,29 +74,42 @@ loki.source.docker "podman_stream" {
 
 // ==============================================================================
 // STREAM 2: HOST LOGS (VIA JOURNALD)
+// Reads host-level system and service logs
 // ==============================================================================
 
-// Processor for Journald logs
+// 1. Processor for Journald logs to extract metadata and prevent duplicates
 loki.relabel "journal_relabel" {
   forward_to = [loki.write.local_loki.receiver]
 
-  // Rule: Get Systemd Unit name
+  // Extract Systemd Unit name (e.g., sshd.service, NetworkManager.service)
   rule {
     source_labels = ["__journal__systemd_unit"]
     target_label  = "unit"
   }
 
-  // IMPORTANT: Filter duplicates!
-  // Because Podman also writes to Journald, we would get logs in duplicate.
-  // We throw away everything here that has a container ID (because Stream 1 already handles it).
+  // Extract Syslog Identifier (useful for identifying non-systemd processes)
+  rule {
+    source_labels = ["__journal_syslog_identifier"]
+    target_label  = "syslog_identifier"
+  }
+
+  // Extract log priority/level (e.g., info, warning, err) for easy filtering
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    target_label  = "level"
+  }
+
+  // IMPORTANT: Deduplication Filter!
+  // Because Podman also writes container logs to Journald, we would get duplicates.
+  // We throw away everything here that has a container ID (handled by Stream 1).
   rule {
     source_labels = ["__journal_container_id"]
-    regex         = ".+"     // If something is in there...
-    action        = "drop"   // ...throw it away from this stream.
+    regex         = ".+"     // If it contains any value...
+    action        = "drop"   // ...drop the log entry from this stream.
   }
 }
 
-// Source: Read the journal files from the host
+// 2. Source: Read the journal files from the host
 loki.source.journal "read_host_journal" {
   max_age = "12h"
   path    = "/var/log/journal"
