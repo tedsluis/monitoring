@@ -2,5 +2,5 @@
 /traefik/certs/*
 !/traefik/certs/.gitkeep
 pr_state.json
-/test-logs/*
+/logs/*
 

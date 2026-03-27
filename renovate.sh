@@ -10,6 +10,9 @@ if [ -z "$GITHUB_COM_TOKEN" ]; then
     exit 1
 fi
 
+WORKDIR="$(pwd)"
+LOG_DIR="$WORKDIR/logs"
+
 echo "🚀 Starting Mend Renovate via Podman..."
 
 # Run the Renovate image locally.
@@ -21,7 +24,7 @@ podman run --rm \
     -e RENOVATE_GIT_AUTHOR="Ted Sluis <ted.sluis@gmail.com>" \
     -e LOG_LEVEL="info" \
     -e NODE_OPTIONS="--dns-result-order=ipv4first" \
-    -v "$(pwd)/renovate-config.js:/usr/src/app/config.js:Z" \
-    ghcr.io/renovatebot/renovate:latest
+    -v "${WORKDIR}/renovate-config.js:/usr/src/app/config.js:Z" \
+    ghcr.io/renovatebot/renovate:latest 2>&1 | tee "${LOG_DIR}/renovate-$(date +%Y%m%d-%H%M%S).log"
 
 echo "✅ Renovate run is complete. Check your GitHub repository for possible Pull Requests!"

@@ -7,7 +7,7 @@ REPO="tedsluis/monitoring"
 WORKDIR="$(pwd)"
 STATE_FILE="$WORKDIR/pr_state.json"
 LOCK_FILE="/tmp/renovate-poller.lock"
-LOG_DIR="$WORKDIR/test-logs"
+LOG_DIR="$WORKDIR/logs"
 
 # Flags and tracking
 MAIN_NEEDS_UPDATE=false
