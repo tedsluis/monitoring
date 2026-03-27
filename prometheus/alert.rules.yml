@@ -1,4 +1,7 @@
 groups:
+    # ---------------------------------------------------------
+    # Fedora Workstation Alerts
+    # ---------------------------------------------------------
   - name: fedora_workstation_alerts
     rules:
       # 1. Is the machine/exporter reachable?
@@ -391,6 +394,9 @@ groups:
           summary: Host clock not synchronising (instance {{ $labels.instance }})
           description: "Clock not synchronising. Ensure NTP is configured on this host.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
+  # ---------------------------------------------------------
+  # Podman Exporter Alerts
+  # ---------------------------------------------------------
   - name: podman_exporter_alerts
     rules:
       # 39. Alarm if a container stops (except if you stop it yourself, 
@@ -419,9 +425,7 @@ groups:
           summary: "Podman Exporter down"
           description: "Cannot retrieve metrics from the Podman socket."
 
-      # ---------------------------------------------------------
-      # 1. Container Crashes & Status
-      # ---------------------------------------------------------
+      # 41. Container Crashes & Status
       - alert: PodmanContainerStopped
         # Alarm if a container has crashed or gave an error (status 5 = exited, exit_code != 0).
         # We use podman_container_exit_code as basis, so $value is the actual exit_code number.
@@ -438,6 +442,7 @@ groups:
           summary: "Container {{ $labels.name }} has crashed"
           description: "Container {{ $labels.name }} (Image: {{ $labels.image }}) stopped with exit code {{ $value }}."
 
+      # 42. Container Restart Loop
       - alert: PodmanContainerRestartLoop
         # Alarm if a container restarts more than 2x in 5 minutes.
         # The changes() function counts how many times the start_time timestamp changes.
@@ -451,6 +456,7 @@ groups:
           summary: "Container {{ $labels.name }} keeps restarting"
           description: "Possible CrashLoop: Container {{ $labels.name }} (Image: {{ $labels.image }}) restarted {{ $value }} times in the last 5 minutes."
 
+      # 43. Container Healthcheck
       - alert: PodmanContainerUnhealthy
         # Only relevant if your containers have a HEALTHCHECK defined in their Dockerfile/Containerfile
         # health_status: 0=healthy, 1=unhealthy, 2=starting
@@ -462,9 +468,7 @@ groups:
           summary: "Container {{ $labels.name }} is unhealthy"
           description: "The healthcheck of container {{ $labels.name }} (Image: {{ $labels.image }}) is failing."
 
-      # ---------------------------------------------------------
-      # 2. Performance & Resources
-      # ---------------------------------------------------------
+      # 44. High CPU or Memory usage
       - alert: PodmanContainerHighCpu
         # Alarm if a container uses more than 80% of 1 CPU core (adjust threshold as needed)
         # We normalize this over 5 minutes to ignore spikes.
@@ -476,6 +480,7 @@ groups:
           summary: "High CPU usage: {{ $labels.name }}"
           description: "Container {{ $labels.name }} is using high CPU ({{ $value }}%)."
 
+      # 45. High Memory usage
       - alert: PodmanContainerHighMemory
         # Alarm if a container uses more than 1GB RAM (adjust threshold as needed)
         # Podman exporter returns bytes. 1e9 = 1GB.
@@ -487,6 +492,7 @@ groups:
           summary: "High Memory usage: {{ $labels.name }}"
           description: "Container {{ $labels.name }} is using more than 1GB RAM ({{ $value | humanize1024 }})."
 
+      # 46. OOM Kills
       - alert: PodmanContainerOOMKilled
         # Works only if podman-exporter has access to OOM events
         expr: increase(podman_container_oom_killed_count[5m]) > 0
@@ -496,6 +502,9 @@ groups:
           summary: "Container {{ $labels.name }} killed by OOM"
           description: "The container was killed by the system due to out of memory (Out Of Memory)."
 
+  # ---------------------------------------------------------
+  # Watchdog Alert
+  # ---------------------------------------------------------
   - name: watchdog_alerts
     rules:
       - alert: Watchdog
@@ -506,6 +515,9 @@ groups:
           summary: "Prometheus is working and sending alerts to Alertmanager"
           description: "This is a heartbeat alert that is always 'firing'."
 
+  # ---------------------------------------------------------
+  # Alertmanager Alerts
+  # ---------------------------------------------------------
   - name: alertmanager_alerts
     rules:
       # --- ALERTMANAGER ---
@@ -526,6 +538,9 @@ groups:
           summary: "Alertmanager reload failed"
           description: "The latest configuration change could not be loaded."
 
+  # ---------------------------------------------------------
+  # Loki Alerts
+  # ---------------------------------------------------------
   - name: loki_alerts
     rules:
       # --- LOKI (Because Loki sometimes drops metrics under heavy load) ---
@@ -583,6 +598,9 @@ groups:
           summary: Loki request latency (instance {{ $labels.instance }})
           description: "The {{ $labels.job }} {{ $labels.route }} is experiencing {{ printf \"%.2f\" $value }}s 99th percentile latency\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
+  # ---------------------------------------------------------
+  # Grafana Alerts
+  # ---------------------------------------------------------
   - name: grafana_alerts
     rules:
       # --- GRAFANA ---
@@ -595,6 +613,9 @@ groups:
           summary: "Grafana Alerting Errors"
           description: "Grafana cannot evaluate its own alerts."
 
+  # ---------------------------------------------------------
+  # Alloy Alerts
+  # ---------------------------------------------------------
   - name: alloy_alerts
     rules:
       # --- ALLOY ---
@@ -617,6 +638,9 @@ groups:
           summary: Grafana Alloy service down (instance {{ $labels.instance }})
           description: "Alloy on (instance {{ $labels.instance }}) is not responding or has stopped running.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
+  # ---------------------------------------------------------
+  # Blackbox Exporter Alerts
+  # --------------------------------------------------------- 
   - name: blackbox_alerts
     rules:
       - alert: ServiceHealthCheckFailed
@@ -639,6 +663,9 @@ groups:
           summary: "Slow response: {{ $labels.instance }}"
           description: "The HTTP probe to {{ $labels.instance }} takes longer than 1 second (current value: {{ $value | humanizeDuration }})."
 
+  # ---------------------------------------------------------
+  # OpenTelemetry Collector Alerts
+  # ---------------------------------------------------------
   - name: opentelemetrycollector_alerts
     rules:
       - alert: OpentelemetryCollectorDown
@@ -749,6 +776,9 @@ groups:
           summary: OpenTelemetry Collector OTLP receiver errors (instance {{ $labels.instance }})
           description: "OpenTelemetry Collector OTLP receiver is completely failing - all spans are being refused\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
+  # ---------------------------------------------------------
+  # MinIO Alerts
+  # --------------------------------------------------------- 
   - name: minio_alerts
     rules:
       - alert: MinioClusterOffline
@@ -769,6 +799,9 @@ groups:
           summary: "MinIO Disk Offline"
           description: "A disk in MinIO is not available."
 
+  # ---------------------------------------------------------
+  # Tempo Alerts
+  # ---------------------------------------------------------
   - name: tempo_alerts
     rules:
       - alert: HighSpanLatency
