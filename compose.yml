@@ -191,7 +191,7 @@ services:
       - LOG_LEVEL=DEBUG
       - KEEP_APP_LOG_LEVEL=DEBUG
       - KEEP_API_URL=https://keep-api.localhost
-      - KEEP_API_KEY=585af6cc-5c07-427f-966f-a263473ad402
+      - KEEP_API_KEY=585af6cc-5c07-427f-966f-a263473ad402 # Note: In a production environment, you should use a more secure way to store the api key, such as using environment variables or a secret manager.
       - KEEP_PROVIDERS_DIRECTORY=/config/providers
       - KEEP_ENABLE_AI=true
       - PORT=8080

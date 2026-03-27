@@ -24,6 +24,9 @@ route:
 
 receivers:
 - name: "keep"
+  # keep webhook receiver, which will send the alert to the keep backend.
+  # Note: the url contains the api key, which is used to authenticate the request. 
+  # In a production environment, you should use a more secure way to store the api key, such as using environment variables or a secret manager.
   webhook_configs:
     - url: 'http://keep-backend:8080/alerts/event/prometheus?api_key=585af6cc-5c07-427f-966f-a263473ad402'
       send_resolved: true
