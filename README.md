@@ -92,10 +92,14 @@ The stack is designed around specific data flows:
 
 ## 5. Prerequisites
 
+### 5.1 Overview
+
 -   OS: Fedora Linux (tested on Fedora 43 and 44).
 -   Tools: podman and podman-compose.
 -   Podman Socket: The user socket must be active for the Podman Exporter and Alloy.
    
+### 5.2 podman & podman-compose to run containers
+
 This stack is using `podman` and `podman-compose` where you may be used to `docker` and `docker-compose`. While Docker is commonly used, there are good reasons to use Podman due to several key architectural and security advantages:
 
 *   **Daemonless Architecture:** Unlike Docker, which requires a heavy, central background daemon (`dockerd`) running as root to manage containers, Podman is daemonless. It interacts directly with the container registry and runtime. This means no single point of failure—if the Docker daemon crashes, container management halts. With Podman, each container runs as an independent process.
@@ -106,7 +110,7 @@ This stack is using `podman` and `podman-compose` where you may be used to `dock
 *   **Kubernetes Readiness:** Podman introduces the concept of "pods" (groups of containers sharing the same network and namespaces) locally, mirroring how Kubernetes operates. It can even generate Kubernetes YAML from local containers or run existing Kubernetes YAML directly, making the transition from local development to production orchestration much smoother.
 
 
-Install requirements:
+### 5.3 Install requirements
 ```bash
    # Install packages
    sudo dnf install podman podman-compose -y
@@ -313,7 +317,7 @@ Go to https://prometheus.localhost
 | `/config`      | full prometheus configuration. |
 
 
-Example Prometheus UI - alert rules overview
+*See the screenshot below for an impression of the Prometheus UI - alert rules overview:*
 ![prometheus](images/prometheus.png)
 
 
@@ -324,7 +328,7 @@ Example Prometheus UI - alert rules overview
 
 Prometheus exposes and scrapes its own metrics. Using these metrics you can monitor prometheus, see below:
 
-Prometheus dashboard
+*See the screenshot below for an impression of the Prometheus metrics dashboard:*
 ![prometheus-dashboard](./images/prometheus-dashboard.png)
 
 ### 7.4 Loki
@@ -335,7 +339,7 @@ In a typical workflow, a collector like Grafana Alloy gathers logs from your con
 
 Loki does not include a built-in user interface. Instead, it relies entirely on Grafana to serve as the unified dashboard for exploring and analyzing your logs, for example:
 
-Loki logging dashboard
+*See the screenshot below for an impression of the Loki logging dashboard:*
 ![loki-logs-dashboard](./images/loki-logs-dashboards.png)
 
 
@@ -346,7 +350,7 @@ Loki logging dashboard
 
 Like most modern container, Loki exposes prometheus metrics too, which are used to monitor Loki using the dashboard below:
 
-Loki dashboard
+*See the screenshot below for an impression of the Loki metrics dashboard:*
 ![loki-metrics-dashboard](/images/loki-metrics-dashboard.png)
 
 ### 7.5 Tempo
@@ -357,15 +361,14 @@ In a typical setup, an OpenTelemetry Collector gathers traces from your applicat
 
 Loki does not include a built-in user interface. Instead, it relies entirely on Grafana to serve as the unified dashboard for exploring and analyzing your logs, for example:
 
-Tempo Tracing dashboard
+*See the screenshot below for an impression of the Tempo Tracing dashboard:*
 ![tempo-dashboard](./images/)
 
 | configuration        | configuration file                         |
 |----------------------|--------------------------------------------|
 | Tempo config         | [./tempo/tempo.yaml](./tempo/tempo.yaml)   |
 
-Tempo exposes prometheus metrics too, which are used to monitor Loki using the dashboard below:
-
+*Tempo exposes prometheus metrics too, which are used to monitor Loki using the dashboard below:*
 ![Tempo-dashboard](./images/tempo-dashboard.png)
 
 ### 7.6 Alertmanager
@@ -384,7 +387,7 @@ Go to https://alertmanager.localhost
 | /#/settings | Alertmanager UI settings                       |
 
 
-Alertmanager UI
+*See the screenshot below for an impression of the Alertmanager UI:*
 ![alertmanager](/images/alertmanager.png)
 
 | configuration        | configuration file                                                  |
@@ -393,7 +396,7 @@ Alertmanager UI
 
 Alertmanager exposes prometheus metrics too, which are used to monitor Alertmanager using the dashboard below:
 
-Alertmanager dashboard
+*See the screenshot below for an impression of the Alertmanager metrics dashboard:*
 ![alertmanager-dashboard](./images/alertmanager-metrics-dashboard.png)
 
 
@@ -407,7 +410,7 @@ Grafana is the central visual heart of this stack and functions as a 'single pan
 
 This repo contains a number of Grafana dashboards stored in [./grafana-provisioning/dashboards/json/](./grafana-provisioning/dashboards/json/) in JSON format.
 
-Grafana Dashboards
+*See the screenshot below for an overview of the Grafana Dashboards:*
 ![grafana-dashboarden](./images/grafana-dashboards.png)
 
 #### 7.7.2 Explore
@@ -417,16 +420,22 @@ The Explore mode provides an advanced interface for ad-hoc analysis and troubles
 **Loki logs explore**
 
  The Loki datasource combined with LogQL makes it possible to efficiently filter log streams by labels, search for specific text patterns or regular expressions, and visualize log volumes alongside raw log lines.
+
+ *See the screenshot below for an impression of the Explore logs:*
 ![Loki-explore](/images/explore-logs.png)
 
 **Prometheus metrics explore**
 
 The Prometheus datasource, combined with PromQL queries, enables iterative exploration of time-series data, trend visualization, and comparison of metrics using split-view functionality.
+
+*See the screenshot below for an impression of the Explore metrics:*
 ![prometheus-explore](/images/explore-metrics.png)
 
 **Tempo tracing explore**
 
 The Tempo datasource combined with TraceQL provides a detailed visualization of the lifecycle of requests through the distributed architecture. Using the waterfall view, users can analyze latency per component, isolating performance bottlenecks and errors within specific spans. Integration with TraceQL enables targeted filtering of traces, which, combined with correlated logs and metrics, allows efficient root-cause analysis during incidents. For example, it can be interesting to filter for requests that do not have an HTTP status code of 4xx or 5xx, or requests that take longer than 500ms.
+
+*See the screenshot below for an impression of the Explore traces:*
 ![tempo-explore](/images/explore-traces.png)
 
 
@@ -437,32 +446,34 @@ To manually test the proxy path by sending a traceparent header, run this comman
 Next, in Grafana, go to Tempo Explore and search for the exact Trace ID: 11112222333344445555666677778888.
 If propagation works, you'll see a beautiful trace tree with the Traefik span at the top and the Grafana span below.
 
-Explore trace - service graph
+*See the screenshot below for an impression of the Explore traces - service graph:*
 ![traces-explore](/images/explore-traces-service-graph.png)
 
 #### 7.7.3 Drilldown
 
 The drill-down functionality within Grafana offers the ability to connect in-depth error analysis through metrics, logs and traces contextually with each other. From an anomaly in a metrics dashboard, you can directly navigate to the correlated log lines in Loki, and then use automatically detected trace IDs to switch to detailed request spans in Tempo. This integration eliminates the need to manually synchronize timestamps and identifiers between different datasources, significantly increasing the efficiency of root cause analysis and performance optimization.
 
-Metrics drilldown
+*See the screenshot below for an impression of the Metrics drilldown:*
 ![Metrics-drilldown](/images/drilldown-metrics-dashboard.png)
 
-Logs drilldown
+*See the screenshot below for an impression of the Logs drilldown:*
 ![loki-drilldown](/images/drill-down-logs-dashboard.png)
 
-Traces drilldown
+*See the screenshot below for an impression of the Traces drilldown:*
 ![traces-drilldown](/images/drilldown-breakdown.png)
 
 #### 7.7.4 Grafana alerts
 
 Grafana Alerting provides a central interface for monitoring alerts. This module aggregates alert rules from both Prometheus (for metrics) and Loki (for log data), creating an overview of the operational status. Through this dashboard you can analyze the real-time status of alerts (‘Pending’ or ‘Firing’), examine the underlying query definitions, and gain insight into the evaluation criteria that safeguard the platform’s stability and availability.
 
-Grafana Alerting
+*See the screenshot below for an impression of the Grafana Alerting:*
 ![grafana-alerting](/images/grafana-alerts.png)
 
 #### 7.7.5 Grafana datasources
 
 Datasources in Grafana serve as the technical interface to the underlying data storage systems, allowing the application to retrieve data without persisting it itself. In this configuration, Prometheus, Loki and Tempo are defined as the primary sources for exposing metrics, log files and distributed traces, respectively.
+
+*See the screenshot below for an impression of the Grafana Datasources:*
 ![grafana-datasources](./images/grafana-datasource.png)
 
 The datasources for Prometheus, Loki and Tempo are configured in [./grafana-provisioning/dashboards/dashboard.yaml](./grafana-provisioning/datasources/datasources.yaml)
@@ -474,7 +485,7 @@ Go to https://karma.localhost
 
 Here you see an overview of all active warnings (e.g., "Disk almost full", "Container down" or "Health Check Failed").
 
-Karma UI
+**See the screenshot below for an impression of the Karma UI:*
 ![karma](images/karma.png)
 
 ### 7.9 webhook-tester
@@ -483,7 +494,7 @@ Go to https://webhook-tester.localhost
 
 Alertmanager sends the alerts to the webhook-tester
 
-Webhook-tester UI
+*See the screenshot below for an impression of the Webhook-tester UI:*
 ![webhook-tester-ui](/images/webhook-tester.png)
 
 ### 7.10 KeepHQ
@@ -492,19 +503,19 @@ Webhook-tester UI
 
 Go to https://minio.localhost
 
-Minio UI - login
+*See the screenshot below for an impression of the Minio UI - login:*
 ![minio](images/minio-login.png)
 
-Minio UI - object browser
+*See the screenshot below for an impression of the Minio UI - object browser:*
 ![minio-object-browser](./images/minio-object-browser.png)
 
-Minio overview dashboard
+*See the screenshot below for an impression of the Minio overview dashboard:*
 ![minio](./images/minio-dashboard.png)
 
-Minio bucket dashboard
+*See the screenshot below for an impression of the Minio bucket dashboard:*
 ![minio-bucket](./images/minio-bucket-dashboard.png)
 
-Minio node dashboard
+*See the screenshot below for an impression of the Minio node dashboard:*
 ![minio-node](./images/minio-node-dashboard.png)
 
 Here you can see how much data Loki and Tempo are using in their buckets.
@@ -513,42 +524,42 @@ Here you can see how much data Loki and Tempo are using in their buckets.
 
 https://alloy.localhost
 
-Alloy
+*See the screenshot below for an impression of the Alloy:*
 ![alloy](./images/alloy.png)
 
-Alloy Graph
+*See the screenshot below for an impression of the Alloy Graph:*
 ![alloy-graph](./images/alloy-graph.png)
 
 ### 7.13 Blackbox exporter
 
 https://blackbox.localhost
 
-Blackbox dashboard
+*See the screenshot below for an impression of the Blackbox dashboard:*
 ![blackbox-dashboard](/images/blackbox-dashboard.png)
 
 ### 7.14 node-exporter
 
-nodes-exporter-full
+*See the screenshot below for an impression of the nodes-exporter-full dashboard:*
 ![nodes-exporter-full-dashboard](/images/node-exporter-dashbaord.png)
 
 ### 7.15 podman-exporter
 
-podman-exporter
+*See the screenshot below for an impression of the podman-exporter dashboard:*
 ![podman-exporter-dashboard](/images/podman-exporter-dashboard.png)
 
 ### 7.16 OpenTelemetry-collector
 
-OpenTelemetry-collector
+*See the screenshot below for an impression of the OpenTelemetry-collector dashboard:*
 ![opentelemetry-collector-dashboard](/images/opentelemetry-collector-dashboard.png)
 
 ### 7.17 Traefik
 
 Go to: https://traefik.localhost
 
-Treafik
+*See the screenshot below for an impression of the Treafik UI:*
 ![traefik](/images/traefik.png)
 
-Treafik dashboard
+*See the screenshot below for an impression of the Treafik dashboard:*
 ![traefik](/images/traefik.dashboard.png)
 
 ## 8. Teardown & Cleanup
