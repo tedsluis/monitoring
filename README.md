@@ -291,6 +291,8 @@ Go to https://localhost
 
 Prometheus is a time-series database that records numeric data, such as CPU usage, network traffic, or application-specific. Prometheus operates on a pull-based model; it actively "scrapes" (fetches) metrics over HTTP from designated target endpoints at regular intervals (in our case every 15 seconds). Once the data is ingested, users can leverage its query language, PromQL, to slice, dice, and aggregate the metrics for visualization in tools like Grafana, or evaluate them against custom rules to trigger real-time notifications via Alertmanager when thresholds are breached.
 
+Today Prometheus 3.x supports not only pull metrics, but also push metrics. In this monitoring stack we push Tempo metrics into Prometheus.
+
 Go to https://prometheus.localhost
 
 | Endpoint paths | Description                    |
