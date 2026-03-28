@@ -92,9 +92,19 @@ The stack is designed around specific data flows:
 
 ## 5. Prerequisites
 
--   OS: Fedora Linux (tested on Fedora 43+).
+-   OS: Fedora Linux (tested on Fedora 43 and 44).
 -   Tools: podman and podman-compose.
 -   Podman Socket: The user socket must be active for the Podman Exporter and Alloy.
+   
+This stack is using `podman` and `podman-compose` where you may be used to `docker` and `docker-compose`. While Docker is commonly used, there are good reasons to use Podman due to several key architectural and security advantages:
+
+*   **Daemonless Architecture:** Unlike Docker, which requires a heavy, central background daemon (`dockerd`) running as root to manage containers, Podman is daemonless. It interacts directly with the container registry and runtime. This means no single point of failure—if the Docker daemon crashes, container management halts. With Podman, each container runs as an independent process.
+*   **Rootless by Design (Enhanced Security):** Security is a primary focus for Podman. It allows you to run containers as a standard, non-root user out of the box. If a container is somehow compromised, the attacker is confined to the privileges of that standard user, preventing them from gaining root access to the host machine. 
+*   **Fully Open Source & Unrestricted:** Podman is a fully open-source project driven by the community and Red Hat. Unlike Docker Desktop, which has introduced commercial licensing and subscription models for enterprise environments, Podman remains completely free and unrestricted for all use cases.
+*   **Drop-in Replacement:** The transition is practically seamless. Podman's CLI is intentionally designed to be identical to Docker's. You can simply add `alias docker=podman` to your shell profile, and all your familiar commands (`build`, `run`, `ps`, `pull`) will work exactly as expected.
+*   **Native Systemd Integration:** Podman integrates fully Linux environments. It can easily generate and manage `systemd` unit files from running containers, allowing you to treat containers as native system services that start automatically on boot.
+*   **Kubernetes Readiness:** Podman introduces the concept of "pods" (groups of containers sharing the same network and namespaces) locally, mirroring how Kubernetes operates. It can even generate Kubernetes YAML from local containers or run existing Kubernetes YAML directly, making the transition from local development to production orchestration much smoother.
+
 
 Install requirements:
 ```bash
@@ -102,6 +112,7 @@ Install requirements:
    sudo dnf install podman podman-compose -y
    
    # Activate the Podman socket for your user (Rootless)\
+   # run as a regular user, not as root!
    systemctl --user enable --now podman.socket
    
    # Check if the socket works
@@ -122,13 +133,22 @@ Install requirements:
     cd monitoring
 ```
 
-### 6.2 Start the stack
+### 6.2 Update your no_proxy
+
+In case you use a http proxy for your internet connection, you have configured environment variables like `http_proxy`, `https_proxy`, `no_proxy`, `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. In that case you need to add hostnames and IP addresses that are used inside this monitoring stack to your `no_proxy` and `NO_PROXY`. Run the script below to add 
+
 ```bash
-    podman-compose up -d
+  ./prepare_no_proxy.sh 
+```
+
+### 6.3 Start the stack
+```bash
+   # Important: only run this step after you have finshed all the steps in the Prerequisites!
+   podman-compose up -d
 ```
 The first time, the `minio-init` container will automatically create the required buckets (`loki-data` and `tempo-data`).
 
-### 6.3 Generate Local TLS Certificates
+### 6.4 Generate Local TLS Certificates
 To ensure secure connections (https://*.localhost) without browser warnings, run the certificate script. This generates a local CA and adds it to your Fedora Trust Store.
 ```bash
    ./renew-certs.sh
@@ -157,7 +177,7 @@ To ensure secure connections (https://*.localhost) without browser warnings, run
 ```
 **note:** If you try `https://localhost` in your web browser, make sure you restart your browser first!
 
-### 6.4 Check the status
+### 6.5 Check the status
 ```bash
 $ podman ps -a
 CONTAINER ID  IMAGE                                                                                                                    COMMAND               CREATED       STATUS                   PORTS                                                             NAMES
@@ -183,7 +203,7 @@ ce958ef62c3e  docker.io/otel/opentelemetry-collector-contrib@sha256:8164eab2e6bc
 ```
 note: The minio-init container only runs when starting minio.
 
-### 6.5 Stop, start or restart
+### 6.6 Stop, start or restart
 
 ```bash
    # stop all containers
