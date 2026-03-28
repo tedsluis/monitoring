@@ -205,8 +205,6 @@ note: The minio-init container only runs when starting minio.
 
 ### 6.6 Stop, start or restart with podman-compose
 
-### 🐙 Orchestrating with Podman-Compose
-
 **podman-compose** is a utility designed to help you define and run multi-container applications seamlessly without relying on a central daemon.
 
 *   **What it is:** `podman-compose` is a script that allows you to manage multi-container environments using Podman. It is fully compatible with the Compose specification, meaning you can often use your existing `docker-compose` projects without any modifications.
