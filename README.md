@@ -264,9 +264,19 @@ Docs: https://podman.io/docs
 
 ## 7. Usage
 
-### 7.1 NGINX start page
+### 7.1 NGINX landing page
 
-Go to https://localhost
+Go to **https://localhost**
+
+To make navigating this observability stack effortless, we use NGINX to serve a static landing page [index.html](./landing-page/index.html). This page acts as the central frontend portal for all the monitoring tools. 
+
+Instead of memorizing various ports and subdomains, this portal provides a clean, unified interface with quick links to everything you need:
+*   **Tools:** Direct access to all core applications like Grafana, Prometheus, Alertmanager, Karma, KeepHQ and MinIO.
+*   **Metrics Exporters:** Quick links to the raw metric endpoints for all running services and exporters.
+*   **Grafana Dashboards:** Direct links to instantly open the pre-provisioned dashboards.
+*   **Drilldown & Explore:** Shortcuts to advanced Grafana Explore and Drilldown views for metrics, logs, and traces.
+
+*See the screenshot below for an impression of the NGINX landing page:*
 
 
 ![startpagina1](./images/startpagina1.png)
