@@ -203,9 +203,19 @@ ce958ef62c3e  docker.io/otel/opentelemetry-collector-contrib@sha256:8164eab2e6bc
 ```
 note: The minio-init container only runs when starting minio.
 
-### 6.6 Stop, start or restart
+### 6.6 Stop, start or restart with podman-compose
+
+### 🐙 Orchestrating with Podman-Compose
+
+**podman-compose** is a utility designed to help you define and run multi-container applications seamlessly without relying on a central daemon.
+
+*   **What it is:** `podman-compose` is a script that allows you to manage multi-container environments using Podman. It is fully compatible with the Compose specification, meaning you can often use your existing `docker-compose` projects without any modifications.
+*   **How it works:** Under the hood, `podman-compose` reads your configuration file and translates the instructions into native Podman commands. Because Podman is daemonless and rootless, `podman-compose` executes these commands in the context of the user running it. It automatically handles the creation of networks (or Pods, depending on the configuration) so your containers can securely discover and communicate with each other locally.
+*   **The Role of `[compose.yml](./compose.yml)`:** The `[compose.yml](./compose.yml)` file serves as the definitive blueprint for your application stack. It is a declarative YAML file where you define your entire infrastructure as code: services, image versions, port mappings, persistent volumes, and environment variables. Instead of manually executing long strings of CLI commands, you simply run `podman-compose up -d`, and the tool reads this file to build, connect, and start your entire environment in a reproducible way.
 
 ```bash
+   # podman-compose --help
+
    # stop all containers
    podman-compose down
    
@@ -221,6 +231,38 @@ note: The minio-init container only runs when starting minio.
    # restart a specific container without applying compose.yaml changes
    podman restart webhook-tester
 ```
+
+### 6.7 Generic podman commands
+
+```bash
+   # podman --help
+
+   # check container log
+   podman logs prometheus
+
+   # keep following container log
+   podman logs -f blackbox
+
+   # list running containers
+   podman ps
+
+   # list all containers (including stopped containers)
+   podman  ps -a
+
+   # restart a container
+   podman restart loki 
+
+   # execute a query in a postgres container
+   podman exec -it keep-db psql -U keep -d keep -c "\d tenant;"
+
+   # Lookup health state log properties of a container
+   podman inspect --format='{{json .State.Health}}' tempo | jq '.Log[-1]'
+
+   # run a https request to docker.io in a temporary curl container
+   podman run --rm docker.io/curlimages/curl:latest -sI "https://auth.docker.io/token?service=registry.docker.io"
+```
+
+Docs: https://podman.io/docs
 
 ## 7. Usage
 
