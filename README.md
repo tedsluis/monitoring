@@ -137,9 +137,9 @@ This stack is using `podman` and `podman-compose` where you may be used to `dock
     cd monitoring
 ```
 
-### 6.2 Update your no_proxy
+### 6.2 Using an http internet proxy? Update your no_proxy
 
-In case you use a http proxy for your internet connection, you have configured environment variables like `http_proxy`, `https_proxy`, `no_proxy`, `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. In that case you need to add hostnames and IP addresses that are used inside this monitoring stack to your `no_proxy` and `NO_PROXY`. Run the script below to add 
+This step is optional in case you use a http proxy for your internet connection and you have configured environment variables like `http_proxy`, `https_proxy`, `no_proxy`, `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. In that case you need to add hostnames and IP addresses that are used inside this monitoring stack to your `no_proxy` and `NO_PROXY`. Run the script below to add 
 
 ```bash
   ./prepare_no_proxy.sh 
@@ -179,11 +179,11 @@ To ensure secure connections (https://*.localhost) without browser warnings, run
    === Done! ===
    Test now with: curl -v https://grafana.localhost
 ```
-**note:** If you try `https://localhost` in your web browser, make sure you restart your browser first!
+**note:** Before you try `https://localhost` in your web browser, make sure you restart your browser first!
 
 ### 6.5 Check the status
 ```bash
-$ podman ps -a
+podman ps -a
 CONTAINER ID  IMAGE                                                                                                                    COMMAND               CREATED       STATUS                   PORTS                                                             NAMES
 b8db045c2924  quay.io/prometheus/alertmanager@sha256:88b605de9aba0410775c1eb3438f951115054e0d307f23f274a4c705f51630c1                  --config.file=/et...  13 hours ago  Up 13 hours (healthy)    9093/tcp                                                          alertmanager
 99746eba94b1  docker.io/grafana/alloy@sha256:8f5666aebb871ba43ee2d65159c5d1c26c903720efafaf2d9ed4e237afc3bc88                          run --server.http...  13 hours ago  Up 13 hours                                                                                alloy
@@ -216,7 +216,8 @@ note: The minio-init container only runs when starting minio.
 *   **The Role of [compose.yml](./compose.yml):** The [compose.yml](./compose.yml) file serves as the definitive blueprint for your application stack. It is a declarative YAML file where you define your entire infrastructure as code: services, image versions, port mappings, persistent volumes, and environment variables. Instead of manually executing long strings of CLI commands, you simply run `podman-compose up -d`, and the tool reads this file to build, connect, and start your entire environment in a reproducible way.
 
 ```bash
-   # podman-compose --help
+   # Podman Help
+   podman-compose --help
 
    # stop all containers
    podman-compose down
@@ -237,7 +238,8 @@ note: The minio-init container only runs when starting minio.
 ### 6.7 Generic podman commands
 
 ```bash
-   # podman --help
+   # Podman Compose Help
+   podman --help
 
    # check container log
    podman logs prometheus
@@ -280,7 +282,7 @@ Instead of memorizing various ports and subdomains, this portal provides a clean
 *   **Grafana Dashboards:** Direct links to instantly open the pre-provisioned dashboards.
 *   **Drilldown & Explore:** Shortcuts to advanced Grafana Explore and Drilldown views for metrics, logs, and traces.
 
-*See the screenshot below for an impression of the NGINX landing page:*
+*See the screenshots below for an impression of the NGINX landing pages:*
 
 
 ![startpagina1](./images/startpagina1.png)
@@ -295,6 +297,8 @@ Instead of memorizing various ports and subdomains, this portal provides a clean
 ![startpagina4](./images/startpagina4.png)
 
 ### 7.2 Login credentials (Defaults)
+
+In case you navigate to Grafana or Minio, you need to login with the user accounts below:
 
 | Service | Username       | Password   | Note                                   |
 |---------|----------------|------------|----------------------------------------|
@@ -331,6 +335,12 @@ Prometheus exposes and scrapes its own metrics. Using these metrics you can moni
 *See the screenshot below for an impression of the Prometheus metrics dashboard:*
 ![prometheus-dashboard](./images/prometheus-dashboard.png)
 
+**Docs:**
+
+* https://prometheus.io/docs/introduction/overview/
+* https://prometheus.io/docs/instrumenting/exporters/
+* https://github.com/prometheus/prometheus
+
 ### 7.4 Loki
 
 Grafana Loki is a log aggregation system inspired by Prometheus. Unlike traditional logging systems (such as the Elastic Search) that index the full text of every log line, Loki only indexes the metadata (labels) attached to each log stream. This unique design choice makes it exceptionally lightweight, cost-effective, and fast to operate. 
@@ -353,6 +363,11 @@ Like most modern container, Loki exposes prometheus metrics too, which are used 
 *See the screenshot below for an impression of the Loki metrics dashboard:*
 ![loki-metrics-dashboard](/images/loki-metrics-dashboard.png)
 
+**Docs:**
+
+* https://grafana.com/docs/loki/latest/
+* https://github.com/grafana/loki
+
 ### 7.5 Tempo
 
 Grafana Tempo is a tracing backend designed to track the flow of requests as they travel through complex architectures and microservices. It helps developers and operators pinpoint exactly where latency, bottlenecks, or errors are occurring in a system. Unlike older tracing tools that require heavy, complex databases for indexing, Tempo is exceptionally cost-effective because it only requires a basic object storage backend (like MinIO or S3) to store the raw trace data. 
@@ -370,6 +385,11 @@ Loki does not include a built-in user interface. Instead, it relies entirely on 
 
 *Tempo exposes prometheus metrics too, which are used to monitor Loki using the dashboard below:*
 ![Tempo-dashboard](./images/tempo-dashboard.png)
+
+**Docs:**
+
+* https://grafana.com/docs/tempo/latest/
+* https://github.com/grafana/tempo
 
 ### 7.6 Alertmanager
 
@@ -399,12 +419,22 @@ Alertmanager exposes prometheus metrics too, which are used to monitor Alertmana
 *See the screenshot below for an impression of the Alertmanager metrics dashboard:*
 ![alertmanager-dashboard](./images/alertmanager-metrics-dashboard.png)
 
+**Docs:**
+
+* https://prometheus.io/docs/alerting/latest/alertmanager/
+* https://github.com/prometheus/alertmanager
+
 
 ### 7.7 Dashboards (Grafana)
 
 Go to https://grafana.localhost
 
 Grafana is the central visual heart of this stack and functions as a 'single pane of glass' for all data. The open-source platform connects to Prometheus (metrics), Loki (logs) and Tempo (traces), enabling deep system insight through dashboards and the Explore mode. Thanks to automated provisioning, datasources and dashboards are loaded at startup, so everything works without manual configuration.
+
+**Docs:**
+
+* https://grafana.com/docs/grafana/latest/
+* https://github.com/grafana/grafana
 
 #### 7.7.1 Dashboards
 
@@ -478,7 +508,6 @@ Datasources in Grafana serve as the technical interface to the underlying data s
 
 The datasources for Prometheus, Loki and Tempo are configured in [./grafana-provisioning/dashboards/dashboard.yaml](./grafana-provisioning/datasources/datasources.yaml)
 
-
 ### 7.8 Karma Alert Dashboard
 
 Go to https://karma.localhost
@@ -487,6 +516,10 @@ Here you see an overview of all active warnings (e.g., "Disk almost full", "Cont
 
 **See the screenshot below for an impression of the Karma UI:*
 ![karma](images/karma.png)
+
+**Docs:**
+
+* https://github.com/prymitive/karma
 
 ### 7.9 webhook-tester
 
@@ -497,7 +530,16 @@ Alertmanager sends the alerts to the webhook-tester
 *See the screenshot below for an impression of the Webhook-tester UI:*
 ![webhook-tester-ui](/images/webhook-tester.png)
 
+**Docs:**
+
+* https://github.com/tarampampam/webhook-tester
+
 ### 7.10 KeepHQ
+
+**Docs:**
+
+* https://docs.keephq.dev/overview/introduction
+* https://github.com/keephq/keep
 
 ### 7.11 Storage (MinIO)
 
@@ -520,6 +562,11 @@ Go to https://minio.localhost
 
 Here you can see how much data Loki and Tempo are using in their buckets.
 
+**Docs:**
+
+* https://github.com/minio/minio
+* https://docs.min.io/enterprise/aistor-object-store/
+
 ### 7.12 Alloy exporter
 
 https://alloy.localhost
@@ -530,6 +577,11 @@ https://alloy.localhost
 *See the screenshot below for an impression of the Alloy Graph:*
 ![alloy-graph](./images/alloy-graph.png)
 
+**Docs:**
+
+* https://grafana.com/docs/alloy/latest
+* https://github.com/grafana/alloy
+
 ### 7.13 Blackbox exporter
 
 https://blackbox.localhost
@@ -537,20 +589,38 @@ https://blackbox.localhost
 *See the screenshot below for an impression of the Blackbox dashboard:*
 ![blackbox-dashboard](/images/blackbox-dashboard.png)
 
+**Docs:**
+
+* https://github.com/prometheus/blackbox_exporter
+
 ### 7.14 node-exporter
 
 *See the screenshot below for an impression of the nodes-exporter-full dashboard:*
 ![nodes-exporter-full-dashboard](/images/node-exporter-dashbaord.png)
+
+**Docs:**
+
+* https://prometheus.io/docs/guides/node-exporter/
+* https://github.com/prometheus/node_exporter
 
 ### 7.15 podman-exporter
 
 *See the screenshot below for an impression of the podman-exporter dashboard:*
 ![podman-exporter-dashboard](/images/podman-exporter-dashboard.png)
 
+**Docs:**
+
+* https://github.com/containers/prometheus-podman-exporter
+
 ### 7.16 OpenTelemetry-collector
 
 *See the screenshot below for an impression of the OpenTelemetry-collector dashboard:*
 ![opentelemetry-collector-dashboard](/images/opentelemetry-collector-dashboard.png)
+
+**Docs:**
+
+* https://opentelemetry.io/docs/collector/
+* https://github.com/open-telemetry/opentelemetry-collector
 
 ### 7.17 Traefik
 
@@ -561,6 +631,11 @@ Go to: https://traefik.localhost
 
 *See the screenshot below for an impression of the Treafik dashboard:*
 ![traefik](/images/traefik.dashboard.png)
+
+**Docs:**
+
+* https://doc.traefik.io/traefik/getting-started/
+* https://github.com/traefik/traefik
 
 ## 8. Teardown & Cleanup
 
