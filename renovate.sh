@@ -10,6 +10,14 @@ if [ -z "$GITHUB_COM_TOKEN" ]; then
     exit 1
 fi
 
+# Check if the RENOVATE_GIT_AUTHOR is available
+if [ -z "$RENOVATE_GIT_AUTHOR" ]; then
+    echo "Error: RENOVATE_GIT_AUTHOR is not set."
+    echo "Usage: export RENOVATE_GIT_AUTHOR='Your Name <your.email@example.com>' && ./run-renovate.sh"
+    exit 1
+fi
+
+
 WORKDIR="$(pwd)"
 LOG_DIR="$WORKDIR/logs"
 
@@ -21,7 +29,7 @@ echo "🚀 Starting Mend Renovate via Podman..."
 podman run --rm \
     -e RENOVATE_TOKEN="${GITHUB_COM_TOKEN}" \
     -e GITHUB_COM_TOKEN="${GITHUB_COM_TOKEN}" \
-    -e RENOVATE_GIT_AUTHOR="Ted Sluis <ted.sluis@gmail.com>" \
+    -e RENOVATE_GIT_AUTHOR="${RENOVATE_GIT_AUTHOR}" \
     -e LOG_LEVEL="info" \
     -e NODE_OPTIONS="--dns-result-order=ipv4first" \
     -v "${WORKDIR}/renovate-config.js:/usr/src/app/config.js:Z" \
