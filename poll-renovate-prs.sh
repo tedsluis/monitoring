@@ -70,7 +70,9 @@ echo "🔄 Starting Renovate PR Poller at $(date)"
 
 # Fetch open PRs with the 'renovate' label
 echo "[INFO] Fetching open Pull Requests with the label 'renovate' from $REPO..."
-PRS=$(retry gh pr list --repo "$REPO" --state open --label "renovate" --json number,headRefName,headRepository,updatedAt --jq '.[] | "\(.number) \(.headRefName) \(.updatedAt)"' || echo "")
+
+# Fetch open PRs that MUST be authored by you, have the 'renovate' label, and start with 'renovate/'
+PRS=$(retry gh pr list --repo "$REPO" --state open --author "@me" --label "renovate" --json number,headRefName,headRepository,updatedAt --jq '.[] | select(.headRefName | startswith("renovate/")) | "\(.number) \(.headRefName) \(.updatedAt)"' || echo "")
 
 if [ -z "$PRS" ]; then
     echo "✅ No open Renovate PRs found at this time."

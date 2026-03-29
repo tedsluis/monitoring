@@ -286,3 +286,18 @@ REPO="tedsluis/monitoring"
 * **Concurrency Locking:** The poller uses a lock file (`/tmp/renovate-poller.lock`). If a test cycle takes a long time, the lock prevents a new cron execution from interfering with the running process.
 * **State Management:** `pr_state.json` tracks tested commits. If Renovate force-pushes a fix to a PR, the script detects the changed SHA and automatically re-tests the new commit.
 * **Guaranteed Rollback:** Regardless of whether a test passes or fails, if the script encounters an error or finishes testing a failing PR, it executes a strict git checkout to your base branch (usually `main`) and forces a rebuild of the stable containers. Your production stack is therefore offline for only a brief period during the test cycle.
+
+## 5. Security: Preventing Unauthorized Executions
+
+Because this automated poller checks out code and runs it on your local Fedora server, security is a top priority. A valid concern is: *What prevents a random GitHub user from submitting a malicious Pull Request that gets automatically tested and merged into the production stack?*
+
+This pipeline is protected against unauthorized code injection through multiple layers of security:
+
+### 5.1 GitHub Label Permissions (The First Line of Defense)
+The `poll-renovate-prs.sh` script is configured to only process PRs that carry the `renovate` label. On GitHub, external contributors (who fork the repository and submit a PR) **cannot** assign labels to their own Pull Requests. Only repository maintainers with Triage, Write, or Admin permissions can apply labels. Therefore, a malicious PR from an outsider is invisible to the poller by default.
+
+### 5.2 Strict Poller Filtering (The Second Line of Defense)
+To completely eliminate the risk of human error (e.g., a maintainer accidentally adding the `renovate` label to an external PR), the `poll-renovate-prs.sh` script applies strict hardcoded filters before it even considers checking out the code:
+
+*   **Author Verification (`--author "@me"`):** The GitHub CLI query strictly filters for PRs created by the authenticated user. Because we run the Mend Renovate bot locally using your Personal Access Token, the PR author must match your exact account.
+*   **Branch Validation (`startswith("renovate/")`):** The script parses the JSON response and ensures the source branch strictly begins with the `renovate/` prefix.
