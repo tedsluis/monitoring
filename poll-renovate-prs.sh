@@ -2,8 +2,15 @@
 # poll-renovate-prs.sh - Checks, tests, merges and restarts the monitoring stack
 set -uo pipefail
 
+# Check if the REPO is available
+if [ -z "$REPO" ]; then
+    echo "Error: REPO is not set."
+    echo "Usage: export REPO='owner/repo' && ./run-renovate.sh"
+    echo "for example: export REPO='tedsluis/monitoring' && ./poll-renovate-prs.sh"
+    exit 1
+fi
+
 # Variables
-REPO="tedsluis/monitoring"
 WORKDIR="$(pwd)"
 STATE_FILE="$WORKDIR/pr_state.json"
 LOCK_FILE="/tmp/renovate-poller.lock"
