@@ -393,7 +393,7 @@ Loki does not include a built-in user interface. Instead, it relies entirely on 
 
 ### 7.6 Alertmanager
 
-Alertmanager is a alert routing and management component that works hand-in-hand with Prometheus and Loki. While Prometheus and Loki are responsible for evaluating metric and logging thresholds and firing raw alerts, Alertmanager takes over to handle the complex logistics of notifications. It deduplicates and intelligently groups related alerts together, preventing engineers from being overwhelmed by "alert fatigue" during major system outages. Once grouped, it routes these notifications to the appropriate downstream receivers, such as Karma for visualization, KeepHQ for AIOps, or webhook-tester for debugging. 
+Alertmanager is a alert routing and management component that works hand-in-hand with both Prometheus and Loki. While Prometheus and Loki are responsible for evaluating metric and logging thresholds and firing raw alerts, Alertmanager takes over to handle the complex logistics of notifications. It deduplicates and intelligently groups related alerts together, preventing engineers from being overwhelmed by "alert fatigue" during major system outages. Once grouped, it routes these notifications to the appropriate downstream receivers, such as Karma for visualization, KeepHQ for AIOps, or webhook-tester for debugging. 
 
 Alertmanager also supports advanced operational features like silencing (temporarily muting specific alerts) and inhibition (suppressing lower-priority alerts if a related high-priority alert is already active), ensuring that teams only receive the most actionable signals.
 
@@ -425,7 +425,7 @@ Alertmanager exposes prometheus metrics too, which are used to monitor Alertmana
 * https://github.com/prometheus/alertmanager
 
 
-### 7.7 Dashboards (Grafana)
+### 7.7 Grafana
 
 Go to https://grafana.localhost
 
@@ -510,12 +510,26 @@ The datasources for Prometheus, Loki and Tempo are configured in [./grafana-prov
 
 ### 7.8 Karma Alert Dashboard
 
+Karma is a specialized, highly visual dashboard designed specifically for Alertmanager. While Alertmanager excels at routing and grouping alerts, its default UI is quite basic. Karma fills this gap by providing an intuitive, color-coded, and auto-refreshing interface that gives Operations and DevOps teams a consolidated overview of the platform's health at a glance.
+
 Go to https://karma.localhost
 
-Here you see an overview of all active warnings (e.g., "Disk almost full", "Container down" or "Health Check Failed").
+How it works in this stack:
+
+* **Direct Alertmanager Integration:** Karma continuously polls Alertmanager to display active alerts in organized, collapsible groups based on their severity and source.
+* **Prometheus History:** It connects directly to Prometheus to enrich the current alerts with historical context, allowing you to see if an alert has been flapping.
+* **Custom Color Coding:** As defined in karma.yaml, alerts are customized with distinct colors based on their severity (e.g., Red for Critical, Orange for Warning) and the specific job that triggered them (e.g., node-exporter, loki, alloy). This makes visual identification instantaneous.
+* **Noise Reduction:** It automatically filters out constant background alerts like the 'Watchdog' (dead man's switch) and strips redundant receiver labels to keep the dashboard clean and actionable.
+* **Live Auto-Refresh:** The dashboard automatically refreshes every 20 seconds so you never miss a critical state change.
+
+
+| configuration        | configuration file                         |
+|----------------------|--------------------------------------------|
+| Karma config         | [./karma/karma.yaml](./karma/karma.yaml)   |
 
 **See the screenshot below for an impression of the Karma UI:*
 ![karma](images/karma.png)
+An overview of all active warnings (e.g., "Disk almost full", "Container down" or "Health Check Failed").
 
 **Docs:**
 
@@ -523,9 +537,15 @@ Here you see an overview of all active warnings (e.g., "Disk almost full", "Cont
 
 ### 7.9 webhook-tester
 
+Webhook-tester is a lightweight and incredibly useful utility for debugging and inspecting incoming HTTP requests. In this observability stack, it acts as a "dummy" or "catch-all" receiver for Alertmanager.
+
 Go to https://webhook-tester.localhost
 
-Alertmanager sends the alerts to the webhook-tester
+**How it works in this stack:** When Prometheus fires an alert, Alertmanager processes and routes it based on its configuration. By configuring Alertmanager to send a webhook to this tester, you can inspect the exact, raw JSON payloads that Alertmanager generates in real-time. This is highly beneficial for:
+
+* **Debugging Alert Payloads:** Understanding the exact data structure, labels, and annotations that get sent out when an alert triggers.
+* **Template Development:** Testing custom notification templates before connecting them to real-world communication channels (like Slack, Microsoft Teams, or PagerDuty).
+* **Integration Testing:** Verifying that the alert routing rules in Alertmanager are working correctly and actually triggering the appropriate webhooks.
 
 *See the screenshot below for an impression of the Webhook-tester UI:*
 ![webhook-tester-ui](/images/webhook-tester.png)
@@ -536,6 +556,23 @@ Alertmanager sends the alerts to the webhook-tester
 
 ### 7.10 KeepHQ
 
+KeepHQ is an open-source AIOps and alert management platform. While Alertmanager handles the initial routing and deduplication of alerts, KeepHQ takes alert management a step further by providing advanced correlation, noise reduction, and automated workflow execution (auto-remediation). It acts as a single pane of glass for all your alerts, enriching them with context from various tools.
+
+https://keep.localhost
+
+KeepHQ is an open-source AIOps and alert management platform. While Alertmanager handles the initial routing and deduplication of alerts, KeepHQ takes alert management a step further by providing advanced correlation, noise reduction, and automated workflow execution (auto-remediation). It acts as a single pane of glass for all your alerts, enriching them with context from various tools.
+
+**How it works in this stack:** KeepHQ is deployed using three containers: a PostgreSQL database (`keep-db`), the core API and AIOps engine (`keep-backend`), and the web interface (`keep-frontend`).
+
+**Automatic Provider Configuration (IaC):** For KeepHQ to intelligently correlate alerts and execute workflows, it needs access to your metrics and logs. Instead of manually configuring these connections in the Keep UI, this stack automatically provisions them on startup using provider configuration files located in `/home/tedsluis/monitoring/keep/providers/`:
+
+| provider config                                   | description                                                                                                                                                                                                   |
+|---------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [prometheus.yml](./keep/providers/prometheus.yml) | Automatically configures the local Prometheus instance as a data source (`http://prometheus:9090`). This allows KeepHQ to dynamically query time-series metrics to gather deeper context when an alert fires. |
+| [loki.yml](./keep/providers/loki.yml)             | Automatically configures the local Grafana Loki instance as a data source (`http://loki:3100`). This enables KeepHQ to directly fetch relevant log lines and event streams associated with an incident.       |
+
+By injecting these configurations via Infrastructure as Code, KeepHQ is instantly ready to query both metrics and logs the moment the stack boots up, significantly accelerating troubleshooting and providing a seamless AIOps experience.
+
 **Docs:**
 
 * https://docs.keephq.dev/overview/introduction
@@ -543,7 +580,17 @@ Alertmanager sends the alerts to the webhook-tester
 
 ### 7.11 Storage (MinIO)
 
+MinIO is a high-performance, S3-compatible object storage server. In this observability stack, it serves as the persistent, long-term storage backend for both Grafana Loki (logs) and Grafana Tempo (traces).
+
 Go to https://minio.localhost
+
+**Why use MinIO?** Modern observability tools like Loki and Tempo have deliberately moved away from requiring heavy, complex databases (like Elasticsearch or Cassandra) for storage. Instead, they maintain a lightweight local index and push the bulk of their compressed log chunks and trace data into cheap, scalable object storage. MinIO provides this exact S3-like API locally, mimicking what you would use in the cloud (like AWS S3 or Google Cloud Storage).
+
+**How it works in this stack:** 
+
+* **Automatic Bucket Provisioning:** When you start the stack, a temporary helper container named minio-init runs alongside the main MinIO server. It automatically connects to the server and creates the necessary storage buckets (loki-data and tempo-data). Once done, the helper container gracefully exits.
+* **Storage Flow:** Loki and Tempo are configured to treat MinIO just like AWS S3. As they collect logs and traces, they bundle them into chunks and push them to their respective buckets in MinIO.
+* **Console & Management:** Through the MinIO UI (link above), you can browse these objects, inspect bucket policies, and see exactly how much storage your logs and traces are consuming.
 
 *See the screenshot below for an impression of the Minio UI - login:*
 ![minio](images/minio-login.png)
@@ -560,8 +607,6 @@ Go to https://minio.localhost
 *See the screenshot below for an impression of the Minio node dashboard:*
 ![minio-node](./images/minio-node-dashboard.png)
 
-Here you can see how much data Loki and Tempo are using in their buckets.
-
 **Docs:**
 
 * https://github.com/minio/minio
@@ -569,9 +614,19 @@ Here you can see how much data Loki and Tempo are using in their buckets.
 
 ### 7.12 Alloy exporter
 
-https://alloy.localhost
+Grafana Alloy is a highly configurable, vendor-neutral observability data pipeline. In this monitoring stack, Alloy acts as the primary log collector and processor, bridging the gap between your raw logs (both container and host-level) and Grafana Loki.
 
-*See the screenshot below for an impression of the Alloy:*
+Go to https://alloy.localhost
+
+**How it works in this stack (config.alloy):** The configuration file located at [alloy/config.alloy](./alloy/config.alloy) defines two main data streams that converge into a single output pushed to Loki:
+
+* **Stream 1:** Container Logs (`Podman Socket`): Alloy discovers all running containers via the local Podman socket (/var/run/docker.sock). Instead of just grabbing raw logs, it enriches them with highly useful metadata. It extracts the container_name, shortens the container_id to 12 characters for precision, and tags the image, pod_name, and compose project. This enrichment is what allows you to effortlessly filter logs in Grafana based on specific containers or pods.
+* **Stream 2:** Host System Logs (`Journald`): Alloy also reads the host machine's system logs directly from /var/log/journal. It extracts the systemd unit (e.g., sshd.service), syslog_identifier, and the log level (e.g., info, warning, err) so you can quickly filter for host-level errors.
+* **Smart Deduplication:** Because rootless Podman automatically writes container logs to the host's system journal as well, simply collecting both streams would result in duplicate logs in Loki. The config.alloy explicitly prevents this by applying a loki.relabel rule that drops any journald log containing a container ID. This ensures your logs remain clean and accurate.
+
+Through the Alloy web UI, you can view the health of these components and visually inspect the data flow pipeline using the Graph tab.
+
+*See the screenshot below for an impression of the Alloy UI:*
 ![alloy](./images/alloy.png)
 
 *See the screenshot below for an impression of the Alloy Graph:*
@@ -584,7 +639,22 @@ https://alloy.localhost
 
 ### 7.13 Blackbox exporter
 
+The Prometheus Blackbox Exporter is a probing tool that allows you to monitor the external health, availability, and response times of your endpoints. Instead of relying on internal application metrics (white-box monitoring), the Blackbox Exporter performs active "black-box" testing by making HTTP requests, TCP connections, or ICMP pings over the network just like a real user or client would.
+
 https://blackbox.localhost
+
+**How it works in this stack:** The Blackbox Exporter acts as a proxy. Prometheus asks the Blackbox Exporter to probe a specific target using a specific module, and the Exporter returns metrics based on the result of that probe (e.g., probe_success, probe_duration_seconds).
+
+* **Configuration (blackbox.yml):** The configuration file located at [blackbox/blackbox.yml](./blackbox/blackbox.yml) defines the modules (the "how"). For instance, it configures an `http_2xx` module which dictates that a probe is only successful if the target returns an HTTP 200 OK status. It also defines modules like tcp_connect to verify if a raw network port is open.
+* **Prometheus Scrape Jobs** (`prometheus.yaml`): While blackbox.yml defines the methods, prometheus.yaml defines the targets (the "what"). This stack includes several dedicated scrape jobs to ensure critical services are running:
+
+| prometheus scrape Job | description                                                                                                                                                                                                                                                  |
+|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| blackbox-http         | A general-purpose job that probes standard web endpoints to verify if HTTP services are responding correctly.                                                                                                                                                |
+| blackbox-keep-api     | A targeted probe specifically monitoring the backend API of KeepHQ to ensure the AIOps engine is healthy and accepting requests.                                                                                                                             |
+| blackbox-keep-ui      | A targeted probe verifying that the KeepHQ frontend interface is accessible to users.                                                                                                                                                                        |
+| blackbox-tcp          | This job uses the TCP module to probe non-HTTP services. It checks if specific ports (like database ports or internal communication sockets) are open and successfully accepting TCP handshakes.                                                             |
+| blackbox_exporter     | This job doesn't probe external targets. Instead, it scrapes the internal metrics of the Blackbox Exporter container itself, allowing you to monitor how many probes have been executed, how long they took, and if the exporter is experiencing any errors. |
 
 *See the screenshot below for an impression of the Blackbox dashboard:*
 ![blackbox-dashboard](/images/blackbox-dashboard.png)
