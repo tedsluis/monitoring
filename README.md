@@ -514,7 +514,7 @@ Karma is a specialized, highly visual dashboard designed specifically for Alertm
 
 Go to https://karma.localhost
 
-How it works in this stack:
+**How it works in this stack:**
 
 * **Direct Alertmanager Integration:** Karma continuously polls Alertmanager to display active alerts in organized, collapsible groups based on their severity and source.
 * **Prometheus History:** It connects directly to Prometheus to enrich the current alerts with historical context, allowing you to see if an alert has been flapping.
@@ -665,6 +665,12 @@ https://blackbox.localhost
 
 ### 7.14 node-exporter
 
+The Prometheus Node Exporter is a fundamental component for infrastructure monitoring. While other exporters focus on specific applications, databases, or container engines, the Node Exporter focuses entirely on the host machine itself (in this case, your underlying Fedora Workstation).
+
+**How it works in this stack:** It exposes a wide variety of hardware and OS-level metrics, such as CPU utilization, memory consumption, disk space, disk I/O, network bandwidth, and system load. Prometheus scrapes these metrics, allowing you to trigger alerts (e.g., "Disk almost full") and visualize the overall health of your host hardware.
+
+**Bypassing Container Isolation (compose.yml):** By design, containers are isolated from the host. To accurately measure the host's hardware, the Node Exporter container requires special configuration. In the compose.yml, it is explicitly set to use network_mode: host and pid: host. Additionally, it mounts the host's entire root filesystem (/) to a /host directory inside the container. This deliberately breaks the container's isolation, allowing the exporter to read the actual /proc and /sys files of the underlying host operating system.
+
 *See the screenshot below for an impression of the nodes-exporter-full dashboard:*
 ![nodes-exporter-full-dashboard](/images/node-exporter-dashbaord.png)
 
@@ -675,6 +681,12 @@ https://blackbox.localhost
 
 ### 7.15 podman-exporter
 
+The Prometheus Podman Exporter is designed to extract metrics specifically from a Podman environment. Since this observability stack intentionally uses daemonless, rootless Podman instead of Docker, traditional Docker exporters will not work. This exporter bridges that gap by providing deep visibility into your container runtime.
+
+**How it works in this stack:** It exposes comprehensive metrics about running containers, pods, images, and volumes (e.g., container CPU/memory usage, network I/O, and container state). Prometheus scrapes these metrics, which power the dedicated Podman Grafana dashboards, allowing you to track the exact resource footprint of each service in the stack.
+
+**Rootless Socket Connection (compose.yml):** To gather these metrics securely, the exporter needs to talk to the Podman API. In the compose.yml, this is achieved by mapping the host user's specific rootless Podman socket (`/run/user/1000/podman/podman.sock`) directly into the container. Furthermore, an environment variable `CONTAINER_HOST=unix:///run/podman/podman.sock` directs the exporter to listen to this specific socket, allowing it to monitor the containers without requiring root privileges on the host machine.
+
 *See the screenshot below for an impression of the podman-exporter dashboard:*
 ![podman-exporter-dashboard](/images/podman-exporter-dashboard.png)
 
@@ -683,6 +695,14 @@ https://blackbox.localhost
 * https://github.com/containers/prometheus-podman-exporter
 
 ### 7.16 OpenTelemetry-collector
+
+The OpenTelemetry (OTel) Collector is a vendor-agnostic proxy, router, and processor for telemetry data. While it has the capability to handle metrics and logs, in this observability stack it is primarily dedicated to handling distributed traces.
+
+**How it works in this stack:** Instead of applications sending trace data directly to the storage backend (Tempo), they send them to the OTel Collector. This architectural pattern decouples your applications from the storage backend, allowing you to easily switch backends, filter sensitive data, or batch requests without needing to change any application code.
+
+* **Trace Ingestion (OTLP):** The collector listens for incoming traces via the standard OpenTelemetry Protocol (OTLP) over gRPC on port `4317`. For instance, Grafana itself is configured in the compose.yml to send its internal traces to this exact port (`GF_TRACING_OPENTELEMETRY_OTLP_ADDRESS=otel-collector:4317`).
+* **Forwarding to Tempo:** Once the collector receives and processes the incoming trace spans, it exports them directly to the local Grafana Tempo container, which subsequently stores them persistently in MinIO.
+* **Traefik gRPC Routing (compose.yml):** To allow external applications or microservices to securely send traces to the collector, Traefik is configured with a dedicated TCP router using Server Name Indication (SNI). The rule `HostSNI('otel-collector.localhost')` routes incoming gRPC traffic directly to the collector. Additionally, the collector exposes its own internal health and performance metrics via an HTTP endpoint on port `8888`.
 
 *See the screenshot below for an impression of the OpenTelemetry-collector dashboard:*
 ![opentelemetry-collector-dashboard](/images/opentelemetry-collector-dashboard.png)
@@ -694,7 +714,16 @@ https://blackbox.localhost
 
 ### 7.17 Traefik
 
+Traefik acts as the Edge Router and Reverse Proxy for this entire observability stack. It is the single entry point that intercepts all incoming requests (like when you visit `https://grafana.localhost`) and dynamically routes them to the correct backend container. Furthermore, it handles all TLS/SSL termination, ensuring your local connections are secure and free of browser warnings.
+
 Go to: https://traefik.localhost
+
+**How it works in this stack:** Traefik uses a combination of auto-discovery and file-based configurations to manage routing:
+
+* **Container Auto-Discovery** ([compose.yml](./compose.yml)): By mounting the rootless Podman socket, Traefik automatically discovers running containers. The routing rules are defined directly on the containers using Docker labels (e.g., `traefik.http.routers.grafana.rule=Host('grafana.localhost'`)).
+* **Static Configuration** ([traefik/traefik.yaml](./traefik/traefik.yaml)): This is the main startup configuration. It defines the global "EntryPoints" (port 80 for HTTP, 443 for HTTPS, and 4317 for OTLP). It enforces an automatic redirect from HTTP to HTTPS for all traffic. Additionally, it configures Traefik to send its own internal distributed traces to the OpenTelemetry Collector and exposes its metrics for Prometheus to scrape.
+* **Dynamic Certificates** ([traefik/dynamic/tls.yaml](./traefik/dynamic/tls.yaml)): Traefik continuously watches the dynamic directory. This specific file instructs Traefik where to find the custom wildcard certificates (`localhost.crt` and `localhost.key`) generated by the `renew-certs.sh` script, applying them automatically to all `.localhost` routes.
+* **Dynamic Routing** ([traefik/dynamic/traefik-dynamic.yaml](./traefik/dynamic/traefik-dynamic.yaml)): While most routing is handled automatically via labels, some services require manual rules. Because the Node Exporter runs on the host network (network_mode: host) to collect accurate hardware data, it lives outside the standard container bridge network. This file explicitly tells Traefik to route requests for node-exporter.localhost out of the container network and into the host machine via `http://host.containers.internal:9100`.
 
 *See the screenshot below for an impression of the Treafik UI:*
 ![traefik](/images/traefik.png)
