@@ -88,7 +88,7 @@ services:
     image: docker.io/grafana/grafana:12.4.2@sha256:83749231c3835e390a3144e5e940203e42b9589761f20ef3169c716e734ad505
     container_name: grafana
     healthcheck:
-      test: ["CMD-SHELL", "http_proxy= HTTP_PROXY= wget -q --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1"]
+      test: ["CMD-SHELL", "http_proxy= HTTP_PROXY= wget -q --tries=1 --spider http://grafana:3000/api/health || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -282,6 +282,11 @@ services:
   minio:
     image: docker.io/minio/minio:latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
     container_name: minio
+    environment:
+      - http_proxy=
+      - https_proxy=
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
     user: "0:0"
     networks:
       - monitoring-net
@@ -294,7 +299,7 @@ services:
       - minio-data:/data:Z
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:9000/minio/health/live"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -321,12 +326,17 @@ services:
   minio-init:
     image: docker.io/minio/mc@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727
     container_name: minio-init
+    environment:
+      - http_proxy=
+      - https_proxy=
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
     networks:
       - monitoring-net
     depends_on:
       minio:
         condition: service_healthy
-    entrypoint: >
+    entrypoint: |
       /bin/sh -c "
       until mc alias set myminio http://minio:9000 minio minio123; do echo '...waiting for minio...'; sleep 1; done;
       mc mb myminio/loki-data --ignore-existing;
@@ -469,6 +479,7 @@ services:
       - "traefik.http.routers.prometheus.tls=true"
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
 
+  # ---------------------------------------------------------
   # ---------------------------------------------------------
   # Tempo
   # ---------------------------------------------------------

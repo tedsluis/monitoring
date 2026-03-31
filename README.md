@@ -139,10 +139,10 @@ This stack is using `podman` and `podman-compose` where you may be used to `dock
 
 ### 6.2 Using an http internet proxy? Update your no_proxy
 
-This step is optional in case you use a http proxy for your internet connection and you have configured environment variables like `http_proxy`, `https_proxy`, `no_proxy`, `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. In that case you need to add hostnames and IP addresses that are used inside this monitoring stack to your `no_proxy` and `NO_PROXY`. Run the script below to add 
+This step is optional in case you use a http proxy for your internet connection and you have configured environment variables like `http_proxy`, `https_proxy`, `no_proxy`, `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. In that case you need to add hostnames and IP addresses that are used inside this monitoring stack to your `no_proxy` and `NO_PROXY`. Source the script below to add the nessesary hostnames and IP addresses.
 
 ```bash
-  ./prepare_no_proxy.sh 
+  source ./prepare_no_proxy.sh 
 ```
 
 ### 6.3 Start the stack
