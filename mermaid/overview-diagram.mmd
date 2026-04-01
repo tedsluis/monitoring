@@ -1,0 +1,148 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'lineColor': '#9e9e9e' }}}%%
+flowchart LR
+  %% Native Mermaid Styling (No HTML) - Node Classes
+  classDef extNode fill:#cfd8dc,stroke:#37474f,stroke-width:2px,color:#000000;
+  classDef hostNode fill:#b3e5fc,stroke:#0277bd,stroke-width:2px,color:#000000;
+  classDef uiNode fill:#bbdefb,stroke:#1565c0,stroke-width:2px,color:#000000;
+  classDef appNode fill:#b2dfdb,stroke:#00695c,stroke-width:2px,color:#000000;
+  classDef obsNode fill:#81d4fa,stroke:#01579b,stroke-width:2px,color:#000000;
+  classDef dbNode fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000000;
+  classDef proxyNode fill:#ffe0b2,stroke:#ef6c00,stroke-width:2px,color:#000000;
+  classDef alertNode fill:#ffcdd2,stroke:#c62828,stroke-width:2px,color:#000000;
+  classDef collectNode fill:#e1bee7,stroke:#6a1b9a,stroke-width:2px,color:#000000;
+
+  External([External Users & Traffic]):::extNode
+
+  subgraph Host [Fedora Linux Host]
+    host_system[Host OS / Podman Socket / Journald]:::hostNode
+    host_ai[Host Network / OpenAI Proxy port 8111]:::hostNode
+    node_exporter[node-exporter]:::collectNode
+
+    subgraph PodmanNet [Podman Bridge Network: monitoring-net]
+      
+      subgraph Ingress [Ingress / Proxy]
+        traefik[traefik]:::proxyNode
+      end
+
+      subgraph UIs [Frontends & Portals]
+        nginx[nginx]:::uiNode
+        grafana[grafana]:::uiNode
+        keep_frontend[keep-frontend]:::uiNode
+      end
+
+      subgraph AppBackends [Application Backends]
+        keep_backend[keep-backend]:::appNode
+        keep_db[(keep-db)]:::dbNode
+      end
+
+      subgraph Pipelines [Data Pipelines & Collectors]
+        alloy[alloy]:::collectNode
+        otel_collector[otel-collector]:::collectNode
+      end
+
+      subgraph Observability [Observability Storage & Engines]
+        prometheus[prometheus]:::obsNode
+        loki[loki]:::obsNode
+        tempo[tempo]:::obsNode
+        minio[(minio)]:::dbNode
+      end
+
+      subgraph Alerts [Alerting & Management]
+        alertmanager[alertmanager]:::alertNode
+        karma[karma]:::alertNode
+        webhook_tester[webhook-tester]:::alertNode
+      end
+
+      subgraph Probes [Metrics Exporters]
+        blackbox_exporter[blackbox-exporter]:::collectNode
+        podman_exporter[podman-exporter]:::collectNode
+      end
+    end
+  end
+
+  %% External Ingress
+  External -->|Port 80/443 HTTP/S| traefik
+  External -->|Port 4317/gRPC| traefik
+
+  %% Host Level Telemetry Sources
+  host_system -.->|Socket/TCP| podman_exporter
+  host_system -.->|Host FS| node_exporter
+  host_system -.->|Socket/Journald| alloy
+
+  %% Traefik Reverse Proxy Routing
+  traefik -->|80/HTTP| nginx
+  traefik -->|3000/HTTP| grafana
+  traefik -->|3000/HTTP| keep_frontend
+  traefik -->|8080/HTTP| keep_backend
+  traefik -->|9090/HTTP| prometheus
+  traefik -->|3100/HTTP| loki
+  traefik -->|3200/HTTP| tempo
+  traefik -->|9000-9001/HTTP| minio
+  traefik -->|9093/HTTP| alertmanager
+  traefik -->|8080/HTTP| karma
+  traefik -->|8080/HTTP| webhook_tester
+  traefik -->|12345/HTTP| alloy
+  traefik -->|9115/HTTP| blackbox_exporter
+  traefik -->|9882/HTTP| podman_exporter
+  traefik -->|4317/gRPC| otel_collector
+
+  %% UI and Frontend interactions
+  grafana -->|9090/HTTP Queries| prometheus
+  grafana -->|3100/HTTP Queries| loki
+  grafana -->|3200-9095 Queries| tempo
+  keep_frontend -->|8080/HTTP API| keep_backend
+  keep_frontend -.->|8111/HTTP AI API| host_ai
+
+  %% Core Telemetry & Storage Pipelines
+  alloy -->|3100/HTTP Push| loki
+  traefik -->|4317/gRPC Traces| otel_collector
+  grafana -->|4317/gRPC Traces| otel_collector
+  otel_collector -->|4317/gRPC Traces| tempo
+  loki -->|9000/HTTP S3 Storage| minio
+  tempo -->|9000/HTTP S3 Storage| minio
+
+  %% Tempo Metrics Generator (Remote Write)
+  tempo -->|9090/HTTP Push Metrics| prometheus
+
+  %% KeepHQ AIOps Pipeline
+  keep_backend -->|5432/TCP| keep_db
+  keep_backend -->|9090/HTTP Context| prometheus
+  keep_backend -->|3100/HTTP Context| loki
+  keep_backend -.->|8111/HTTP AI API| host_ai
+
+  %% Prometheus Metrics Scraping (Pull)
+  prometheus -->|9100/HTTP Scrape| node_exporter
+  prometheus -->|9882/HTTP Scrape| podman_exporter
+  prometheus -->|8888/HTTP Scrape| otel_collector
+  prometheus -->|9115/HTTP Scrape| blackbox_exporter
+  prometheus -->|8082/HTTP Scrape| traefik
+  prometheus -->|12345/HTTP Scrape| alloy
+  prometheus -->|3000/HTTP Scrape| grafana
+  prometheus -->|8080/HTTP Scrape| keep_backend
+  prometheus -->|3200/HTTP Scrape| tempo
+  prometheus -->|3100/HTTP Scrape| loki
+  prometheus -->|9000/HTTP Scrape| minio
+  prometheus -->|8080/HTTP Scrape| karma
+  prometheus -->|9093/HTTP Scrape| alertmanager
+  
+  %% Active Probes
+  blackbox_exporter -.->|HTTP/TCP Probes| traefik
+  blackbox_exporter -.->|5432/TCP Probe| keep_db
+
+  %% Alerting Flow
+  prometheus -->|9093/HTTP Fire Alerts| alertmanager
+  loki -->|9093/HTTP Fire Alerts| alertmanager
+  alertmanager -->|8080/HTTP Webhook| keep_backend
+  alertmanager -->|8080/HTTP Webhook| webhook_tester
+  karma -->|9093/HTTP Poll Status| alertmanager
+
+  %% Subgraph Styling (Background blocks)
+  style Host fill:#f5f5f5,stroke:#9e9e9e,stroke-width:2px
+  style PodmanNet fill:#ffffff,stroke:#cfd8dc,stroke-width:2px,stroke-dasharray: 5 5
+  style Ingress fill:#fff8e1,stroke:#ffe082,stroke-width:2px,rx:10,ry:10
+  style UIs fill:#e3f2fd,stroke:#90caf9,stroke-width:2px,rx:10,ry:10
+  style AppBackends fill:#e8f5e9,stroke:#a5d6a7,stroke-width:2px,rx:10,ry:10
+  style Pipelines fill:#f3e5f5,stroke:#ce93d8,stroke-width:2px,rx:10,ry:10
+  style Observability fill:#e0f7fa,stroke:#80deea,stroke-width:2px,rx:10,ry:10
+  style Alerts fill:#ffebee,stroke:#ef9a9a,stroke-width:2px,rx:10,ry:10
+  style Probes fill:#eceff1,stroke:#b0bec5,stroke-width:2px,rx:10,ry:10
