@@ -1,0 +1,92 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'lineColor': '#9e9e9e' }}}%%
+flowchart LR
+%% Native Mermaid Styling (No HTML) - Node Classes
+classDef uiNode fill:#bbdefb,stroke:#1565c0,stroke-width:2px,color:#000000;
+classDef appNode fill:#b2dfdb,stroke:#00695c,stroke-width:2px,color:#000000;
+classDef obsNode fill:#81d4fa,stroke:#01579b,stroke-width:2px,color:#000000;
+classDef dbNode fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000000;
+classDef proxyNode fill:#ffe0b2,stroke:#ef6c00,stroke-width:2px,color:#000000;
+classDef alertNode fill:#ffcdd2,stroke:#c62828,stroke-width:2px,color:#000000;
+classDef collectNode fill:#e1bee7,stroke:#6a1b9a,stroke-width:2px,color:#000000;
+classDef hostNode fill:#b3e5fc,stroke:#0277bd,stroke-width:2px,color:#000000;
+
+%% Core Component
+blackbox_exporter[blackbox-exporter]:::collectNode
+
+%% Grouped Components (Ingress & Triggers)
+subgraph Ingress [Ingress / Proxy]
+traefik_in[traefik]:::proxyNode
+end
+
+subgraph Monitoring [Prometheus Scraper]
+prometheus_in[prometheus]:::obsNode
+end
+
+%% Grouped Components (Probe Targets)
+subgraph KeepHQ [KeepHQ Targets]
+keep_frontend[keep-frontend]:::uiNode
+keep_backend[keep-backend]:::appNode
+keep_db[(keep-db)]:::dbNode
+end
+
+subgraph Infra [Infrastructure Targets]
+nginx[nginx]:::uiNode
+traefik_out[traefik]:::proxyNode
+node_exporter[node-exporter]:::collectNode
+podman_exporter[podman-exporter]:::collectNode
+end
+
+subgraph Observability [Observability Targets]
+grafana[grafana]:::uiNode
+prometheus_out[prometheus]:::obsNode
+loki[loki]:::obsNode
+tempo[tempo]:::obsNode
+minio[(minio)]:::dbNode
+alloy[alloy]:::collectNode
+otel_collector[otel-collector]:::collectNode
+end
+
+subgraph Alerting [Alerting Targets]
+alertmanager[alertmanager]:::alertNode
+karma[karma]:::alertNode
+webhook_tester[webhook-tester]:::alertNode
+end
+
+%% Ingress Routing
+traefik_in -->|Port 9115/HTTP Route| blackbox_exporter
+
+%% Prometheus Triggers
+prometheus_in -->|Port 9115/HTTP Trigger Probes & Scrape| blackbox_exporter
+
+%% Probes to KeepHQ (Specific Modules)
+blackbox_exporter -.->|Port 3000/HTTP Probe module: http_keep_ui| keep_frontend
+blackbox_exporter -.->|Port 8080/HTTP Probe module: http_keep_api| keep_backend
+blackbox_exporter -.->|Port 5432/TCP Probe module: tcp_connect| keep_db
+
+%% Probes to Infrastructure (http_2xx)
+blackbox_exporter -.->|Port 80/HTTP Probe| nginx
+blackbox_exporter -.->|Port 8082/HTTP Probe| traefik_out
+blackbox_exporter -.->|Port 9100/HTTP Probe| node_exporter
+blackbox_exporter -.->|Port 9882/HTTP Probe| podman_exporter
+
+%% Probes to Observability (http_2xx)
+blackbox_exporter -.->|Port 3000/HTTP Probe| grafana
+blackbox_exporter -.->|Port 9090/HTTP Probe| prometheus_out
+blackbox_exporter -.->|Port 3100/HTTP Probe| loki
+blackbox_exporter -.->|Port 3200/HTTP Probe| tempo
+blackbox_exporter -.->|Port 9000/HTTP Probe| minio
+blackbox_exporter -.->|Port 12345/HTTP Probe| alloy
+blackbox_exporter -.->|Port 8888/HTTP Probe| otel_collector
+
+%% Probes to Alerting (http_2xx)
+blackbox_exporter -.->|Port 9093/HTTP Probe| alertmanager
+blackbox_exporter -.->|Port 8080/HTTP Probe| karma
+blackbox_exporter -.->|Port 8080/HTTP Probe| webhook_tester
+
+%% Subgraph Styling (Background blocks)
+style Ingress fill:#fff8e1,stroke:#ffe082,stroke-width:2px,rx:10,ry:10
+style Monitoring fill:#e0f7fa,stroke:#80deea,stroke-width:2px,rx:10,ry:10
+style KeepHQ fill:#e8f5e9,stroke:#a5d6a7,stroke-width:2px,rx:10,ry:10
+style Infra fill:#f5f5f5,stroke:#cfd8dc,stroke-width:2px,rx:10,ry:10
+style Observability fill:#f3e5f5,stroke:#ce93d8,stroke-width:2px,rx:10,ry:10
+style Alerting fill:#ffebee,stroke:#ef9a9a,stroke-width:2px,rx:10,ry:10

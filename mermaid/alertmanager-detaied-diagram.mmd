@@ -1,0 +1,51 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'lineColor': '#9e9e9e' }}}%%
+flowchart LR
+  %% Native Mermaid Styling (No HTML) - Node Classes
+  classDef uiNode fill:#bbdefb,stroke:#1565c0,stroke-width:2px,color:#000000;
+  classDef appNode fill:#b2dfdb,stroke:#00695c,stroke-width:2px,color:#000000;
+  classDef obsNode fill:#81d4fa,stroke:#01579b,stroke-width:2px,color:#000000;
+  classDef dbNode fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000000;
+  classDef proxyNode fill:#ffe0b2,stroke:#ef6c00,stroke-width:2px,color:#000000;
+  classDef alertNode fill:#ffcdd2,stroke:#c62828,stroke-width:2px,color:#000000;
+  classDef collectNode fill:#e1bee7,stroke:#6a1b9a,stroke-width:2px,color:#000000;
+
+  %% Core Engine
+  alertmanager[alertmanager]:::alertNode
+
+  %% Grouped Components
+  subgraph Evaluators [Alert Evaluators & Sources]
+    prometheus[prometheus]:::obsNode
+    loki[loki]:::obsNode
+  end
+
+  subgraph Receivers [Alert Receivers & UIs]
+    karma[karma]:::alertNode
+    keep_backend[keep-backend]:::appNode
+    webhook_tester[webhook-tester]:::alertNode
+  end
+
+  subgraph Ingress [Ingress / Proxy]
+    traefik[traefik]:::proxyNode
+  end
+
+  %% Alert Ingestion (Firing alerts)
+  prometheus -->|Port 9093/HTTP Fire Alerts| alertmanager
+  loki -->|Port 9093/HTTP Fire Alerts| alertmanager
+
+  %% Alert Routing & Polling
+  alertmanager -->|Port 8080/HTTP Webhook| keep_backend
+  alertmanager -->|Port 8080/HTTP Webhook| webhook_tester
+  karma -->|Port 9093/HTTP Poll Status| alertmanager
+
+  %% Metrics Scraping
+  prometheus -->|Port 9093/HTTP Scrape Metrics| alertmanager
+
+  %% Ingress Routing
+  traefik -->|Port 9093/HTTP Route| alertmanager
+  traefik -->|Port 8080/HTTP Route| karma
+  traefik -->|Port 8080/HTTP Route| webhook_tester
+
+  %% Subgraph Styling (Background blocks)
+  style Evaluators fill:#e0f7fa,stroke:#80deea,stroke-width:2px,rx:10,ry:10
+  style Receivers fill:#ffebee,stroke:#ef9a9a,stroke-width:2px,rx:10,ry:10
+  style Ingress fill:#fff8e1,stroke:#ffe082,stroke-width:2px,rx:10,ry:10

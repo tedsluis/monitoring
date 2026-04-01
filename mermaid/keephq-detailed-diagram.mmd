@@ -1,0 +1,70 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'lineColor': '#9e9e9e' }}}%%
+flowchart LR
+%% Native Mermaid Styling (No HTML) - Node Classes
+classDef uiNode fill:#bbdefb,stroke:#1565c0,stroke-width:2px,color:#000000;
+classDef appNode fill:#b2dfdb,stroke:#00695c,stroke-width:2px,color:#000000;
+classDef obsNode fill:#81d4fa,stroke:#01579b,stroke-width:2px,color:#000000;
+classDef dbNode fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000000;
+classDef proxyNode fill:#ffe0b2,stroke:#ef6c00,stroke-width:2px,color:#000000;
+classDef alertNode fill:#ffcdd2,stroke:#c62828,stroke-width:2px,color:#000000;
+classDef collectNode fill:#e1bee7,stroke:#6a1b9a,stroke-width:2px,color:#000000;
+classDef hostNode fill:#b3e5fc,stroke:#0277bd,stroke-width:2px,color:#000000;
+
+%% Core KeepHQ Components
+keep_frontend[keep-frontend]:::uiNode
+keep_backend[keep-backend]:::appNode
+keep_db[(keep-db)]:::dbNode
+
+%% Grouped Components
+subgraph Ingress [Ingress / Proxy]
+traefik[traefik]:::proxyNode
+end
+
+subgraph Context [Observability Context]
+prometheus[prometheus]:::obsNode
+loki[loki]:::obsNode
+end
+
+subgraph Alerting [Alert Routing]
+alertmanager[alertmanager]:::alertNode
+end
+
+subgraph Probes [Metrics Exporters]
+blackbox_exporter[blackbox-exporter]:::collectNode
+end
+
+subgraph Host [Host Network]
+host_ai[Host / OpenAI Proxy port 8111]:::hostNode
+end
+
+%% Ingress Routing
+traefik -->|Port 3000/HTTP Route| keep_frontend
+traefik -->|Port 8080/HTTP Route| keep_backend
+
+%% Internal KeepHQ Flow
+keep_frontend -->|Port 8080/HTTP API| keep_backend
+keep_backend -->|Port 5432/TCP Connect| keep_db
+
+%% AIOps Context Gathering
+keep_backend -->|Port 9090/HTTP Fetch Context| prometheus
+keep_backend -->|Port 3100/HTTP Fetch Context| loki
+
+%% Incoming Webhook Alerts
+alertmanager -->|Port 8080/HTTP Webhook| keep_backend
+
+%% AI Integration (Local LLM via host)
+keep_frontend -.->|Port 8111/HTTP AI API| host_ai
+keep_backend -.->|Port 8111/HTTP AI API| host_ai
+
+%% Prometheus Metrics & Health Probes
+prometheus -->|Port 8080/HTTP Scrape Metrics| keep_backend
+blackbox_exporter -.->|Port 3000/HTTP Health Probe| keep_frontend
+blackbox_exporter -.->|Port 8080/HTTP Health Probe| keep_backend
+blackbox_exporter -.->|Port 5432/TCP Health Probe| keep_db
+
+%% Subgraph Styling (Background blocks)
+style Ingress fill:#fff8e1,stroke:#ffe082,stroke-width:2px,rx:10,ry:10
+style Context fill:#e0f7fa,stroke:#80deea,stroke-width:2px,rx:10,ry:10
+style Alerting fill:#ffebee,stroke:#ef9a9a,stroke-width:2px,rx:10,ry:10
+style Probes fill:#eceff1,stroke:#b0bec5,stroke-width:2px,rx:10,ry:10
+style Host fill:#f5f5f5,stroke:#cfd8dc,stroke-width:2px,rx:10,ry:10

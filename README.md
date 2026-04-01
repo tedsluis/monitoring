@@ -420,6 +420,8 @@ Tempo does not include a built-in user interface. Instead, it relies entirely on
 
 Alertmanager is a alert routing and management component that works hand-in-hand with both Prometheus and Loki. While Prometheus and Loki are responsible for evaluating metric and logging thresholds and firing raw alerts, Alertmanager takes over to handle the complex logistics of notifications. It deduplicates and intelligently groups related alerts together, preventing engineers from being overwhelmed by "alert fatigue" during major system outages. Once grouped, it routes these notifications to the appropriate downstream receivers, such as Karma for visualization, KeepHQ for AIOps, or webhook-tester for debugging. 
 
+![alertmanager](./images/alertmanager-detailed-diagram.svg)
+
 Alertmanager also supports advanced operational features like silencing (temporarily muting specific alerts) and inhibition (suppressing lower-priority alerts if a related high-priority alert is already active), ensuring that teams only receive the most actionable signals.
 
 Go to https://alertmanager.localhost
@@ -455,6 +457,8 @@ Alertmanager exposes prometheus metrics too, which are used to monitor Alertmana
 Go to https://grafana.localhost
 
 Grafana is the central visual heart of this stack and functions as a 'single pane of glass' for all data. The open-source platform connects to Prometheus (metrics), Loki (logs) and Tempo (traces), enabling deep system insight through dashboards and the Explore mode. Thanks to automated provisioning, datasources and dashboards are loaded at startup, so everything works without manual configuration.
+
+![grafana](./images/grafana-detailed-diagram.svg)
 
 **Docs:**
 
@@ -539,6 +543,8 @@ Karma is a specialized, highly visual dashboard designed specifically for Alertm
 
 Go to https://karma.localhost
 
+![karma](./images/karma-detailed-diagram.svg)
+
 **How it works in this stack:**
 
 * **Direct Alertmanager Integration:** Karma continuously polls Alertmanager to display active alerts in organized, collapsible groups based on their severity and source.
@@ -566,6 +572,8 @@ Webhook-tester is a lightweight and incredibly useful utility for debugging and 
 
 Go to https://webhook-tester.localhost
 
+![webhook-tester](./images/webhook-tester-detailed-diagram.svg)
+
 **How it works in this stack:** When Prometheus fires an alert, Alertmanager processes and routes it based on its configuration. By configuring Alertmanager to send a webhook to this tester, you can inspect the exact, raw JSON payloads that Alertmanager generates in real-time. This is highly beneficial for:
 
 * **Debugging Alert Payloads:** Understanding the exact data structure, labels, and annotations that get sent out when an alert triggers.
@@ -586,6 +594,8 @@ KeepHQ is an open-source AIOps and alert management platform. While Alertmanager
 https://keep.localhost
 
 KeepHQ is an open-source AIOps and alert management platform. While Alertmanager handles the initial routing and deduplication of alerts, KeepHQ takes alert management a step further by providing advanced correlation, noise reduction, and automated workflow execution (auto-remediation). It acts as a single pane of glass for all your alerts, enriching them with context from various tools.
+
+![keephq](./images/keephq-detailed-diagram.svg)
 
 **How it works in this stack:** KeepHQ is deployed using three containers: a PostgreSQL database (`keep-db`), the core API and AIOps engine (`keep-backend`), and the web interface (`keep-frontend`).
 
@@ -643,6 +653,8 @@ Grafana Alloy is a highly configurable, vendor-neutral observability data pipeli
 
 Go to https://alloy.localhost
 
+[alloy](./images/alloy-detailed-diagram.svg)
+
 **How it works in this stack (config.alloy):** The configuration file located at [alloy/config.alloy](./alloy/config.alloy) defines two main data streams that converge into a single output pushed to Loki:
 
 * **Stream 1:** Container Logs (`Podman Socket`): Alloy discovers all running containers via the local Podman socket (/var/run/docker.sock). Instead of just grabbing raw logs, it enriches them with highly useful metadata. It extracts the container_name, shortens the container_id to 12 characters for precision, and tags the image, pod_name, and compose project. This enrichment is what allows you to effortlessly filter logs in Grafana based on specific containers or pods.
@@ -667,6 +679,8 @@ Through the Alloy web UI, you can view the health of these components and visual
 The Prometheus Blackbox Exporter is a probing tool that allows you to monitor the external health, availability, and response times of your endpoints. Instead of relying on internal application metrics (white-box monitoring), the Blackbox Exporter performs active "black-box" testing by making HTTP requests, TCP connections, or ICMP pings over the network just like a real user or client would.
 
 https://blackbox.localhost
+
+![blackbox-exporter](./images/blackbox-exporter-detailed-diagram.svg)
 
 **How it works in this stack:** The Blackbox Exporter acts as a proxy. Prometheus asks the Blackbox Exporter to probe a specific target using a specific module, and the Exporter returns metrics based on the result of that probe (e.g., probe_success, probe_duration_seconds).
 
@@ -723,6 +737,8 @@ The Prometheus Podman Exporter is designed to extract metrics specifically from 
 
 The OpenTelemetry (OTel) Collector is a vendor-agnostic proxy, router, and processor for telemetry data. While it has the capability to handle metrics and logs, in this observability stack it is primarily dedicated to handling distributed traces.
 
+![opentelematry-collector](./images/opentelemetry-collector-detailed-diagram.svg)
+
 **How it works in this stack:** Instead of applications sending trace data directly to the storage backend (Tempo), they send them to the OTel Collector. This architectural pattern decouples your applications from the storage backend, allowing you to easily switch backends, filter sensitive data, or batch requests without needing to change any application code.
 
 * **Trace Ingestion (OTLP):** The collector listens for incoming traces via the standard OpenTelemetry Protocol (OTLP) over gRPC on port `4317`. For instance, Grafana itself is configured in the compose.yml to send its internal traces to this exact port (`GF_TRACING_OPENTELEMETRY_OTLP_ADDRESS=otel-collector:4317`).
@@ -742,6 +758,8 @@ The OpenTelemetry (OTel) Collector is a vendor-agnostic proxy, router, and proce
 Traefik acts as the Edge Router and Reverse Proxy for this entire observability stack. It is the single entry point that intercepts all incoming requests (like when you visit `https://grafana.localhost`) and dynamically routes them to the correct backend container. Furthermore, it handles all TLS/SSL termination, ensuring your local connections are secure and free of browser warnings.
 
 Go to: https://traefik.localhost
+
+![traefik](./images/traefik-detailed-diagram.svg)
 
 **How it works in this stack:** Traefik uses a combination of auto-discovery and file-based configurations to manage routing:
 

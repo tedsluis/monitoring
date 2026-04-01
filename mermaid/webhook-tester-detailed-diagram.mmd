@@ -1,0 +1,40 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'lineColor': '#9e9e9e' }}}%%
+flowchart LR
+  %% Native Mermaid Styling (No HTML) - Node Classes
+  classDef uiNode fill:#bbdefb,stroke:#1565c0,stroke-width:2px,color:#000000;
+  classDef obsNode fill:#81d4fa,stroke:#01579b,stroke-width:2px,color:#000000;
+  classDef proxyNode fill:#ffe0b2,stroke:#ef6c00,stroke-width:2px,color:#000000;
+  classDef alertNode fill:#ffcdd2,stroke:#c62828,stroke-width:2px,color:#000000;
+  classDef collectNode fill:#e1bee7,stroke:#6a1b9a,stroke-width:2px,color:#000000;
+
+  %% Core Component
+  webhook_tester[webhook-tester]:::alertNode
+
+  %% Grouped Components
+  subgraph Ingress [Ingress / Proxy]
+    traefik[traefik]:::proxyNode
+  end
+
+  subgraph Alerting [Alert Management]
+    alertmanager[alertmanager]:::alertNode
+  end
+
+  subgraph Monitoring [Monitoring & Probes]
+    prometheus[prometheus]:::obsNode
+    blackbox_exporter[blackbox-exporter]:::collectNode
+  end
+
+  %% Ingress Routing
+  traefik -->|Port 8080/HTTP Route| webhook_tester
+
+  %% Alert Routing
+  alertmanager -->|Port 8080/HTTP Webhook| webhook_tester
+
+  %% Prometheus Metrics & Probes
+  prometheus -->|Port 9115/HTTP Trigger Probe| blackbox_exporter
+  blackbox_exporter -.->|Port 8080/HTTP Health Probe| webhook_tester
+
+  %% Subgraph Styling (Background blocks)
+  style Ingress fill:#fff8e1,stroke:#ffe082,stroke-width:2px,rx:10,ry:10
+  style Alerting fill:#ffebee,stroke:#ef9a9a,stroke-width:2px,rx:10,ry:10
+  style Monitoring fill:#e0f7fa,stroke:#80deea,stroke-width:2px,rx:10,ry:10

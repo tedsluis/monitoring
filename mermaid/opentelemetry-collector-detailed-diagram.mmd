@@ -1,0 +1,39 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'lineColor': '#9e9e9e' }}}%%
+flowchart LR
+%% Native Mermaid Styling (No HTML) - Node Classes
+classDef uiNode fill:#bbdefb,stroke:#1565c0,stroke-width:2px,color:#000000;
+classDef obsNode fill:#81d4fa,stroke:#01579b,stroke-width:2px,color:#000000;
+classDef proxyNode fill:#ffe0b2,stroke:#ef6c00,stroke-width:2px,color:#000000;
+classDef collectNode fill:#e1bee7,stroke:#6a1b9a,stroke-width:2px,color:#000000;
+
+%% Core Component
+otel_collector[otel-collector]:::collectNode
+
+%% Grouped Components
+subgraph Ingress [Ingress / Proxy]
+traefik[traefik]:::proxyNode
+end
+
+subgraph UIs [Frontends & Portals]
+grafana[grafana]:::uiNode
+end
+
+subgraph Observability [Observability Storage & Metrics]
+tempo[tempo]:::obsNode
+prometheus[prometheus]:::obsNode
+end
+
+%% Trace Ingestion
+traefik -->|Port 4317/gRPC Route / Internal Traces| otel_collector
+grafana -->|Port 4317/gRPC Internal Traces| otel_collector
+
+%% Trace Export
+otel_collector -->|Port 4317/gRPC Export Traces| tempo
+
+%% Metrics Scraping
+prometheus -->|Port 8888/HTTP Scrape Metrics| otel_collector
+
+%% Subgraph Styling (Background blocks)
+style Ingress fill:#fff8e1,stroke:#ffe082,stroke-width:2px,rx:10,ry:10
+style UIs fill:#e3f2fd,stroke:#90caf9,stroke-width:2px,rx:10,ry:10
+style Observability fill:#e0f7fa,stroke:#80deea,stroke-width:2px,rx:10,ry:10

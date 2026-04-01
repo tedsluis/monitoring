@@ -1,0 +1,43 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'lineColor': '#9e9e9e' }}}%%
+flowchart LR
+  %% Native Mermaid Styling (No HTML) - Node Classes
+  classDef uiNode fill:#bbdefb,stroke:#1565c0,stroke-width:2px,color:#000000;
+  classDef obsNode fill:#81d4fa,stroke:#01579b,stroke-width:2px,color:#000000;
+  classDef proxyNode fill:#ffe0b2,stroke:#ef6c00,stroke-width:2px,color:#000000;
+  classDef collectNode fill:#e1bee7,stroke:#6a1b9a,stroke-width:2px,color:#000000;
+
+  %% Core Engine
+  grafana[grafana]:::uiNode
+
+  %% Grouped Components
+  subgraph Ingress [Ingress / Proxy]
+    traefik[traefik]:::proxyNode
+  end
+
+  subgraph Observability [Datasources / Storage & Engines]
+    prometheus[prometheus]:::obsNode
+    loki[loki]:::obsNode
+    tempo[tempo]:::obsNode
+  end
+
+  subgraph Pipelines [Trace Pipelines]
+    otel_collector[otel-collector]:::collectNode
+  end
+
+  %% Ingress Routing
+  traefik -->|Port 3000/HTTP Route| grafana
+
+  %% Grafana Queries to Datasources
+  grafana -->|Port 9090/HTTP PromQL Queries| prometheus
+  grafana -->|Port 3100/HTTP LogQL Queries| loki
+  grafana -->|Port 3200/HTTP TraceQL Queries| tempo
+  grafana -->|Port 9095/gRPC TraceQL Queries| tempo
+
+  %% Grafana Internal Traces & Metrics
+  grafana -->|Port 4317/gRPC Internal Traces| otel_collector
+  prometheus -->|Port 3000/HTTP Scrape Metrics| grafana
+
+  %% Subgraph Styling (Background blocks)
+  style Ingress fill:#fff8e1,stroke:#ffe082,stroke-width:2px,rx:10,ry:10
+  style Observability fill:#e0f7fa,stroke:#80deea,stroke-width:2px,rx:10,ry:10
+  style Pipelines fill:#f3e5f5,stroke:#ce93d8,stroke-width:2px,rx:10,ry:10
