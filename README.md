@@ -438,11 +438,16 @@ Tempo does not include a built-in user interface. Instead, it relies entirely on
 
 ### 7.6 Alertmanager
 
-Alertmanager is a alert routing and management component that works hand-in-hand with both Prometheus and Loki. While Prometheus and Loki are responsible for evaluating metric and logging thresholds and firing raw alerts, Alertmanager takes over to handle the complex logistics of notifications. It deduplicates and intelligently groups related alerts together, preventing engineers from being overwhelmed by "alert fatigue" during major system outages. Once grouped, it routes these notifications to the appropriate downstream receivers, such as Karma for visualization, KeepHQ for AIOps, or webhook-tester for debugging. 
+Alertmanager handles alerts sent by client applications such as the Prometheus server and Loki's Ruler. While Prometheus and Loki evaluate data and fire alerts based on predefined thresholds, Alertmanager takes over the complex logistics of notification management.
+
+Its primary goal is to prevent "alert fatigue" during major incidents. It achieves this by deduplicating redundant alerts, grouping related alerts together into a single notification, and intelligently routing them to the correct downstream receivers (like email, Slack, or webhook endpoints). It also provides operational features such as silencing (temporarily muting specific alerts) and inhibition (suppressing lower-priority alerts, like warnings, when a related critical alert is already active).
 
 ![alertmanager](./images/alertmanager-detailed-diagram.svg)
 
-Alertmanager also supports advanced operational features like silencing (temporarily muting specific alerts) and inhibition (suppressing lower-priority alerts if a related high-priority alert is already active), ensuring that teams only receive the most actionable signals.
+**How it works in this stack:** The core behavior and routing logic of Alertmanager are defined in [./alertmanager/alertmanager.yml](./alertmanager/alertmanager.yml). This configuration file orchestrates several key mechanisms:
+* **The Routing Tree (route):** This section defines how incoming alerts are processed. It groups alerts based on specific labels (like alertname or severity). It sets timers such as group_wait (how long to wait to bundle alerts before sending the first notification), group_interval (how long to wait before sending updates about a group), and repeat_interval (how long to wait before re-sending a persistent alert).
+* **Receivers (receivers):** This section defines the actual destinations for your alerts. In our educational stack, instead of sending emails or Slack messages, the receivers are configured as webhooks. Alerts are routed to the Webhook Tester (`http://webhook-tester:8080`) so you can easily inspect the raw JSON alert payloads for debugging, and to KeepHQ (`http://keep-backend:8080`) where the AIOps platform correlates and processes them further.
+* **Inhibition Rules (inhibit_rules):** Defines logic to mute certain alerts if other specific alerts are already firing, keeping the dashboard and notifications focused on the root cause.
 
 Go to https://alertmanager.localhost
 
@@ -476,9 +481,11 @@ Alertmanager exposes prometheus metrics too, which are used to monitor Alertmana
 
 Go to https://grafana.localhost
 
-Grafana is the central visual heart of this stack and functions as a 'single pane of glass' for all data. The open-source platform connects to Prometheus (metrics), Loki (logs) and Tempo (traces), enabling deep system insight through dashboards and the Explore mode. Thanks to automated provisioning, datasources and dashboards are loaded at startup, so everything works without manual configuration.
+Grafana is the central visual heart of this stack, functioning as the 'single pane of glass' for all your observability data. While Prometheus, Loki, and Tempo act as the backend storage and query engines, Grafana provides the unified frontend interface. It allows you to query, visualize, alert on, and understand your metrics, logs, and traces all in one place.
 
 ![grafana](./images/grafana-detailed-diagram.svg)
+
+A major highlight of this environment is that Grafana is fully pre-provisioned via Infrastructure as Code (IaC). Instead of manually clicking through the UI to connect databases and build dashboards from scratch, everything is automatically injected the moment the container starts.
 
 **Docs:**
 
@@ -487,7 +494,7 @@ Grafana is the central visual heart of this stack and functions as a 'single pan
 
 #### 7.7.1 Dashboards
 
-This repo contains a number of Grafana dashboards stored in [./grafana-provisioning/dashboards/json/](./grafana-provisioning/dashboards/json/) in JSON format.
+**Automated dashboard provisioning:** [./grafana-provisioning/dashboards/dashboard.yaml](./grafana-provisioning/dashboards/dashboard.yaml) acts as a dashboard provider configuration. It tells Grafana to recursively scan the local directory `./grafana-provisioning/dashboards/json/` for any .json files and automatically load them into the UI. Because of this, all the specialized dashboards (for Node Exporter, Podman, Alloy, Blackbox, MinIO, etc.) are instantly available for use without requiring manual import steps.
 
 *See the screenshot below for an overview of the Grafana Dashboards:*
 ![grafana-dashboarden](./images/grafana-dashboards.png)
@@ -551,6 +558,8 @@ Grafana Alerting provides a central interface for monitoring alerts. This module
 #### 7.7.5 Grafana datasources
 
 Datasources in Grafana serve as the technical interface to the underlying data storage systems, allowing the application to retrieve data without persisting it itself. In this configuration, Prometheus, Loki and Tempo are defined as the primary sources for exposing metrics, log files and distributed traces, respectively.
+
+[./grafana-provisioning/datasources/datasources.yaml](./grafana-provisioning/datasources/datasources.yaml) instructs Grafana exactly how to connect to the internal network endpoints for Prometheus (`http://prometheus:9090`), Loki (`http://loki:3100`), and Tempo (`http://tempo:3200`). More importantly, this file configures the contextual correlations between them. For example, it defines "Derived Fields" for Loki, telling Grafana: "If you see a 32-character string that looks like a Trace ID in a log line, make it a clickable button that instantly opens that exact trace in Tempo." It also sets up exemplar links between Prometheus metrics and Tempo traces.
 
 *See the screenshot below for an impression of the Grafana Datasources:*
 ![grafana-datasources](./images/grafana-datasource.png)
