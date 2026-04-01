@@ -4,9 +4,7 @@
 This repository contains a complete, production-like observability stack optimized for Fedora Workstation with rootless Podman. It is designed as an educational environment to help Developers and DevOps Engineers understand how modern monitoring tools interlock to provide comprehensive metrics, logging, tracing, and alerting capabilities. The entire stack is automatically configured upon startup, including pre-provisioned Grafana dashboards, datasources, and alerting rules.
 
 Diagram
-<a href="./images/overview-diagram.svg" target="_blank">
-  <img src="./images/overview-diagram.svg" alt="diagram">
-</a>
+![diagram](./images/overview-diagram.svg)
 
 ## Table of Contents
 
