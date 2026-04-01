@@ -1,0 +1,20 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'lineColor': '#9e9e9e' }}}%%
+flowchart LR
+  classDef uiNode fill:#bbdefb,stroke:#1565c0,stroke-width:2px,color:#000000;
+  classDef obsNode fill:#81d4fa,stroke:#01579b,stroke-width:2px,color:#000000;
+  classDef collectNode fill:#e1bee7,stroke:#6a1b9a,stroke-width:2px,color:#000000;
+
+  subgraph Targets [Scrape Targets]
+    node[node-exporter]:::collectNode
+    podman[podman-exporter]:::collectNode
+    blackbox[blackbox-exporter]:::collectNode
+  end
+
+  prom[Prometheus]:::obsNode
+  grafana[Grafana]:::uiNode
+
+  node -->|Expose metrics| prom
+  podman -->|Expose metrics| prom
+  blackbox -->|Expose metrics| prom
+  
+  prom -->|PromQL Queries / Visualize| grafana

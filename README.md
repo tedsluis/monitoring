@@ -32,9 +32,20 @@ Why use this stack? This environment is built to teach you:
 
 The stack is designed around specific data flows:
 - **Metrics Flow**: Node-exporter, Podman-exporter, and Blackbox-exporter expose metrics -> Prometheus scrapes them -> Grafana visualizes them.
+
+![metrics](./images/prometheus-metrics-diagram.svg)
+
 - **Logging Flow**: System (journald) and Container logs -> Grafana Alloy collects them -> Pushed to Loki -> Stored in MinIO -> Visualized in Grafana.
+
+![logging](./images/loki-logging-diagram.svg)
+
 - **Tracing Flow**: Application traces -> OpenTelemetry Collector -> Pushed to Tempo -> Stored in MinIO -> Visualized in Grafana.
+
+![tracing](./images/tempo-tracing-diagram.svg)
+
 - **Alerting Flow**: Prometheus evaluates alert.rules.yml -> Fires to Alertmanager -> Alertmanager routes to Karma (UI), KeepHQ (AIOps), and Webhook-tester.
+
+![alerting](./images/alerting-diagram.svg)
 
 ## 3. Service Port Map
 

@@ -1,0 +1,26 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'lineColor': '#9e9e9e' }}}%%
+flowchart LR
+  classDef uiNode fill:#bbdefb,stroke:#1565c0,stroke-width:2px,color:#000000;
+  classDef obsNode fill:#81d4fa,stroke:#01579b,stroke-width:2px,color:#000000;
+  classDef alertNode fill:#ffcdd2,stroke:#c62828,stroke-width:2px,color:#000000;
+  classDef appNode fill:#b2dfdb,stroke:#00695c,stroke-width:2px,color:#000000;
+
+  subgraph Evaluators [Rule Engines]
+    prom[Prometheus\nalert.rules.yml]:::obsNode
+    loki[Loki Ruler]:::obsNode
+  end
+
+  am[Alertmanager]:::alertNode
+
+  subgraph Receivers [Alert Receivers]
+    karma[Karma UI]:::alertNode
+    keep[KeepHQ AIOps]:::appNode
+    webhook[Webhook Tester]:::alertNode
+  end
+
+  prom -->|Evaluate & Fire| am
+  loki -->|Evaluate & Fire| am
+  
+  am -->|Poll UI| karma
+  am -->|Route Webhook| keep
+  am -->|Route Webhook| webhook
