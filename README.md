@@ -653,7 +653,7 @@ Grafana Alloy is a highly configurable, vendor-neutral observability data pipeli
 
 Go to https://alloy.localhost
 
-[alloy](./images/alloy-detailed-diagram.svg)
+![alloy](./images/alloy-detailed-diagram.svg)
 
 **How it works in this stack (config.alloy):** The configuration file located at [alloy/config.alloy](./alloy/config.alloy) defines two main data streams that converge into a single output pushed to Loki:
 
