@@ -368,6 +368,8 @@ Grafana Loki is a log aggregation system inspired by Prometheus. Unlike traditio
 
 In a typical workflow, a collector like Grafana Alloy gathers logs from your containers or system journals and pushes them to Loki. Loki then compresses this data into chunks and stores it efficiently in an object storage backend like MinIO. Users can seamlessly search and analyze these logs in Grafana using LogQL (Loki Query Language), leveraging the exact same labels used in Prometheus to instantly correlate metrics spikes with their underlying log events.
 
+![loki](./images/loki-detailed-diagram.svg)
+
 Loki does not include a built-in user interface. Instead, it relies entirely on Grafana to serve as the unified dashboard for exploring and analyzing your logs, for example:
 
 *See the screenshot below for an impression of the Loki logging dashboard:*
@@ -395,7 +397,9 @@ Grafana Tempo is a tracing backend designed to track the flow of requests as the
 
 In a typical setup, an OpenTelemetry Collector gathers traces from your applications and pushes them to Tempo. Within Grafana, users can visualize these request lifecycles using TraceQL, and seamlessly jump directly from a log line in Loki to the exact corresponding trace span in Tempo for rapid root cause analysis.
 
-Loki does not include a built-in user interface. Instead, it relies entirely on Grafana to serve as the unified dashboard for exploring and analyzing your logs, for example:
+![tempo](./images/tempo-detailed-diagram.svg)
+
+Tempo does not include a built-in user interface. Instead, it relies entirely on Grafana to serve as the unified dashboard for exploring and analyzing your traces, for example:
 
 *See the screenshot below for an impression of the Tempo Tracing dashboard:*
 ![tempo-dashboard](./images/)

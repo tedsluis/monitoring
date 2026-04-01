@@ -1,0 +1,64 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'lineColor': '#9e9e9e' }}}%%
+flowchart LR
+  %% Native Mermaid Styling (No HTML) - Node Classes
+  classDef uiNode fill:#bbdefb,stroke:#1565c0,stroke-width:2px,color:#000000;
+  classDef appNode fill:#b2dfdb,stroke:#00695c,stroke-width:2px,color:#000000;
+  classDef obsNode fill:#81d4fa,stroke:#01579b,stroke-width:2px,color:#000000;
+  classDef dbNode fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000000;
+  classDef proxyNode fill:#ffe0b2,stroke:#ef6c00,stroke-width:2px,color:#000000;
+  classDef alertNode fill:#ffcdd2,stroke:#c62828,stroke-width:2px,color:#000000;
+  classDef collectNode fill:#e1bee7,stroke:#6a1b9a,stroke-width:2px,color:#000000;
+
+  %% Core Engine
+  tempo[tempo]:::obsNode
+
+  %% Grouped Components
+  subgraph Pipelines [Trace Pipelines]
+    otel_collector[otel-collector]:::collectNode
+  end
+
+  subgraph Storage [Object Storage]
+    minio[(minio)]:::dbNode
+  end
+
+  subgraph Consumers [Frontends & Querying]
+    grafana[grafana]:::uiNode
+  end
+
+  subgraph Monitoring [Monitoring & Metrics]
+    prometheus[prometheus]:::obsNode
+  end
+
+  subgraph Ingress [Ingress / Proxy]
+    traefik[traefik]:::proxyNode
+  end
+
+  %% Trace Ingestion (from Traefik and Grafana internals)
+  traefik -->|Port 4317/gRPC Internal Traces| otel_collector
+  grafana -->|Port 4317/gRPC Internal Traces| otel_collector
+  
+  %% Pipeline to Backend
+  otel_collector -->|Port 4317/gRPC Export Traces| tempo
+
+  %% Storage Backend
+  tempo <-->|Port 9000/HTTP S3 Storage| minio
+
+  %% Queries & Consumers
+  grafana -->|Port 3200/HTTP TraceQL Queries| tempo
+  grafana -->|Port 9095/gRPC TraceQL Queries| tempo
+
+  %% Metrics Generator (Remote Write)
+  tempo -->|Port 9090/HTTP Push Metrics| prometheus
+
+  %% Metrics Scraping
+  prometheus -->|Port 3200/HTTP Scrape| tempo
+
+  %% Ingress Routing
+  traefik -->|Port 3200/HTTP Route| tempo
+
+  %% Subgraph Styling (Background blocks)
+  style Pipelines fill:#f3e5f5,stroke:#ce93d8,stroke-width:2px,rx:10,ry:10
+  style Storage fill:#e8f5e9,stroke:#a5d6a7,stroke-width:2px,rx:10,ry:10
+  style Consumers fill:#e3f2fd,stroke:#90caf9,stroke-width:2px,rx:10,ry:10
+  style Monitoring fill:#eceff1,stroke:#b0bec5,stroke-width:2px,rx:10,ry:10
+  style Ingress fill:#fff8e1,stroke:#ffe082,stroke-width:2px,rx:10,ry:10
