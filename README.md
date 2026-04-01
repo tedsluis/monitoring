@@ -326,11 +326,20 @@ In case you navigate to Grafana or Minio, you need to login with the user accoun
 
 ### 7.3 Prometheus Metrics
 
-Prometheus is a time-series database that records numeric data, such as CPU usage, network traffic, or application-specific. Prometheus operates on a pull-based model; it actively "scrapes" (fetches) metrics over HTTP from designated target endpoints at regular intervals (in our case every 15 seconds). Once the data is ingested, users can leverage its query language, PromQL, to slice, dice, and aggregate the metrics for visualization in tools like Grafana, or evaluate them against custom rules to trigger real-time notifications via Alertmanager when thresholds are breached.
+Prometheus is the core metrics engine of this observability stack. It is a powerful time-series database (TSDB) that records numeric data—such as CPU utilization, network traffic, memory consumption, and application-specific metrics.
+
+Unlike traditional monitoring tools that wait for systems to send data to them, Prometheus primarily uses a pull-based model. It actively "scrapes" (fetches over HTTP) metrics from designated target endpoints (like our exporters) at regular intervals. Once the data is ingested, users can leverage its highly flexible query language, PromQL, to slice, dice, and aggregate the metrics for visualization in Grafana. It also continuously evaluates these metrics against custom rules to trigger real-time notifications via Alertmanager when specific thresholds are breached.
 
 ![prometheus](./images/prometheus-detailed-diagram.svg)
 
-Today Prometheus 3.x supports not only pull metrics, but also push metrics. In this monitoring stack we push Tempo metrics into Prometheus.
+**How it works in this stack (prometheus.yml):** The central brain instructing Prometheus what to do is located in [prometheus/prometheus.yml](./prometheus/prometheus.yml). This configuration file orchestrates several crucial tasks:
+
+* **Global Settings:** It defines the default scrape_interval (typically 15 seconds), dictating how often Prometheus polls the targets for fresh data.
+* **Rule Files:** It instructs Prometheus to load and evaluate the alert rules defined in alert.rules.yml (e.g., "Alert if disk space is > 90%").
+* **Alerting Configuration:** It specifies the destination for fired alerts, pointing Prometheus to the local Alertmanager container (`http://alertmanager:9093`).
+* **Scrape Configurations (scrape_configs):** This is the most important section. It contains the inventory of all services Prometheus needs to monitor. It maps out jobs and targets using the internal Docker network hostnames, such as node-exporter:9100, podman-exporter:9882, alloy:12345, traefik:8082, and the various blackbox HTTP/TCP probes.
+
+Note: While Prometheus is famous for pulling data, version 3.x also supports pushing metrics natively. In this stack, Tempo is configured to push its internal metrics directly to Prometheus.
 
 Go to https://prometheus.localhost
 
@@ -341,10 +350,8 @@ Go to https://prometheus.localhost
 | `/targets`     | status of the scrape targets.  |
 | `/config`      | full prometheus configuration. |
 
-
 *See the screenshot below for an impression of the Prometheus UI - alert rules overview:*
 ![prometheus](images/prometheus.png)
-
 
 | configuration        | configuration file                                           |
 |----------------------|--------------------------------------------------------------|
@@ -364,24 +371,30 @@ Prometheus exposes and scrapes its own metrics. Using these metrics you can moni
 
 ### 7.4 Loki
 
-Grafana Loki is a log aggregation system inspired by Prometheus. Unlike traditional logging systems (such as the Elastic Search) that index the full text of every log line, Loki only indexes the metadata (labels) attached to each log stream. This unique design choice makes it exceptionally lightweight, cost-effective, and fast to operate. 
+Grafana Loki is a log aggregation system inspired by Prometheus. Unlike traditional logging systems (such as Elasticsearch) that index the full text of every log line, Loki only indexes the metadata (labels) attached to each log stream. This unique design choice makes it exceptionally lightweight, cost-effective, and fast to operate.
 
-In a typical workflow, a collector like Grafana Alloy gathers logs from your containers or system journals and pushes them to Loki. Loki then compresses this data into chunks and stores it efficiently in an object storage backend like MinIO. Users can seamlessly search and analyze these logs in Grafana using LogQL (Loki Query Language), leveraging the exact same labels used in Prometheus to instantly correlate metrics spikes with their underlying log events.
+In a typical workflow, a collector like Grafana Alloy gathers logs from your containers or system journals and pushes them to Loki. Loki then compresses this data into chunks and stores it efficiently in an object storage backend. Users can seamlessly search and analyze these logs in Grafana using **LogQL** (Loki Query Language), leveraging the exact same labels used in Prometheus to instantly correlate metrics spikes with their underlying log events.
 
 ![loki](./images/loki-detailed-diagram.svg)
+
+**How it works in this stack (loki-config.yaml):** The core behavior of Loki in this environment is defined in [loki/loki-config.yaml(./loki/loki-config.yaml)]:
+
+* **S3 Storage Backend (MinIO):** Rather than saving heavy log files to local disk, Loki is configured to use the s3 storage type. It connects directly to the local MinIO instance (`http://minio:9000`) using the `minio` / `minio123` credentials and stores all log chunks in the loki-data bucket.
+* **TSDB Indexing:** The `schema_config` defines that Loki uses tsdb (Time Series Database) for its index. This is the modern, highly optimized index format for Loki that drastically improves query performance and reduces storage costs compared to older formats.
+* **Data Retention & Compactor:** To prevent the disk/MinIO from filling up indefinitely, the limits_config enforces a strict retention period of `168h` (7 days). The compactor component runs periodically to scan the MinIO bucket and automatically delete log data that has exceeded this age limit.
+* **The Ruler (Alerting):** Loki isn't just for searching; it can proactively monitor your logs. The ruler block configures Loki to continuously evaluate LogQL alert rules stored in `/loki/rules` (e.g., triggering an alert if the word "ERROR" appears more than 10 times in a minute). If a rule threshold is met, Loki sends the alert directly to `http://alertmanager:9093`.
 
 Loki does not include a built-in user interface. Instead, it relies entirely on Grafana to serve as the unified dashboard for exploring and analyzing your logs, for example:
 
 *See the screenshot below for an impression of the Loki logging dashboard:*
 ![loki-logs-dashboard](./images/loki-logs-dashboards.png)
 
-
 | configuration        | configuration file                                                                 |
 |----------------------|------------------------------------------------------------------------------------|
 | Loki config          | [./loki/loki-config.yaml](./loki/loki-config.yaml)                                 |
 | Loki alert rules     | [./loki/rules/fake/loki-alert-rules.yaml](./loki/rules/fake/loki-alert-rules.yaml) |
 
-Like most modern container, Loki exposes prometheus metrics too, which are used to monitor Loki using the dashboard below:
+Like most modern containers, Loki exposes prometheus metrics too, which are used to monitor Loki using the dashboard below:
 
 *See the screenshot below for an impression of the Loki metrics dashboard:*
 ![loki-metrics-dashboard](/images/loki-metrics-dashboard.png)
@@ -393,11 +406,18 @@ Like most modern container, Loki exposes prometheus metrics too, which are used 
 
 ### 7.5 Tempo
 
-Grafana Tempo is a tracing backend designed to track the flow of requests as they travel through complex architectures and microservices. It helps developers and operators pinpoint exactly where latency, bottlenecks, or errors are occurring in a system. Unlike older tracing tools that require heavy, complex databases for indexing, Tempo is exceptionally cost-effective because it only requires a basic object storage backend (like MinIO or S3) to store the raw trace data. 
+Grafana Tempo is a high-volume, distributed tracing backend designed to track the lifecycle of requests as they travel through complex, interconnected microservices. It helps developers and operators pinpoint exactly where latency, bottlenecks, or errors are occurring in a system. Unlike older tracing tools that require heavy, complex databases for indexing (like Elasticsearch or Cassandra), Tempo is exceptionally cost-effective because it only requires a basic object storage backend to store the raw trace data.
 
-In a typical setup, an OpenTelemetry Collector gathers traces from your applications and pushes them to Tempo. Within Grafana, users can visualize these request lifecycles using TraceQL, and seamlessly jump directly from a log line in Loki to the exact corresponding trace span in Tempo for rapid root cause analysis.
+In this observability stack, applications (and components like Traefik and Grafana) send their traces to the OpenTelemetry Collector, which acts as a router and pushes them to Tempo. Within Grafana, users can query and visualize these request lifecycles using TraceQL. Thanks to standard Trace IDs, you can seamlessly jump directly from a log line in Loki or an exemplar in Prometheus to the exact corresponding trace span in Tempo for rapid root cause analysis.
 
 ![tempo](./images/tempo-detailed-diagram.svg)
+
+**How it works in this stack (tempo.yaml):** The internal workings and storage behaviors of Tempo are configured in [tempo/tempo.yaml](./tempo/tempo.yaml). This file instructs Tempo on how to handle incoming traces and where to put them:
+
+* **Receivers:** Configures Tempo to ingest trace data. In our setup, it primarily receives traces via the OTLP protocol directly from the local OpenTelemetry Collector.
+* **S3 Storage Backend (MinIO):** Instructs Tempo to use the s3 storage backend. It connects to our local MinIO instance (`http://minio:9000`) using the minio credentials and stores all trace blocks securely in the tempo-data bucket.
+* **WAL (Write-Ahead Log):** Defines a local path (`/var/tempo/wal`) where Tempo temporarily buffers incoming traces before they are fully batched and uploaded to MinIO. This ensures no traces are lost if the container unexpectedly restarts.
+* **Compactor:** A background process that periodically scans the MinIO bucket, combining smaller trace blocks into larger ones to improve querying performance and manage data retention policies.
 
 Tempo does not include a built-in user interface. Instead, it relies entirely on Grafana to serve as the unified dashboard for exploring and analyzing your traces, for example:
 
@@ -426,12 +446,12 @@ Alertmanager also supports advanced operational features like silencing (tempora
 
 Go to https://alertmanager.localhost
 
-| Path        | Description                                    |
-|-------------|------------------------------------------------|
-| /#/alerts   | Overview of current alerts                     |
-| /#/silences | Ability to silence alerts                      |
-| /#/status   | Alertmanager status and configuration overview |
-| /#/settings | Alertmanager UI settings                       |
+| Path          | Description                                    |
+|---------------|------------------------------------------------|
+| `/#/alerts`   | Overview of current alerts                     |
+| `/#/silences` | Ability to silence alerts                      |
+| `/#/status`   | Alertmanager status and configuration overview |
+| `/#/settings` | Alertmanager UI settings                       |
 
 
 *See the screenshot below for an impression of the Alertmanager UI:*
@@ -599,7 +619,7 @@ KeepHQ is an open-source AIOps and alert management platform. While Alertmanager
 
 **How it works in this stack:** KeepHQ is deployed using three containers: a PostgreSQL database (`keep-db`), the core API and AIOps engine (`keep-backend`), and the web interface (`keep-frontend`).
 
-**Automatic Provider Configuration (IaC):** For KeepHQ to intelligently correlate alerts and execute workflows, it needs access to your metrics and logs. Instead of manually configuring these connections in the Keep UI, this stack automatically provisions them on startup using provider configuration files located in `/home/tedsluis/monitoring/keep/providers/`:
+**Automatic Provider Configuration (IaC):** For KeepHQ to intelligently correlate alerts and execute workflows, it needs access to your metrics and logs. Instead of manually configuring these connections in the Keep UI, this stack automatically provisions them on startup using provider configuration files located in `[keep/providers/](./keep/providers/)`:
 
 | provider config                                   | description                                                                                                                                                                                                   |
 |---------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -647,7 +667,7 @@ Go to https://minio.localhost
 * https://github.com/minio/minio
 * https://docs.min.io/enterprise/aistor-object-store/
 
-### 7.12 Alloy exporter
+### 7.12 Alloy
 
 Grafana Alloy is a highly configurable, vendor-neutral observability data pipeline. In this monitoring stack, Alloy acts as the primary log collector and processor, bridging the gap between your raw logs (both container and host-level) and Grafana Loki.
 
