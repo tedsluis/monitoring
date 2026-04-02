@@ -1,0 +1,40 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'lineColor': '#9e9e9e' }}}%%
+flowchart LR
+  %% Native Mermaid Styling (No HTML) - Node Classes
+  classDef uiNode fill:#bbdefb,stroke:#1565c0,stroke-width:2px,color:#000000;
+  classDef obsNode fill:#81d4fa,stroke:#01579b,stroke-width:2px,color:#000000;
+  classDef proxyNode fill:#ffe0b2,stroke:#ef6c00,stroke-width:2px,color:#000000;
+  classDef collectNode fill:#e1bee7,stroke:#6a1b9a,stroke-width:2px,color:#000000;
+  classDef hostNode fill:#b3e5fc,stroke:#0277bd,stroke-width:2px,color:#000000;
+
+  %% Core Component
+  nginx[nginx]:::uiNode
+
+  %% Grouped Components
+  subgraph Ingress [Ingress / Proxy]
+    traefik[traefik]:::proxyNode
+  end
+
+  subgraph Host [Host System / Volumes]
+    html_file[Host FS / ./landing-page/index.html]:::hostNode
+  end
+
+  subgraph Monitoring [Monitoring & Probes]
+    prometheus[prometheus]:::obsNode
+    blackbox_exporter[blackbox-exporter]:::collectNode
+  end
+
+  %% Ingress Routing
+  traefik -->|Port 80/HTTP Route| nginx
+
+  %% Volume Mount (Static HTML)
+  nginx -.->|Read Static Landing Page| html_file
+
+  %% Prometheus Metrics & Health Probes
+  prometheus -->|Port 9115/HTTP Trigger Probe| blackbox_exporter
+  blackbox_exporter -.->|Port 80/HTTP Health Probe module: http_2xx| nginx
+
+  %% Subgraph Styling (Background blocks)
+  style Ingress fill:#fff8e1,stroke:#ffe082,stroke-width:2px,rx:10,ry:10
+  style Host fill:#f5f5f5,stroke:#cfd8dc,stroke-width:2px,rx:10,ry:10
+  style Monitoring fill:#e0f7fa,stroke:#80deea,stroke-width:2px,rx:10,ry:10

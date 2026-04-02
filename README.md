@@ -295,6 +295,8 @@ Go to **https://localhost**
 
 To make navigating this observability stack effortless, we use NGINX to serve a static landing page [index.html](./landing-page/index.html). This page acts as the central frontend portal for all the monitoring tools. 
 
+![nginx](./images/nginx-detailed-diagram.svg)
+
 Instead of memorizing various ports and subdomains, this portal provides a clean, unified interface with quick links to everything you need:
 *   **Tools:** Direct access to all core applications like Grafana, Prometheus, Alertmanager, Karma, KeepHQ and MinIO.
 *   **Metrics Exporters:** Quick links to the raw metric endpoints for all running services and exporters.
