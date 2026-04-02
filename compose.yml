@@ -282,15 +282,14 @@ services:
   minio:
     image: docker.io/minio/minio:latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
     container_name: minio
+    user: "0:0"
+    networks:
+      - monitoring-net
     environment:
       - http_proxy=
       - https_proxy=
       - HTTP_PROXY=
       - HTTPS_PROXY=
-    user: "0:0"
-    networks:
-      - monitoring-net
-    environment:
       - MINIO_ROOT_USER=minio
       - MINIO_ROOT_PASSWORD=minio123
       - MINIO_PROMETHEUS_AUTH_TYPE=public
