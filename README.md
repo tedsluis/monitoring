@@ -81,7 +81,7 @@ Prometheus evaluates alert.rules.yml -> Fires to Alertmanager -> Alertmanager ro
 
 **1. Visualization & Portal**
    * Nginx (Portal): Serves as a static, central hub linking to all services and endpoints.
-   * Grafana (v12.3): The 'single pane of glass'. Dashboards and Datasources are loaded automatically via Infrastructure as Code (IaC).
+   * Grafana: The 'single pane of glass'. Dashboards and Datasources are loaded automatically via Infrastructure as Code (IaC).
 
 **2. Metrics (The "What is happening?")**
    * Prometheus: Scrapes targets, stores time-series data, and evaluates alert rules.
@@ -117,7 +117,7 @@ Prometheus evaluates alert.rules.yml -> Fires to Alertmanager -> Alertmanager ro
 -   Tools: podman and podman-compose.
 -   Podman Socket: The user socket must be active for the Podman Exporter and Alloy.
    
-### 5.2 podman & podman-compose to run containers
+### 5.2 Podman & podman-compose to run containers
 
 This stack is using `podman` and `podman-compose` where you may be used to `docker` and `docker-compose`. While Docker is commonly used, there are good reasons to use Podman due to several key architectural and security advantages:
 
@@ -125,7 +125,7 @@ This stack is using `podman` and `podman-compose` where you may be used to `dock
 *   **Rootless by Design (Enhanced Security):** Security is a primary focus for Podman. It allows you to run containers as a standard, non-root user out of the box. If a container is somehow compromised, the attacker is confined to the privileges of that standard user, preventing them from gaining root access to the host machine. 
 *   **Fully Open Source & Unrestricted:** Podman is a fully open-source project driven by the community and Red Hat. Unlike Docker Desktop, which has introduced commercial licensing and subscription models for enterprise environments, Podman remains completely free and unrestricted for all use cases.
 *   **Drop-in Replacement:** The transition is practically seamless. Podman's CLI is intentionally designed to be identical to Docker's. You can simply add `alias docker=podman` to your shell profile, and all your familiar commands (`build`, `run`, `ps`, `pull`) will work exactly as expected.
-*   **Native Systemd Integration:** Podman integrates fully Linux environments. It can easily generate and manage `systemd` unit files from running containers, allowing you to treat containers as native system services that start automatically on boot.
+*   **Native Systemd Integration:** Podman integrates fully into Linux environments. It can easily generate and manage `systemd` unit files from running containers, allowing you to treat containers as native system services that start automatically on boot.
 *   **Kubernetes Readiness:** Podman introduces the concept of "pods" (groups of containers sharing the same network and namespaces) locally, mirroring how Kubernetes operates. It can even generate Kubernetes YAML from local containers or run existing Kubernetes YAML directly, making the transition from local development to production orchestration much smoother.
 
 
@@ -134,7 +134,7 @@ This stack is using `podman` and `podman-compose` where you may be used to `dock
    # Install packages
    sudo dnf install podman podman-compose -y
    
-   # Activate the Podman socket for your user (Rootless)\
+   # Activate the Podman socket for your user (Rootless)
    # run as a regular user, not as root!
    systemctl --user enable --now podman.socket
    
@@ -156,9 +156,9 @@ This stack is using `podman` and `podman-compose` where you may be used to `dock
     cd monitoring
 ```
 
-### 6.2 Using an http internet proxy? Update your no_proxy
+### 6.2 Using an HTTP proxy? Update your no_proxy
 
-This step is optional in case you use a http proxy for your internet connection and you have configured environment variables like `http_proxy`, `https_proxy`, `no_proxy`, `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. In that case you need to add hostnames and IP addresses that are used inside this monitoring stack to your `no_proxy` and `NO_PROXY`. Source the script below to add the nessesary hostnames and IP addresses.
+This step is optional if you use an HTTP proxy for your internet connection and you have configured environment variables like `http_proxy`, `https_proxy`, `no_proxy`, `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. In that case, you need to add hostnames and IP addresses that are used inside this monitoring stack to your `no_proxy` and `NO_PROXY`. Source the script below to add the necessary hostnames and IP addresses.
 
 ```bash
   source ./prepare_no_proxy.sh 
@@ -166,7 +166,7 @@ This step is optional in case you use a http proxy for your internet connection 
 
 ### 6.3 Start the stack
 ```bash
-   # Important: only run this step after you have finshed all the steps in the Prerequisites!
+   # Important: only run this step after you have finished all the steps in the Prerequisites!
    podman-compose up -d
 ```
 The first time, the `minio-init` container will automatically create the required buckets (`loki-data` and `tempo-data`).
@@ -174,29 +174,33 @@ The first time, the `minio-init` container will automatically create the require
 ### 6.4 Generate Local TLS Certificates
 To ensure secure connections (https://*.localhost) without browser warnings, run the certificate script. This generates a local CA and adds it to your Fedora Trust Store.
 ```bash
-   ./renew-certs.sh
-   === Start Certificate Renewal (Version 3.2) ===
-   Cleaning up old files...
-   Generating SAN configuration...
-   Generating Root CA...
-   ...+++++++++++++++++++++++++++++++++++++++*.....+....+...+..+.+....................+.......+...+++++++++++++++++++++++++++++++++++++++*.....+.......+.........+........++++++
-   ...+.....+++++++++++++++++++++++++++++++++++++++*...+......+...+..+....+......+......+..+.............+..+.+......+++++++++++++++++++++++++++++++++++++++*....+.........+......+.+..................+..+...................+.........+.....+....+..+.+.........+........+.+..+....+......+.........+......+...+.........+..+.............+.....+.......+........+......+.........+.......+......+..+.......+...+............+......+........+.........+...+....+........+.+..+...+.......+.....+....+...+..+..........+......+..+.+.........+..+........................+.......+...+..+.......+..+...+...+............+.+......+...+............+.....+.+.....+....+........+......+....+........+...+..........+......+...........+..........+.................++++++
-   -----
-   Generating Server Certificate...
-   Certificate request self-signature ok
-   subject=C=NL, ST=Utrecht, L=Utrecht, O=Bachstraat, OU=Home, CN=*.localhost
-   Fixing permissions (chmod 644)...
-   Updating Fedora Trust Store...
-   Checking if System Bundle trusts the certificate...
-   ✓ SUCCESS: System bundle now trusts your certificate!
-   Restarting Traefik...
-   WARN[0010] StopSignal SIGTERM failed to stop container traefik in 10 seconds, resorting to SIGKILL
-   traefik
-   traefik
-   7ca33df28db75aec091abf01850c21eca9b226f27e430ece68c43300772c0e48
-   traefik
-   === Done! ===
-   Test now with: curl -v https://grafana.localhost
+$ ./renew-certs.sh 
+=== Start Certificate Renewal (Version 3.2) ===
+Cleaning up old files...
+Generating SAN configuration...
+Generating Root CA...
+.....+.+.........+.....+......+....+......+...............+.....+.+......+.....+...+.....................+.+...+..+.........+......+...+....+......+..+++++++++++++++++++++++++++++++++++++++*..........+...+.+..+...+.........+.......+.....+.+........+....+.....+.+++++++++++++++++++++++++++++++++++++++*....+.......+..+.+........+............+...+..........+......+...+...........+.+...+.....+......+........................+...............+...+...+.+...+........+..........+..............+...+.+..+........................+.+..............+.+..+.+............+.........+...+........+.......+...+...+.........+.....+...+...............+...+.+.....+....+...........+.+........+....+..+.........++++++
+......+.+........+.+.....+....+..+++++++++++++++++++++++++++++++++++++++*..+..+...+.......+........+.+...............+..+....+++++++++++++++++++++++++++++++++++++++*.....+..+...+....+...+..+...+...+....+.....................+...+.........+........+.......+...+...+..+...+.........+.+............+........+.........+......+........................+................+............+..............+...+.............+...+..+..........+..+...+....+....................+...+.+..+...............+....+...+...+..+..........+..+.+...............+..............+.+.........+...+..+....+.....+.........+.......+.....+...+...+....+......+...............+.........+.....+.........+......++++++
+-----
+Generating Server Certificate...
+Certificate request self-signature ok
+subject=C=NL, ST=Utrecht, L=Utrecht, O=Utrecht, OU=Utrecht, CN=*.localhost
+Fixing permissions (chmod 644)...
+Updating Fedora Trust Store...
+Checking if System Bundle trusts the certificate...
+Error loading file /etc/pki/tls/certs/ca-bundle.crt
+00F387DE7E7F0000:error:80000002:system library:file_ctrl:No such file or directory:crypto/bio/bss_file.c:288:calling fopen(/etc/pki/tls/certs/ca-bundle.crt, r)
+00F387DE7E7F0000:error:10080002:BIO routines:file_ctrl:system lib:crypto/bio/bss_file.c:291:
+00F387DE7E7F0000:error:05880020:x509 certificate routines:X509_load_cert_file_ex:BIO lib:crypto/x509/by_file.c:105:
+⚠️  WARNING: System bundle validation failed.
+Trying fallback method: Directly append to user-trust...
+✓ SUCCESS: CA manually added and validated.
+Restarting Traefik...
+09472457d666a166853f477d347381f942c6a5e89658ab27ef5e044ea8e4a349
+7c9d7c92a8802bfa1e6fce66a3da539181f3205ccb314ce9bc1be0911a019a0e
+traefik
+=== Done! ===
+Test now with: curl -v https://grafana.localhost
 ```
 **note:** Before you try `https://localhost` in your web browser, make sure you restart your browser first!
 
@@ -224,7 +228,7 @@ af2575426baf  docker.io/grafana/loki@sha256:3c8fd3570dd9219951a60d3f919c7f31923d
 ce958ef62c3e  docker.io/otel/opentelemetry-collector-contrib@sha256:8164eab2e6bca9c9b0837a8d2f118a6618489008a839db7f9d6510e66be3923c   --config=/etc/ote...  13 hours ago  Up 13 hours              4317-4318/tcp, 55679/tcp                                          otel-collector
 66c8b0604c18  docker.io/grafana/grafana@sha256:e932bd6ed0e026595b08483cd0141e5103e1ab7ff8604839ff899b8dc54cabcb                                              13 hours ago  Up 13 hours (healthy)    3000/tcp                                                          grafana
 ```
-note: The minio-init container only runs when starting minio.
+note: The minio-init container only runs when starting MinIo.
 
 ### 6.6 Stop, start or restart with podman-compose
 
@@ -254,7 +258,7 @@ note: The minio-init container only runs when starting minio.
    podman restart webhook-tester
 ```
 
-### 6.7 Generic podman commands
+### 6.7 Generic Podman commands
 
 ```bash
    # Podman Compose Help
@@ -270,18 +274,18 @@ note: The minio-init container only runs when starting minio.
    podman ps
 
    # list all containers (including stopped containers)
-   podman  ps -a
+   podman ps -a
 
    # restart a container
    podman restart loki 
 
-   # execute a query in a postgres container
+   # execute a query in a Postgres container
    podman exec -it keep-db psql -U keep -d keep -c "\d tenant;"
 
-   # Lookup health state log properties of a container
+   # Look up health state log properties of a container
    podman inspect --format='{{json .State.Health}}' tempo | jq '.Log[-1]'
 
-   # run a https request to docker.io in a temporary curl container
+   # run an HTTPS request to docker.io in a temporary curl container
    podman run --rm docker.io/curlimages/curl:latest -sI "https://auth.docker.io/token?service=registry.docker.io"
 ```
 
@@ -319,7 +323,7 @@ Instead of memorizing various ports and subdomains, this portal provides a clean
 
 ### 7.2 Login credentials (Defaults)
 
-In case you navigate to Grafana or Minio, you need to login with the user accounts below:
+In case you navigate to Grafana or MinIO, you need to log in with the user accounts below:
 
 | Service | Username       | Password   | Note                                   |
 |---------|----------------|------------|----------------------------------------|
@@ -360,7 +364,7 @@ Go to https://prometheus.localhost
 | scrape target        | [./prometheus/prometheus.yml](./prometheus/prometheus.yml)   |
 | alert rules          | [./prometheus/alert.rules.yml](./prometheus/alert.rules.yml) |
 
-Prometheus exposes and scrapes its own metrics. Using these metrics you can monitor prometheus, see below:
+Prometheus exposes and scrapes its own metrics. Using these metrics, you can monitor Prometheus, see below:
 
 *See the screenshot below for an impression of the Prometheus metrics dashboard:*
 ![prometheus-dashboard](./images/prometheus-dashboard.png)
@@ -379,7 +383,7 @@ In a typical workflow, a collector like Grafana Alloy gathers logs from your con
 
 ![loki](./images/loki-detailed-diagram.svg)
 
-**How it works in this stack (loki-config.yaml):** The core behavior of Loki in this environment is defined in [loki/loki-config.yaml(./loki/loki-config.yaml)]:
+**How it works in this stack (loki-config.yaml):** The core behavior of Loki in this environment is defined in [loki/loki-config.yaml](./loki/loki-config.yaml):
 
 * **S3 Storage Backend (MinIO):** Rather than saving heavy log files to local disk, Loki is configured to use the s3 storage type. It connects directly to the local MinIO instance (`http://minio:9000`) using the `minio` / `minio123` credentials and stores all log chunks in the loki-data bucket.
 * **TSDB Indexing:** The `schema_config` defines that Loki uses tsdb (Time Series Database) for its index. This is the modern, highly optimized index format for Loki that drastically improves query performance and reduces storage costs compared to older formats.
@@ -396,7 +400,7 @@ Loki does not include a built-in user interface. Instead, it relies entirely on 
 | Loki config          | [./loki/loki-config.yaml](./loki/loki-config.yaml)                                 |
 | Loki alert rules     | [./loki/rules/fake/loki-alert-rules.yaml](./loki/rules/fake/loki-alert-rules.yaml) |
 
-Like most modern containers, Loki exposes prometheus metrics too, which are used to monitor Loki using the dashboard below:
+Like most modern containers, Loki exposes Prometheus metrics too, which are used to monitor Loki using the dashboard below:
 
 *See the screenshot below for an impression of the Loki metrics dashboard:*
 ![loki-metrics-dashboard](/images/loki-metrics-dashboard.png)
@@ -430,7 +434,7 @@ Tempo does not include a built-in user interface. Instead, it relies entirely on
 |----------------------|--------------------------------------------|
 | Tempo config         | [./tempo/tempo.yaml](./tempo/tempo.yaml)   |
 
-*Tempo exposes prometheus metrics too, which are used to monitor Loki using the dashboard below:*
+*Tempo exposes Prometheus metrics too, which are used to monitor Tempo using the dashboard below:*
 ![Tempo-dashboard](./images/tempo-dashboard.png)
 
 **Docs:**
@@ -566,7 +570,7 @@ Datasources in Grafana serve as the technical interface to the underlying data s
 *See the screenshot below for an impression of the Grafana Datasources:*
 ![grafana-datasources](./images/grafana-datasource.png)
 
-The datasources for Prometheus, Loki and Tempo are configured in [./grafana-provisioning/dashboards/dashboard.yaml](./grafana-provisioning/datasources/datasources.yaml)
+The datasources for Prometheus, Loki and Tempo are configured in [./grafana-provisioning/datasources/datasources.yaml](./grafana-provisioning/datasources/datasources.yaml).
 
 ### 7.8 Karma Alert Dashboard
 
@@ -624,8 +628,6 @@ KeepHQ is an open-source AIOps and alert management platform. While Alertmanager
 
 https://keep.localhost
 
-KeepHQ is an open-source AIOps and alert management platform. While Alertmanager handles the initial routing and deduplication of alerts, KeepHQ takes alert management a step further by providing advanced correlation, noise reduction, and automated workflow execution (auto-remediation). It acts as a single pane of glass for all your alerts, enriching them with context from various tools.
-
 ![keephq](./images/keephq-detailed-diagram.svg)
 
 **How it works in this stack:** KeepHQ is deployed using three containers: a PostgreSQL database (`keep-db`), the core API and AIOps engine (`keep-backend`), and the web interface (`keep-frontend`).
@@ -658,19 +660,19 @@ Go to https://minio.localhost
 * **Storage Flow:** Loki and Tempo are configured to treat MinIO just like AWS S3. As they collect logs and traces, they bundle them into chunks and push them to their respective buckets in MinIO.
 * **Console & Management:** Through the MinIO UI (link above), you can browse these objects, inspect bucket policies, and see exactly how much storage your logs and traces are consuming.
 
-*See the screenshot below for an impression of the Minio UI - login:*
+*See the screenshot below for an impression of the MinIO UI - login:*
 ![minio](images/minio-login.png)
 
-*See the screenshot below for an impression of the Minio UI - object browser:*
+*See the screenshot below for an impression of the MinIO UI - object browser:*
 ![minio-object-browser](./images/minio-object-browser.png)
 
-*See the screenshot below for an impression of the Minio overview dashboard:*
+*See the screenshot below for an impression of the MinIO overview dashboard:*
 ![minio](./images/minio-dashboard.png)
 
-*See the screenshot below for an impression of the Minio bucket dashboard:*
+*See the screenshot below for an impression of the MinIO bucket dashboard:*
 ![minio-bucket](./images/minio-bucket-dashboard.png)
 
-*See the screenshot below for an impression of the Minio node dashboard:*
+*See the screenshot below for an impression of the MinIO node dashboard:*
 ![minio-node](./images/minio-node-dashboard.png)
 
 **Docs:**
@@ -741,7 +743,7 @@ The Prometheus Node Exporter is a fundamental component for infrastructure monit
 
 **Bypassing Container Isolation (compose.yml):** By design, containers are isolated from the host. To accurately measure the host's hardware, the Node Exporter container requires special configuration. In the compose.yml, it is explicitly set to use network_mode: host and pid: host. Additionally, it mounts the host's entire root filesystem (/) to a /host directory inside the container. This deliberately breaks the container's isolation, allowing the exporter to read the actual /proc and /sys files of the underlying host operating system.
 
-*See the screenshot below for an impression of the nodes-exporter-full dashboard:*
+*See the screenshot below for an impression of the node-exporter-full dashboard:*
 ![nodes-exporter-full-dashboard](/images/node-exporter-dashbaord.png)
 
 **Docs:**
@@ -768,7 +770,7 @@ The Prometheus Podman Exporter is designed to extract metrics specifically from 
 
 The OpenTelemetry (OTel) Collector is a vendor-agnostic proxy, router, and processor for telemetry data. While it has the capability to handle metrics and logs, in this observability stack it is primarily dedicated to handling distributed traces.
 
-![opentelematry-collector](./images/opentelemetry-collector-detailed-diagram.svg)
+![opentelemetry-collector](./images/opentelemetry-collector-detailed-diagram.svg)
 
 **How it works in this stack:** Instead of applications sending trace data directly to the storage backend (Tempo), they send them to the OTel Collector. This architectural pattern decouples your applications from the storage backend, allowing you to easily switch backends, filter sensitive data, or batch requests without needing to change any application code.
 
@@ -799,10 +801,10 @@ Go to: https://traefik.localhost
 * **Dynamic Certificates** ([traefik/dynamic/tls.yaml](./traefik/dynamic/tls.yaml)): Traefik continuously watches the dynamic directory. This specific file instructs Traefik where to find the custom wildcard certificates (`localhost.crt` and `localhost.key`) generated by the `renew-certs.sh` script, applying them automatically to all `.localhost` routes.
 * **Dynamic Routing** ([traefik/dynamic/traefik-dynamic.yaml](./traefik/dynamic/traefik-dynamic.yaml)): While most routing is handled automatically via labels, some services require manual rules. Because the Node Exporter runs on the host network (network_mode: host) to collect accurate hardware data, it lives outside the standard container bridge network. This file explicitly tells Traefik to route requests for node-exporter.localhost out of the container network and into the host machine via `http://host.containers.internal:9100`.
 
-*See the screenshot below for an impression of the Treafik UI:*
+*See the screenshot below for an impression of the Traefik UI:*
 ![traefik](/images/traefik.png)
 
-*See the screenshot below for an impression of the Treafik dashboard:*
+*See the screenshot below for an impression of the Traefik dashboard:*
 ![traefik](/images/traefik.dashboard.png)
 
 **Docs:**
@@ -812,7 +814,7 @@ Go to: https://traefik.localhost
 
 ## 8. Teardown & Cleanup
 
-This sections explains how to remove everthing.
+This section explains how to remove everything.
 
 ```bash
    # stop all containers
