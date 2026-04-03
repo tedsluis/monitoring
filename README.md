@@ -820,8 +820,13 @@ This section explains how to remove everything.
    # stop all containers
    podman-compose down
    
+   # (optional) remove the compose network if it still exists
+   # check the network name first; typically 'monitoring_monitoring-net'
+   podman network ls | grep monitoring || true
+   podman network rm monitoring_monitoring-net 2>/dev/null || true
+
    # show volumes
-   podman volume ls | grep monitoring
+   podman volume ls | grep monitoring_
    local       monitoring_prometheus-data
    local       monitoring_loki-wal
    local       monitoring_tempo-wal
@@ -830,8 +835,8 @@ This section explains how to remove everything.
    local       monitoring_keep-db-data
    local       monitoring_keep-state
    
-   # remove volumes
-   podman volume rm monitoring_prometheus-data monitoring_loki-wal monitoring_tempo-wal monitoring_minio-data monitoring_grafana-data monitoring_keep-db-data monitoring_keep-state
+   # one-shot removal of any remaining project volumes
+   podman volume rm $(podman volume ls -q | grep '^monitoring_') 2>/dev/null || true
    
    # remove certificates
    sudo rm /etc/pki/ca-trust/source/anchors/my-local-ca.pem
@@ -841,9 +846,19 @@ This section explains how to remove everything.
    # disable podman socket
    systemctl --user disable --now podman.socket
    
-   # remove rootless ports
+   # remove rootless ports configuration file
    sudo rm /etc/sysctl.d/99-rootless-ports.conf
+   # reset the runtime sysctl to the default privileged port start (1024)
+   sudo sysctl -w net.ipv4.ip_unprivileged_port_start=1024
+
+   # (optional) prune any stopped containers, unused networks, and images
+   # This impacts your whole Podman host, not just this project.
+   podman system prune -a -f
    
    # remove monitoring repo
    rm -rf path-to-your-repo/monitoring
 ```
+
+Notes:
+- If your browser trusted the local CA, restart the browser to ensure trust store changes take effect.
+- The compose network is usually removed by `podman-compose down`, but the explicit removal ensures a clean state.
