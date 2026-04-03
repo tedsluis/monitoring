@@ -85,8 +85,8 @@ x509_extensions = v3_ca
 C = NL
 ST = Utrecht
 L = Utrecht
-O = Bachstraat
-OU = Home
+O = Utrecht
+OU = Utrecht
 CN = Fedora Localhost Root CA
 
 [ v3_ca ]
@@ -109,7 +109,7 @@ fi
 # 5. Generate Server Certificate
 echo "Generating Server Certificate..."
 openssl genrsa -out "$SERVER_KEY" 2048
-openssl req -new -key "$SERVER_KEY" -out "$SERVER_CSR" -subj "/C=NL/ST=Utrecht/L=Utrecht/O=Bachstraat/OU=Home/CN=*.localhost"
+openssl req -new -key "$SERVER_KEY" -out "$SERVER_CSR" -subj "/C=NL/ST=Utrecht/L=Utrecht/O=Utrecht/OU=Utrecht/CN=*.localhost"
 openssl x509 -req -in "$SERVER_CSR" -CA "$CA_CERT" -CAkey "$CA_KEY" -CAcreateserial \
 -out "$SERVER_CERT" -days 3650 -sha256 -extfile "$EXT_FILE"
 
