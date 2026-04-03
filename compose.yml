@@ -37,7 +37,7 @@ services:
   # Alloy
   # ---------------------------------------------------------
   alloy:
-    image: docker.io/grafana/alloy:v1.14.2@sha256:eadfe35ea52b26cbec4d4d780fbcc31edb31108c1c9e537ca59557a5a102c712
+    image: docker.io/grafana/alloy:v1.15.0@sha256:579582bce40049f2e27bd1e445000689c907a41f0495cb0d0c7f65609316ba7c
     container_name: alloy
     user: "0:0"
     networks:
