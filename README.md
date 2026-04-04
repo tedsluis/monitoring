@@ -427,8 +427,8 @@ In this observability stack, applications (and components like Traefik and Grafa
 
 Tempo does not include a built-in user interface. Instead, it relies entirely on Grafana to serve as the unified dashboard for exploring and analyzing your traces, for example:
 
-*See the screenshot below for an impression of the Tempo Tracing dashboard:*
-![tempo-dashboard](./images/)
+*See the screenshot below for an impression of a Tempo Trace through Traefik and Grafana:*
+![tempo-dashboard](./images/tempo-trace.png)
 
 | configuration        | configuration file                         |
 |----------------------|--------------------------------------------|
@@ -640,6 +640,12 @@ https://keep.localhost
 | [loki.yml](./keep/providers/loki.yml)             | Automatically configures the local Grafana Loki instance as a data source (`http://loki:3100`). This enables KeepHQ to directly fetch relevant log lines and event streams associated with an incident.       |
 
 By injecting these configurations via Infrastructure as Code, KeepHQ is instantly ready to query both metrics and logs the moment the stack boots up, significantly accelerating troubleshooting and providing a seamless AIOps experience.
+
+*See the screenshot below for an impression of the KeepHQ feeds UI:*
+![feeds](./images/keephq-feeds.png)
+
+*See the screenshot below for an impression of the KeepHQ plugins:*
+![plugins](./images/keephq-plugins.png)
 
 **Docs:**
 
