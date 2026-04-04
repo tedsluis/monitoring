@@ -647,6 +647,9 @@ By injecting these configurations via Infrastructure as Code, KeepHQ is instantl
 *See the screenshot below for an impression of the KeepHQ plugins:*
 ![plugins](./images/keephq-plugins.png)
 
+*See the screenshot below for an impression of the KeepHQ metrics dashboard:*
+![keephq-dashboard](./images/keephq-dashboard.png)
+
 **Docs:**
 
 * https://docs.keephq.dev/overview/introduction
