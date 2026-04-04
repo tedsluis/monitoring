@@ -437,7 +437,7 @@ services:
     security_opt:
       - label=disable
     volumes:
-      - /run/user/1000/podman/podman.sock:/run/podman/podman.sock:ro
+      - /run/user/1000/podman/podman.sock:/run/podman/podman.sock:ro,Z
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.podman-exporter.rule=Host(`podman-exporter.localhost`)"
@@ -527,11 +527,11 @@ services:
       - "443:443"   # HTTPS Services
       - "4317:4317" # OTLP gRPC (TCP/TLS)
     volumes:
-      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
-      - ./traefik/traefik.yaml:/etc/traefik/traefik.yaml:ro
+      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro,Z
+      - ./traefik/traefik.yaml:/etc/traefik/traefik.yaml:ro,Z
       # Mount the directory for dynamic config (node-exporter)
-      - ./traefik/dynamic:/etc/traefik/dynamic:ro 
-      - ./traefik/certs:/etc/traefik/certs:ro
+      - ./traefik/dynamic:/etc/traefik/dynamic:ro,Z
+      - ./traefik/certs:/etc/traefik/certs:ro,Z
     networks:
       - monitoring-net
     # Ensure that Traefik can resolve 'host.containers.internal' to the host IP
