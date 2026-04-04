@@ -4,7 +4,7 @@ type: grafana_loki
 description: "Internal Loki (IaC)"
 authentication:
   host_url: http://loki:3100
-  authenication_type: NoAuth
+  authentication_type: NoAuth
 
 
 
