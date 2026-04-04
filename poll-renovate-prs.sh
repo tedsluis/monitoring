@@ -1,11 +1,11 @@
 #!/bin/bash
 # poll-renovate-prs.sh - Checks, tests, merges and restarts the monitoring stack
-set -uo pipefail
+set -euo pipefail
 
 # Check if the REPO is available
 if [ -z "$REPO" ]; then
     echo "Error: REPO is not set."
-    echo "Usage: export REPO='owner/repo' && ./run-renovate.sh"
+    echo "Usage: export REPO='owner/repo' && ./poll-renovate-prs.sh"
     echo "for example: export REPO='tedsluis/monitoring' && ./poll-renovate-prs.sh"
     exit 1
 fi
