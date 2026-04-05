@@ -26,17 +26,17 @@ The complete lifecycle of a container update looks like this:
    * **On Failure**: The script applies the `test-failed` label, creates a GitHub Issue containing the error logs, and immediately **rolls back** to the stable base branch to restore the working stack.
 6. **Production Update**: If any PRs were successfully merged during the run, the poller checks out the `main` branch, pulls the latest images, and restarts the production stack so it runs the newly merged versions.
 
-## 2. Prerequisites
+## 3. Prerequisites
 
 Before running the automation, ensure your environnment is properly configured.
 
-### 2.1 Required Packages
+### 3.1 Required Packages
 Ensure you have the GitHub CLI (`gh`) and `jq` installed:
 ```bash
 sudo dnf install jq gh -y
 ```
 
-### 2.2 Set required enviroment variables
+### 3.2 Set required enviroment variables
 
 Create a Personal Access Token (classic) with repo scope and export it:
 ```bash
@@ -45,13 +45,13 @@ export RENOVATE_GIT_AUTHOR="Your Name <your.email@example.com>"
 export REPO="tedsluis/monitoring" # Adjust to your repository format: owner/repo
 ```
 
-### 2.3 GitHub Authentication
+### 3.3 GitHub Authentication
 The GitHub CLI must be authenticated to interact with repositories, PRs, and Issues.
 ```bash
 echo "$GITHUB_COM_TOKEN" | gh auth login --with-token
 ```
 
-### 2.4 Add Github labels
+### 3.4 Add Github labels
 
 The scripts use specific labels to track status. Create them once in your repository:
 ```bash
@@ -62,10 +62,10 @@ gh label create "test-failed" --color "D93F0B" --description "Automated smoke te
 
 ```
 
-## 3. Execution Examples
+## 4. Execution Examples
 You can run these scripts manually for debugging or immediate updates.
 
-### 3.1 Running Renovate
+### 4.1 Running Renovate
 
 To manually trigger the Renovate bot to scan for updates and create PRs:
 ```bash
@@ -111,7 +111,7 @@ $ ./renovate.sh
 
 The log file created during the run of `renovate.sh` is stored in **./logs/pr-*.log**
 
-### 3.2 Running the Poller
+### 4.2 Running the Poller
 
 To manually trigger the poller to process any open Renovate PRs:
 ```bash
@@ -183,7 +183,7 @@ https://github.com/tedsluis/monitoring/pull/16#issuecomment-4108240074
 
 The test log file created during the `poll-renovate-prs.sh` is stored in **./logs/pr-*.log**
 
-### 3.3 Running Tests Manually
+### 4.3 Running Tests Manually
 If you want to validate the stack without interacting with GitHub:
 ```bash
 $ ./run-tests.sh 
@@ -262,8 +262,7 @@ $ ./run-tests.sh
 🎉 [COMPLETE] All tests completed successfully! Stack is stable.
 ```
 
-
-## 3. Automation (Cron Setup)
+## 5. Automation (Cron Setup)
 
 To have this workflow operate autonomously, set up a cronjob. Running the poller every 15 minutes ensures you stay well within GitHub API rate limits while avoiding unnecessary server load. Open your crontab:
 ```bash
@@ -276,29 +275,29 @@ GITHUB_COM_TOKEN="your_personal_access_token"
 RENOVATE_GIT_AUTHOR="Your Name <your.email@example.com>"
 REPO="tedsluis/monitoring" # Adjust to your repository format: owner/repo
 # Run the renovate and poller every 8 hours (adjust the paths below to your choice)
-* 0,8,16 * * * cd /home/${HOME}/git/monitoring && ./renovate.sh >> /home/${HOME}}$/git/monitoring/logs/renovate-cron.log 2>&1
-* 1,7,17 * * * cd /home/${HOME}/git/monitoring && ./poll-renovate-prs.sh >> /home/${HOME}}$/git/monitoring/logs/poll-renovate-prs-cron.log 2>&1
+* 0,8,16 * * * cd /${HOME}/git/monitoring && ./renovate.sh >> /${HOME}/git/monitoring/logs/renovate-cron.log 2>&1
+* 1,7,17 * * * cd /${HOME}/git/monitoring && ./poll-renovate-prs.sh >> /${HOME}/git/monitoring/logs/poll-renovate-prs-cron.log 2>&1
 
 # Clean up old downloaded Podman images weekly on Sunday night at 03:00
 0 3 * * 0 podman image prune -a -f
 ```
 
-## 4. Reliability & Rollback Guarantees
+## 6. Reliability & Rollback Guarantees
 
 * **Concurrency Locking:** The poller uses a lock file (`/tmp/renovate-poller.lock`). If a test cycle takes a long time, the lock prevents a new cron execution from interfering with the running process.
 * **State Management:** `pr_state.json` tracks tested commits. If Renovate force-pushes a fix to a PR, the script detects the changed SHA and automatically re-tests the new commit.
 * **Guaranteed Rollback:** Regardless of whether a test passes or fails, if the script encounters an error or finishes testing a failing PR, it executes a strict git checkout to your base branch (usually `main`) and forces a rebuild of the stable containers. Your production stack is therefore offline for only a brief period during the test cycle.
 
-## 5. Security: Preventing Unauthorized Executions
+## 7. Security: Preventing Unauthorized Executions
 
 Because this automated poller checks out code and runs it on your local Fedora server, security is a top priority. A valid concern is: *What prevents a random GitHub user from submitting a malicious Pull Request that gets automatically tested and merged into the production stack?*
 
 This pipeline is protected against unauthorized code injection through multiple layers of security:
 
-### 5.1 GitHub Label Permissions (The First Line of Defense)
+### 7.1 GitHub Label Permissions (The First Line of Defense)
 The `poll-renovate-prs.sh` script is configured to only process PRs that carry the `renovate` label. On GitHub, external contributors (who fork the repository and submit a PR) **cannot** assign labels to their own Pull Requests. Only repository maintainers with Triage, Write, or Admin permissions can apply labels. Therefore, a malicious PR from an outsider is invisible to the poller by default.
 
-### 5.2 Strict Poller Filtering (The Second Line of Defense)
+### 7.2 Strict Poller Filtering (The Second Line of Defense)
 To completely eliminate the risk of human error (e.g., a maintainer accidentally adding the `renovate` label to an external PR), the `poll-renovate-prs.sh` script applies strict hardcoded filters before it even considers checking out the code:
 
 *   **Author Verification (`--author "@me"`):** The GitHub CLI query strictly filters for PRs created by the authenticated user. Because we run the Mend Renovate bot locally using your Personal Access Token, the PR author must match your exact account.
