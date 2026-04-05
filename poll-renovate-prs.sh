@@ -22,7 +22,7 @@ MERGED_PRS=()
 
 # --- HELPER FUNCTIONS ---
 
-# Veilige state update met mktemp om corruptie te voorkomen
+# Safe state update using mktemp to prevent corruption
 safe_state_update() {
     local jq_filter="$1"
     local tmpfile
@@ -30,7 +30,7 @@ safe_state_update() {
     jq "$jq_filter" "$STATE_FILE" > "$tmpfile" && mv "$tmpfile" "$STATE_FILE"
 }
 
-# Retry mechanisme voor tijdelijke API/Netwerk fouten
+# Retry mechanism for temporary API/network errors
 retry() {
     local n=1
     local max=3
@@ -87,7 +87,7 @@ while read -r pr_number branch updated; do
     echo "----------------------------------------"
     echo "📌 Inspecting PR #$pr_number (Branch: $branch)"
 
-    # Uitsluiten van Major updates voor handmatige review
+    # Exclude major updates for manual review
     if gh pr view "$pr_number" --repo "$REPO" --json labels --jq '.labels[].name' | grep -q "major-update"; then
         echo "⏩ PR #$pr_number has the 'major-update' label. Skipping for manual review."
         continue
@@ -189,14 +189,14 @@ $LOG_CONTENT
             echo "[INFO] Bringing down the test stack..."
             podman-compose down -t 30
             
-            # Base branch updaten na merge om stale base voor de volgende iteratie te voorkomen
+            # Update base branch after merge to prevent stale base for the next iteration
             echo "[INFO] Syncing local base branch ($base_branch) with origin..."
             git checkout --force "$base_branch"
             retry git fetch origin
             git reset --hard origin/"$base_branch"
         else
             echo "⚠️ Could not merge PR automatically. Rolling back..."
-            # Rollback na merge fout met pull/reset
+            # Rollback after merge error using pull/reset
             git checkout --force "$base_branch"
             retry git fetch origin
             git reset --hard origin/"$base_branch"
@@ -215,7 +215,7 @@ $LOG_CONTENT
         
         if [ -z "$ISSUE_NUM" ] || [ "$ISSUE_NUM" == "null" ]; then
             echo "[INFO] Creating a new GitHub Issue for the failed test..."
-            # Veilige ISSUE_NUM parsing via --json
+            # Safe ISSUE_NUM parsing via --json
             ISSUE_NUM=$(gh issue create --repo "$REPO" \
                 --title "🚨 Test Failed: Renovate PR #$pr_number" \
                 --body "The automatic test failed for PR #$pr_number (Commit \`$current_sha\`).
@@ -253,7 +253,7 @@ $FAIL_LOG
 
         safe_state_update ".\"$pr_number\".status = \"failed\""
         
-        # ROLLBACK TO STABLE STATE inclusief actuele origin sync
+        # ROLLBACK TO STABLE STATE including current origin sync
         echo "⏪ Rolling back to base branch ($base_branch)..."
         git checkout --force "$base_branch"
         retry git fetch origin
@@ -289,7 +289,7 @@ if [ "$MAIN_NEEDS_UPDATE" = true ]; then
     
     echo "🎉 Main stack successfully updated and running on the latest versions!"
 
-    # Notificatie na main-update voor alle succesvolle PR's in deze run
+    # Notification after main update for all successful PRs in this run
     for merged_pr in "${MERGED_PRS[@]}"; do
         retry gh pr comment "$merged_pr" --repo "$REPO" --body "🎉 **Production Updated!**
 The main monitoring stack has been successfully restarted with the code from this PR."
