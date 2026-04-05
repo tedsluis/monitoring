@@ -424,7 +424,7 @@ services:
     image: quay.io/navidys/prometheus-podman-exporter:v1.21.0@sha256:2ebb9e09101d8cc1e28e3f306b56a722450918e628208435201ed39bd62403cb
     container_name: podman-exporter
     healthcheck:
-      test: ["CMD-SHELL", "http_proxy= HTTP_PROXY= wget -q --tries=1 --spider http://127.0.0.1:9882/metrics || exit 1"]
+      test: ["CMD-SHELL", "http_proxy= HTTP_PROXY= wget -q -O /dev/null http://127.0.0.1:9882/metrics || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -437,7 +437,7 @@ services:
     security_opt:
       - label=disable
     volumes:
-      - /run/user/1000/podman/podman.sock:/run/podman/podman.sock:ro,Z
+      - /run/user/1000/podman/podman.sock:/run/podman/podman.sock:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.podman-exporter.rule=Host(`podman-exporter.localhost`)"
