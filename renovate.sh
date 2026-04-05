@@ -6,7 +6,7 @@ set -e
 # Check if the GitHub Token is available
 if [ -z "$GITHUB_COM_TOKEN" ]; then
     echo "Error: GITHUB_COM_TOKEN is not set."
-    echo "Usage: export GITHUB_COM_TOKEN=your_token && ./run-renovate.sh"
+    echo "Usage: export GITHUB_COM_TOKEN=your_token && ./renovate.sh"
     exit 1
 fi
 
@@ -20,6 +20,7 @@ fi
 
 WORKDIR="$(pwd)"
 LOG_DIR="$WORKDIR/logs"
+mkdir -p "$LOG_DIR"
 
 echo "🚀 Starting Mend Renovate via Podman..."
 
