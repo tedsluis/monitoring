@@ -139,20 +139,23 @@ sudo update-ca-trust extract
 # 8. Verification against System Bundle
 echo "Checking if System Bundle trusts the certificate..."
 
+# Safety check: Check if the file is a symlink (as it should be on Fedora)
+if [ ! -L "$SYS_BUNDLE" ]; then
+    echo -e "${RED}⚠️ WARNING: $SYS_BUNDLE is not a symlink!${NC}"
+    echo -e "Your system's trust store is broken (likely by previous manual appends)."
+    echo -e "Please fix this manually by running:"
+    echo -e "  sudo ln -sf /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem $SYS_BUNDLE"
+    echo -e "  sudo update-ca-trust extract"
+    exit 1
+fi
+
+# Validate certificate against system bundle
 if openssl verify -CAfile "$SYS_BUNDLE" "$SERVER_CERT" | grep -q "OK"; then
     echo -e "${GREEN}✓ SUCCESS: System bundle now trusts your certificate!${NC}"
 else
-    echo -e "${RED}⚠️  WARNING: System bundle validation failed.${NC}"
-    echo -e "Trying fallback method: Directly append to user-trust..."
-    echo "" | sudo tee -a "$SYS_BUNDLE" > /dev/null
-    openssl x509 -in "$CA_CERT" | sudo tee -a "$SYS_BUNDLE" > /dev/null
-    
-    if openssl verify -CAfile "$SYS_BUNDLE" "$SERVER_CERT" | grep -q "OK"; then
-         echo -e "${GREEN}✓ SUCCESS: CA manually added and validated.${NC}"
-    else
-         echo -e "${RED}✗ ERROR: Even manual addition failed.${NC}"
-         exit 1
-    fi
+    echo -e "${RED}✗ ERROR: System bundle validation failed.${NC}"
+    echo -e "Please check if update-ca-trust worked correctly."
+    exit 1
 fi
 
 # 9. Restart Traefik
