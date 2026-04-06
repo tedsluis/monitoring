@@ -38,7 +38,9 @@ storage:
 
 overrides:
   # Ensure local-blocks is active!
-  metrics_generator_processors: [service-graphs, span-metrics, local-blocks]
+  defaults:
+    metrics_generator:
+      processors: [service-graphs, span-metrics, local-blocks]
 
 metrics_generator:
   registry:
