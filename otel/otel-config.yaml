@@ -1,4 +1,5 @@
 receivers:
+  # The OTLP receiver is required for the OpenTelemetry Collector to receive traces from the applications instrumented with OpenTelemetry and send them to Tempo. It allows the collector to accept data in the OpenTelemetry Protocol (OTLP) format, which is a standard format for telemetry data.
   otlp:
     protocols:
       grpc:
