@@ -69,7 +69,7 @@ groups:
           summary: "Loki Watchdog (Heartbeat)"
           description: "This alert must always be visible. If it's missing, the Loki alerting pipeline is not working anymore."
 
-      # 2. BONUS: Ingestion Watchdog
+      # 2. Ingestion Watchdog
       # This alert fires if NO logs come in at all.
       # This is different from the Watchdog above; this tests if Alloy/Promtail still sends data.
       - alert: LokiNoLogsIngested
