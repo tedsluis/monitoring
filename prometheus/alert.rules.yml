@@ -605,7 +605,7 @@ groups:
     rules:
       - alert: GrafanaDown
         expr: up{job="grafana"} == 0
-        for: 1m
+        for: 2m
         labels:
           severity: critical
         annotations:
@@ -624,7 +624,7 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "KeepHQ is traag"
+          summary: "KeepHQ is slow"
           description: "Average response time of KeepHQ is greater than 2 seconds."
 
   # ---------------------------------------------------------
@@ -634,7 +634,7 @@ groups:
     rules:
       - alert: KarmaDashboardDown
         expr: up{job="karma"} == 0
-        for: 1m
+        for: 2m
         labels:
           severity: critical
         annotations:
@@ -654,7 +654,7 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "Alloy component ongezond"
+          summary: "Alloy component unhealthy (component {{ $labels.component_id }})"
           description: "Component {{ $labels.component_id }} in Alloy reports a error."
 
       - alert: GrafanaAlloyServiceDown
@@ -674,7 +674,7 @@ groups:
       - alert: ServiceHealthCheckFailed
         # probe_success is 1 (success) or 0 (failed)
         expr: probe_success == 0
-        for: 1m
+        for: 2m
         labels:
           severity: critical
         annotations:
@@ -849,7 +849,7 @@ groups:
     rules:
       - alert: TraefikDown
         expr: up{job="traefik"} == 0
-        for: 1m
+        for: 2m
         labels:
           severity: critical
         annotations:
