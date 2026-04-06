@@ -1,8 +1,10 @@
 server:
+  # The http_listen_port is the port on which Tempo will listen for incoming HTTP requests, such as those from Grafana's Explore feature. The grpc_listen_port is the port on which Tempo will listen for incoming gRPC requests, such as those from the OpenTelemetry Collector.
   http_listen_port: 3200
   grpc_listen_port: 9095
 
 distributor:
+  # The distributor is responsible for receiving the traces from the OpenTelemetry Collector and distributing them to the ingesters.
   receivers:
     otlp:
       protocols:
@@ -12,11 +14,13 @@ distributor:
           endpoint: "0.0.0.0:4318"
 
 ingester:
+  # The trace_idle_period is the duration after which an idle trace is considered complete and can be flushed to storage. Setting this to a reasonable value helps ensure that traces are not kept open indefinitely, which can lead to resource exhaustion. In this configuration, we set it to 10 seconds, which means that if no new spans are added to a trace for 10 seconds, the trace will be closed and flushed to storage.
   trace_idle_period: 10s
   max_block_bytes: 1_000_000
   max_block_duration: 5m
 
 compactor:
+  # The compactor is responsible for compacting the blocks in the storage and applying retention policies.
   compaction:
     compaction_window: 1h
     max_block_bytes: 100_000_000
@@ -27,6 +31,7 @@ storage:
   trace:
     backend: s3
     s3:
+      # The S3 configuration for Tempo.
       bucket: tempo-data
       endpoint: minio:9000
       access_key: minio
@@ -60,7 +65,7 @@ metrics_generator:
     local_blocks:
       filter_server_spans: false
       
-  # CRITICAL: Tell the metrics generator where the traces WAL is
+  # Tell the metrics generator where the traces WAL is
   # In Tempo 2.10 this must be configured via traces_storage
   traces_storage:
     path: /var/tempo/wal/traces
