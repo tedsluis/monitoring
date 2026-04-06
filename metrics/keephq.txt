@@ -1,0 +1,229 @@
+# HELP keep_http_request_duration_highr_seconds Latency with many buckets but no API specific labels. Made for more accurate percentile calculations. 
+# TYPE keep_http_request_duration_highr_seconds histogram
+keep_http_request_duration_highr_seconds_sum 10.02990641334327
+keep_http_request_duration_highr_seconds_bucket{le="0.01"} 198.0
+keep_http_request_duration_highr_seconds_bucket{le="0.025"} 357.0
+keep_http_request_duration_highr_seconds_bucket{le="0.05"} 481.0
+keep_http_request_duration_highr_seconds_bucket{le="0.075"} 491.0
+keep_http_request_duration_highr_seconds_bucket{le="0.1"} 492.0
+keep_http_request_duration_highr_seconds_bucket{le="0.25"} 497.0
+keep_http_request_duration_highr_seconds_bucket{le="0.5"} 500.0
+keep_http_request_duration_highr_seconds_bucket{le="0.75"} 500.0
+keep_http_request_duration_highr_seconds_bucket{le="1.0"} 500.0
+keep_http_request_duration_highr_seconds_bucket{le="1.5"} 500.0
+keep_http_request_duration_highr_seconds_bucket{le="2.0"} 500.0
+keep_http_request_duration_highr_seconds_bucket{le="2.5"} 500.0
+keep_http_request_duration_highr_seconds_bucket{le="3.0"} 500.0
+keep_http_request_duration_highr_seconds_bucket{le="3.5"} 500.0
+keep_http_request_duration_highr_seconds_bucket{le="4.0"} 500.0
+keep_http_request_duration_highr_seconds_bucket{le="4.5"} 500.0
+keep_http_request_duration_highr_seconds_bucket{le="5.0"} 500.0
+keep_http_request_duration_highr_seconds_bucket{le="7.5"} 500.0
+keep_http_request_duration_highr_seconds_bucket{le="10.0"} 500.0
+keep_http_request_duration_highr_seconds_bucket{le="30.0"} 500.0
+keep_http_request_duration_highr_seconds_bucket{le="60.0"} 500.0
+keep_http_request_duration_highr_seconds_bucket{le="+Inf"} 500.0
+keep_http_request_duration_highr_seconds_count 500.0
+# HELP keep_http_request_duration_seconds Latency with only few buckets by handler. Made to be only used if aggregation by handler is important. 
+# TYPE keep_http_request_duration_seconds histogram
+keep_http_request_duration_seconds_sum{handler="/alerts/event/{provider_type}",method="POST"} 6.772281783196377
+keep_http_request_duration_seconds_sum{handler="/healthcheck",method="GET"} 1.016648250108119
+keep_http_request_duration_seconds_sum{handler="/",method="GET"} 0.006587089999811724
+keep_http_request_duration_seconds_sum{handler="/incidents",method="GET"} 0.16826789898914285
+keep_http_request_duration_seconds_sum{handler="/alerts/facets",method="GET"} 0.027972587995463982
+keep_http_request_duration_seconds_sum{handler="/tags",method="GET"} 0.07163873501121998
+keep_http_request_duration_seconds_sum{handler="/alerts/query",method="POST"} 0.5126075530133676
+keep_http_request_duration_seconds_sum{handler="/providers",method="GET"} 0.4241900680062827
+keep_http_request_duration_seconds_sum{handler="/alerts/facets/options",method="POST"} 0.3708867820096202
+keep_http_request_duration_seconds_sum{handler="/workflows/query",method="POST"} 0.18802440201397985
+keep_http_request_duration_seconds_sum{handler="/topology",method="GET"} 0.1472881300142035
+keep_http_request_duration_seconds_sum{handler="/dashboard",method="GET"} 0.06835980599862523
+keep_http_request_duration_seconds_sum{handler="/preset",method="GET"} 0.1007488059985917
+keep_http_request_duration_seconds_sum{handler="/settings/tenant/configuration",method="GET"} 0.05522435699822381
+keep_http_request_duration_seconds_sum{handler="/alerts/facets/fields",method="GET"} 0.04301141799078323
+keep_http_request_duration_seconds_sum{handler="/alerts/event/error",method="GET"} 0.056168745999457315
+keep_http_request_duration_seconds_bucket{handler="/alerts/event/{provider_type}",le="0.1",method="POST"} 302.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/event/{provider_type}",le="0.5",method="POST"} 302.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/event/{provider_type}",le="1.0",method="POST"} 302.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/event/{provider_type}",le="+Inf",method="POST"} 302.0
+keep_http_request_duration_seconds_count{handler="/alerts/event/{provider_type}",method="POST"} 302.0
+keep_http_request_duration_seconds_bucket{handler="/healthcheck",le="0.1",method="GET"} 180.0
+keep_http_request_duration_seconds_bucket{handler="/healthcheck",le="0.5",method="GET"} 180.0
+keep_http_request_duration_seconds_bucket{handler="/healthcheck",le="1.0",method="GET"} 180.0
+keep_http_request_duration_seconds_bucket{handler="/healthcheck",le="+Inf",method="GET"} 180.0
+keep_http_request_duration_seconds_count{handler="/healthcheck",method="GET"} 180.0
+keep_http_request_duration_seconds_bucket{handler="/",le="0.1",method="GET"} 2.0
+keep_http_request_duration_seconds_bucket{handler="/",le="0.5",method="GET"} 2.0
+keep_http_request_duration_seconds_bucket{handler="/",le="1.0",method="GET"} 2.0
+keep_http_request_duration_seconds_bucket{handler="/",le="+Inf",method="GET"} 2.0
+keep_http_request_duration_seconds_count{handler="/",method="GET"} 2.0
+keep_http_request_duration_seconds_bucket{handler="/incidents",le="0.1",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/incidents",le="0.5",method="GET"} 2.0
+keep_http_request_duration_seconds_bucket{handler="/incidents",le="1.0",method="GET"} 2.0
+keep_http_request_duration_seconds_bucket{handler="/incidents",le="+Inf",method="GET"} 2.0
+keep_http_request_duration_seconds_count{handler="/incidents",method="GET"} 2.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/facets",le="0.1",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/facets",le="0.5",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/facets",le="1.0",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/facets",le="+Inf",method="GET"} 1.0
+keep_http_request_duration_seconds_count{handler="/alerts/facets",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/tags",le="0.1",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/tags",le="0.5",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/tags",le="1.0",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/tags",le="+Inf",method="GET"} 1.0
+keep_http_request_duration_seconds_count{handler="/tags",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/query",le="0.1",method="POST"} 0.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/query",le="0.5",method="POST"} 2.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/query",le="1.0",method="POST"} 2.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/query",le="+Inf",method="POST"} 2.0
+keep_http_request_duration_seconds_count{handler="/alerts/query",method="POST"} 2.0
+keep_http_request_duration_seconds_bucket{handler="/providers",le="0.1",method="GET"} 0.0
+keep_http_request_duration_seconds_bucket{handler="/providers",le="0.5",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/providers",le="1.0",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/providers",le="+Inf",method="GET"} 1.0
+keep_http_request_duration_seconds_count{handler="/providers",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/facets/options",le="0.1",method="POST"} 0.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/facets/options",le="0.5",method="POST"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/facets/options",le="1.0",method="POST"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/facets/options",le="+Inf",method="POST"} 1.0
+keep_http_request_duration_seconds_count{handler="/alerts/facets/options",method="POST"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/workflows/query",le="0.1",method="POST"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/workflows/query",le="0.5",method="POST"} 2.0
+keep_http_request_duration_seconds_bucket{handler="/workflows/query",le="1.0",method="POST"} 2.0
+keep_http_request_duration_seconds_bucket{handler="/workflows/query",le="+Inf",method="POST"} 2.0
+keep_http_request_duration_seconds_count{handler="/workflows/query",method="POST"} 2.0
+keep_http_request_duration_seconds_bucket{handler="/topology",le="0.1",method="GET"} 0.0
+keep_http_request_duration_seconds_bucket{handler="/topology",le="0.5",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/topology",le="1.0",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/topology",le="+Inf",method="GET"} 1.0
+keep_http_request_duration_seconds_count{handler="/topology",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/dashboard",le="0.1",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/dashboard",le="0.5",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/dashboard",le="1.0",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/dashboard",le="+Inf",method="GET"} 1.0
+keep_http_request_duration_seconds_count{handler="/dashboard",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/preset",le="0.1",method="GET"} 0.0
+keep_http_request_duration_seconds_bucket{handler="/preset",le="0.5",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/preset",le="1.0",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/preset",le="+Inf",method="GET"} 1.0
+keep_http_request_duration_seconds_count{handler="/preset",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/settings/tenant/configuration",le="0.1",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/settings/tenant/configuration",le="0.5",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/settings/tenant/configuration",le="1.0",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/settings/tenant/configuration",le="+Inf",method="GET"} 1.0
+keep_http_request_duration_seconds_count{handler="/settings/tenant/configuration",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/facets/fields",le="0.1",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/facets/fields",le="0.5",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/facets/fields",le="1.0",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/facets/fields",le="+Inf",method="GET"} 1.0
+keep_http_request_duration_seconds_count{handler="/alerts/facets/fields",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/event/error",le="0.1",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/event/error",le="0.5",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/event/error",le="1.0",method="GET"} 1.0
+keep_http_request_duration_seconds_bucket{handler="/alerts/event/error",le="+Inf",method="GET"} 1.0
+keep_http_request_duration_seconds_count{handler="/alerts/event/error",method="GET"} 1.0
+# HELP keep_running_tasks_current Current number of running tasks
+# TYPE keep_running_tasks_current gauge
+keep_running_tasks_current 0.0
+# HELP keep_running_tasks_by_process Current number of running tasks per process
+# TYPE keep_running_tasks_by_process gauge
+keep_running_tasks_by_process 0.0
+# HELP keep_processing_time_seconds Average time spent processing events
+# TYPE keep_processing_time_seconds summary
+keep_processing_time_seconds_count 302.0
+keep_processing_time_seconds_sum 26.36194065993186
+# HELP keep_http_request_size_bytes Content length of incoming requests by handler. Only value of header is respected. Otherwise ignored. No percentile calculated. 
+# TYPE keep_http_request_size_bytes summary
+keep_http_request_size_bytes_count{handler="/alerts/event/{provider_type}"} 302.0
+keep_http_request_size_bytes_sum{handler="/alerts/event/{provider_type}"} 364435.0
+keep_http_request_size_bytes_count{handler="/healthcheck"} 180.0
+keep_http_request_size_bytes_sum{handler="/healthcheck"} 0.0
+keep_http_request_size_bytes_count{handler="/"} 2.0
+keep_http_request_size_bytes_sum{handler="/"} 0.0
+keep_http_request_size_bytes_count{handler="/incidents"} 2.0
+keep_http_request_size_bytes_sum{handler="/incidents"} 0.0
+keep_http_request_size_bytes_count{handler="/alerts/facets"} 1.0
+keep_http_request_size_bytes_sum{handler="/alerts/facets"} 0.0
+keep_http_request_size_bytes_count{handler="/tags"} 1.0
+keep_http_request_size_bytes_sum{handler="/tags"} 0.0
+keep_http_request_size_bytes_count{handler="/alerts/query"} 2.0
+keep_http_request_size_bytes_sum{handler="/alerts/query"} 45.0
+keep_http_request_size_bytes_count{handler="/providers"} 1.0
+keep_http_request_size_bytes_sum{handler="/providers"} 0.0
+keep_http_request_size_bytes_count{handler="/alerts/facets/options"} 1.0
+keep_http_request_size_bytes_sum{handler="/alerts/facets/options"} 229.0
+keep_http_request_size_bytes_count{handler="/workflows/query"} 2.0
+keep_http_request_size_bytes_sum{handler="/workflows/query"} 232.0
+keep_http_request_size_bytes_count{handler="/topology"} 1.0
+keep_http_request_size_bytes_sum{handler="/topology"} 0.0
+keep_http_request_size_bytes_count{handler="/dashboard"} 1.0
+keep_http_request_size_bytes_sum{handler="/dashboard"} 0.0
+keep_http_request_size_bytes_count{handler="/preset"} 1.0
+keep_http_request_size_bytes_sum{handler="/preset"} 0.0
+keep_http_request_size_bytes_count{handler="/settings/tenant/configuration"} 1.0
+keep_http_request_size_bytes_sum{handler="/settings/tenant/configuration"} 0.0
+keep_http_request_size_bytes_count{handler="/alerts/facets/fields"} 1.0
+keep_http_request_size_bytes_sum{handler="/alerts/facets/fields"} 0.0
+keep_http_request_size_bytes_count{handler="/alerts/event/error"} 1.0
+keep_http_request_size_bytes_sum{handler="/alerts/event/error"} 0.0
+# HELP keep_http_response_size_bytes Content length of outgoing responses by handler. Only value of header is respected. Otherwise ignored. No percentile calculated. 
+# TYPE keep_http_response_size_bytes summary
+keep_http_response_size_bytes_count{handler="/alerts/event/{provider_type}"} 302.0
+keep_http_response_size_bytes_sum{handler="/alerts/event/{provider_type}"} 9362.0
+keep_http_response_size_bytes_count{handler="/healthcheck"} 180.0
+keep_http_response_size_bytes_sum{handler="/healthcheck"} 360.0
+keep_http_response_size_bytes_count{handler="/"} 2.0
+keep_http_response_size_bytes_sum{handler="/"} 208.0
+keep_http_response_size_bytes_count{handler="/incidents"} 2.0
+keep_http_response_size_bytes_sum{handler="/incidents"} 86.0
+keep_http_response_size_bytes_count{handler="/alerts/facets"} 1.0
+keep_http_response_size_bytes_sum{handler="/alerts/facets"} 790.0
+keep_http_response_size_bytes_count{handler="/tags"} 1.0
+keep_http_response_size_bytes_sum{handler="/tags"} 2.0
+keep_http_response_size_bytes_count{handler="/alerts/query"} 2.0
+keep_http_response_size_bytes_sum{handler="/alerts/query"} 105041.0
+keep_http_response_size_bytes_count{handler="/providers"} 1.0
+keep_http_response_size_bytes_sum{handler="/providers"} 204531.0
+keep_http_response_size_bytes_count{handler="/alerts/facets/options"} 1.0
+keep_http_response_size_bytes_sum{handler="/alerts/facets/options"} 1099.0
+keep_http_response_size_bytes_count{handler="/workflows/query"} 2.0
+keep_http_response_size_bytes_sum{handler="/workflows/query"} 94.0
+keep_http_response_size_bytes_count{handler="/topology"} 1.0
+keep_http_response_size_bytes_sum{handler="/topology"} 2.0
+keep_http_response_size_bytes_count{handler="/dashboard"} 1.0
+keep_http_response_size_bytes_sum{handler="/dashboard"} 2.0
+keep_http_response_size_bytes_count{handler="/preset"} 1.0
+keep_http_response_size_bytes_sum{handler="/preset"} 287.0
+keep_http_response_size_bytes_count{handler="/settings/tenant/configuration"} 1.0
+keep_http_response_size_bytes_sum{handler="/settings/tenant/configuration"} 2.0
+keep_http_response_size_bytes_count{handler="/alerts/facets/fields"} 1.0
+keep_http_response_size_bytes_sum{handler="/alerts/facets/fields"} 1158.0
+keep_http_response_size_bytes_count{handler="/alerts/event/error"} 1.0
+keep_http_response_size_bytes_sum{handler="/alerts/event/error"} 2.0
+# HELP keep_events_in_total Total number of events received
+# TYPE keep_events_in_total counter
+keep_events_in_total 302.0
+# HELP keep_events_processed_total Total number of events processed
+# TYPE keep_events_processed_total counter
+keep_events_processed_total 302.0
+# HELP keep_events_error_total Total number of events with error
+# TYPE keep_events_error_total counter
+keep_events_error_total 0.0
+# HELP keep_http_requests_total Total number of requests by method, status and handler.
+# TYPE keep_http_requests_total counter
+keep_http_requests_total{handler="/alerts/event/{provider_type}",method="POST",status="202"} 302.0
+keep_http_requests_total{handler="/healthcheck",method="GET",status="200"} 180.0
+keep_http_requests_total{handler="/",method="GET",status="200"} 2.0
+keep_http_requests_total{handler="/incidents",method="GET",status="200"} 2.0
+keep_http_requests_total{handler="/alerts/facets",method="GET",status="200"} 1.0
+keep_http_requests_total{handler="/tags",method="GET",status="200"} 1.0
+keep_http_requests_total{handler="/alerts/query",method="POST",status="200"} 2.0
+keep_http_requests_total{handler="/providers",method="GET",status="200"} 1.0
+keep_http_requests_total{handler="/alerts/facets/options",method="POST",status="200"} 1.0
+keep_http_requests_total{handler="/workflows/query",method="POST",status="200"} 2.0
+keep_http_requests_total{handler="/topology",method="GET",status="200"} 1.0
+keep_http_requests_total{handler="/dashboard",method="GET",status="200"} 1.0
+keep_http_requests_total{handler="/preset",method="GET",status="200"} 1.0
+keep_http_requests_total{handler="/settings/tenant/configuration",method="GET",status="200"} 1.0
+keep_http_requests_total{handler="/alerts/facets/fields",method="GET",status="200"} 1.0
+keep_http_requests_total{handler="/alerts/event/error",method="GET",status="200"} 1.0

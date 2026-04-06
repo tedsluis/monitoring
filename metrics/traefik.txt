@@ -1,0 +1,642 @@
+# HELP go_gc_duration_seconds A summary of the wall-time pause (stop-the-world) duration in garbage collection cycles.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 4.4707e-05
+go_gc_duration_seconds{quantile="0.25"} 5.9207e-05
+go_gc_duration_seconds{quantile="0.5"} 7.42e-05
+go_gc_duration_seconds{quantile="0.75"} 0.000129135
+go_gc_duration_seconds{quantile="1"} 0.000656713
+go_gc_duration_seconds_sum 0.073635635
+go_gc_duration_seconds_count 624
+# HELP go_gc_gogc_percent Heap size target percentage configured by the user, otherwise 100. This value is set by the GOGC environment variable, and the runtime/debug.SetGCPercent function. Sourced from /gc/gogc:percent.
+# TYPE go_gc_gogc_percent gauge
+go_gc_gogc_percent 100
+# HELP go_gc_gomemlimit_bytes Go runtime memory limit configured by the user, otherwise math.MaxInt64. This value is set by the GOMEMLIMIT environment variable, and the runtime/debug.SetMemoryLimit function. Sourced from /gc/gomemlimit:bytes.
+# TYPE go_gc_gomemlimit_bytes gauge
+go_gc_gomemlimit_bytes 9.223372036854776e+18
+# HELP go_goroutines Number of goroutines that currently exist.
+# TYPE go_goroutines gauge
+go_goroutines 84
+# HELP go_info Information about the Go environment.
+# TYPE go_info gauge
+go_info{version="go1.25.8"} 1
+# HELP go_memstats_alloc_bytes Number of bytes allocated in heap and currently in use. Equals to /memory/classes/heap/objects:bytes.
+# TYPE go_memstats_alloc_bytes gauge
+go_memstats_alloc_bytes 1.6639792e+07
+# HELP go_memstats_alloc_bytes_total Total number of bytes allocated in heap until now, even if released already. Equals to /gc/heap/allocs:bytes.
+# TYPE go_memstats_alloc_bytes_total counter
+go_memstats_alloc_bytes_total 5.477984336e+09
+# HELP go_memstats_buck_hash_sys_bytes Number of bytes used by the profiling bucket hash table. Equals to /memory/classes/profiling/buckets:bytes.
+# TYPE go_memstats_buck_hash_sys_bytes gauge
+go_memstats_buck_hash_sys_bytes 1.737319e+06
+# HELP go_memstats_frees_total Total number of heap objects frees. Equals to /gc/heap/frees:objects + /gc/heap/tiny/allocs:objects.
+# TYPE go_memstats_frees_total counter
+go_memstats_frees_total 3.4398646e+07
+# HELP go_memstats_gc_sys_bytes Number of bytes used for garbage collection system metadata. Equals to /memory/classes/metadata/other:bytes.
+# TYPE go_memstats_gc_sys_bytes gauge
+go_memstats_gc_sys_bytes 4.034832e+06
+# HELP go_memstats_heap_alloc_bytes Number of heap bytes allocated and currently in use, same as go_memstats_alloc_bytes. Equals to /memory/classes/heap/objects:bytes.
+# TYPE go_memstats_heap_alloc_bytes gauge
+go_memstats_heap_alloc_bytes 1.6639792e+07
+# HELP go_memstats_heap_idle_bytes Number of heap bytes waiting to be used. Equals to /memory/classes/heap/released:bytes + /memory/classes/heap/free:bytes.
+# TYPE go_memstats_heap_idle_bytes gauge
+go_memstats_heap_idle_bytes 1.1091968e+07
+# HELP go_memstats_heap_inuse_bytes Number of heap bytes that are in use. Equals to /memory/classes/heap/objects:bytes + /memory/classes/heap/unused:bytes
+# TYPE go_memstats_heap_inuse_bytes gauge
+go_memstats_heap_inuse_bytes 2.0496384e+07
+# HELP go_memstats_heap_objects Number of currently allocated objects. Equals to /gc/heap/objects:objects.
+# TYPE go_memstats_heap_objects gauge
+go_memstats_heap_objects 75853
+# HELP go_memstats_heap_released_bytes Number of heap bytes released to OS. Equals to /memory/classes/heap/released:bytes.
+# TYPE go_memstats_heap_released_bytes gauge
+go_memstats_heap_released_bytes 6.47168e+06
+# HELP go_memstats_heap_sys_bytes Number of heap bytes obtained from system. Equals to /memory/classes/heap/objects:bytes + /memory/classes/heap/unused:bytes + /memory/classes/heap/released:bytes + /memory/classes/heap/free:bytes.
+# TYPE go_memstats_heap_sys_bytes gauge
+go_memstats_heap_sys_bytes 3.1588352e+07
+# HELP go_memstats_last_gc_time_seconds Number of seconds since 1970 of last garbage collection.
+# TYPE go_memstats_last_gc_time_seconds gauge
+go_memstats_last_gc_time_seconds 1.7754993511906335e+09
+# HELP go_memstats_mallocs_total Total number of heap objects allocated, both live and gc-ed. Semantically a counter version for go_memstats_heap_objects gauge. Equals to /gc/heap/allocs:objects + /gc/heap/tiny/allocs:objects.
+# TYPE go_memstats_mallocs_total counter
+go_memstats_mallocs_total 3.4474499e+07
+# HELP go_memstats_mcache_inuse_bytes Number of bytes in use by mcache structures. Equals to /memory/classes/metadata/mcache/inuse:bytes.
+# TYPE go_memstats_mcache_inuse_bytes gauge
+go_memstats_mcache_inuse_bytes 9664
+# HELP go_memstats_mcache_sys_bytes Number of bytes used for mcache structures obtained from system. Equals to /memory/classes/metadata/mcache/inuse:bytes + /memory/classes/metadata/mcache/free:bytes.
+# TYPE go_memstats_mcache_sys_bytes gauge
+go_memstats_mcache_sys_bytes 15704
+# HELP go_memstats_mspan_inuse_bytes Number of bytes in use by mspan structures. Equals to /memory/classes/metadata/mspan/inuse:bytes.
+# TYPE go_memstats_mspan_inuse_bytes gauge
+go_memstats_mspan_inuse_bytes 282880
+# HELP go_memstats_mspan_sys_bytes Number of bytes used for mspan structures obtained from system. Equals to /memory/classes/metadata/mspan/inuse:bytes + /memory/classes/metadata/mspan/free:bytes.
+# TYPE go_memstats_mspan_sys_bytes gauge
+go_memstats_mspan_sys_bytes 408000
+# HELP go_memstats_next_gc_bytes Number of heap bytes when next garbage collection will take place. Equals to /gc/heap/goal:bytes.
+# TYPE go_memstats_next_gc_bytes gauge
+go_memstats_next_gc_bytes 2.5389834e+07
+# HELP go_memstats_other_sys_bytes Number of bytes used for other system allocations. Equals to /memory/classes/other:bytes.
+# TYPE go_memstats_other_sys_bytes gauge
+go_memstats_other_sys_bytes 1.494649e+06
+# HELP go_memstats_stack_inuse_bytes Number of bytes obtained from system for stack allocator in non-CGO environments. Equals to /memory/classes/heap/stacks:bytes.
+# TYPE go_memstats_stack_inuse_bytes gauge
+go_memstats_stack_inuse_bytes 1.96608e+06
+# HELP go_memstats_stack_sys_bytes Number of bytes obtained from system for stack allocator. Equals to /memory/classes/heap/stacks:bytes + /memory/classes/os-stacks:bytes.
+# TYPE go_memstats_stack_sys_bytes gauge
+go_memstats_stack_sys_bytes 1.96608e+06
+# HELP go_memstats_sys_bytes Number of bytes obtained from system. Equals to /memory/classes/total:byte.
+# TYPE go_memstats_sys_bytes gauge
+go_memstats_sys_bytes 4.1244936e+07
+# HELP go_sched_gomaxprocs_threads The current runtime.GOMAXPROCS setting, or the number of operating system threads that can execute user-level Go code simultaneously. Sourced from /sched/gomaxprocs:threads.
+# TYPE go_sched_gomaxprocs_threads gauge
+go_sched_gomaxprocs_threads 8
+# HELP go_threads Number of OS threads created.
+# TYPE go_threads gauge
+go_threads 14
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 64.87
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 524288
+# HELP process_network_receive_bytes_total Number of bytes received by the process over the network.
+# TYPE process_network_receive_bytes_total counter
+process_network_receive_bytes_total 4.610498e+06
+# HELP process_network_transmit_bytes_total Number of bytes sent by the process over the network.
+# TYPE process_network_transmit_bytes_total counter
+process_network_transmit_bytes_total 9.933308e+06
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 31
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 5.7176064e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.7754934844e+09
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 1.436008448e+09
+# HELP process_virtual_memory_max_bytes Maximum amount of virtual memory available in bytes.
+# TYPE process_virtual_memory_max_bytes gauge
+process_virtual_memory_max_bytes 1.8446744073709552e+19
+# HELP traefik_config_last_reload_success Last config reload success
+# TYPE traefik_config_last_reload_success gauge
+traefik_config_last_reload_success 1.775493546e+09
+# HELP traefik_config_reloads_total Config reloads
+# TYPE traefik_config_reloads_total counter
+traefik_config_reloads_total 9
+# HELP traefik_entrypoint_request_duration_seconds How long it took to process the request on an entrypoint, partitioned by status code, protocol, and method.
+# TYPE traefik_entrypoint_request_duration_seconds histogram
+traefik_entrypoint_request_duration_seconds_bucket{code="200",entrypoint="websecure",method="GET",protocol="http",le="0.1"} 26
+traefik_entrypoint_request_duration_seconds_bucket{code="200",entrypoint="websecure",method="GET",protocol="http",le="0.3"} 37
+traefik_entrypoint_request_duration_seconds_bucket{code="200",entrypoint="websecure",method="GET",protocol="http",le="1.2"} 47
+traefik_entrypoint_request_duration_seconds_bucket{code="200",entrypoint="websecure",method="GET",protocol="http",le="5"} 47
+traefik_entrypoint_request_duration_seconds_bucket{code="200",entrypoint="websecure",method="GET",protocol="http",le="+Inf"} 47
+traefik_entrypoint_request_duration_seconds_sum{code="200",entrypoint="websecure",method="GET",protocol="http"} 8.519573014999999
+traefik_entrypoint_request_duration_seconds_count{code="200",entrypoint="websecure",method="GET",protocol="http"} 47
+traefik_entrypoint_request_duration_seconds_bucket{code="200",entrypoint="websecure",method="OPTIONS",protocol="http",le="0.1"} 1
+traefik_entrypoint_request_duration_seconds_bucket{code="200",entrypoint="websecure",method="OPTIONS",protocol="http",le="0.3"} 1
+traefik_entrypoint_request_duration_seconds_bucket{code="200",entrypoint="websecure",method="OPTIONS",protocol="http",le="1.2"} 1
+traefik_entrypoint_request_duration_seconds_bucket{code="200",entrypoint="websecure",method="OPTIONS",protocol="http",le="5"} 1
+traefik_entrypoint_request_duration_seconds_bucket{code="200",entrypoint="websecure",method="OPTIONS",protocol="http",le="+Inf"} 1
+traefik_entrypoint_request_duration_seconds_sum{code="200",entrypoint="websecure",method="OPTIONS",protocol="http"} 0.008875839
+traefik_entrypoint_request_duration_seconds_count{code="200",entrypoint="websecure",method="OPTIONS",protocol="http"} 1
+traefik_entrypoint_request_duration_seconds_bucket{code="200",entrypoint="websecure",method="POST",protocol="http",le="0.1"} 102
+traefik_entrypoint_request_duration_seconds_bucket{code="200",entrypoint="websecure",method="POST",protocol="http",le="0.3"} 118
+traefik_entrypoint_request_duration_seconds_bucket{code="200",entrypoint="websecure",method="POST",protocol="http",le="1.2"} 122
+traefik_entrypoint_request_duration_seconds_bucket{code="200",entrypoint="websecure",method="POST",protocol="http",le="5"} 122
+traefik_entrypoint_request_duration_seconds_bucket{code="200",entrypoint="websecure",method="POST",protocol="http",le="+Inf"} 122
+traefik_entrypoint_request_duration_seconds_sum{code="200",entrypoint="websecure",method="POST",protocol="http"} 6.640662416999998
+traefik_entrypoint_request_duration_seconds_count{code="200",entrypoint="websecure",method="POST",protocol="http"} 122
+traefik_entrypoint_request_duration_seconds_bucket{code="304",entrypoint="websecure",method="GET",protocol="http",le="0.1"} 2
+traefik_entrypoint_request_duration_seconds_bucket{code="304",entrypoint="websecure",method="GET",protocol="http",le="0.3"} 2
+traefik_entrypoint_request_duration_seconds_bucket{code="304",entrypoint="websecure",method="GET",protocol="http",le="1.2"} 3
+traefik_entrypoint_request_duration_seconds_bucket{code="304",entrypoint="websecure",method="GET",protocol="http",le="5"} 3
+traefik_entrypoint_request_duration_seconds_bucket{code="304",entrypoint="websecure",method="GET",protocol="http",le="+Inf"} 3
+traefik_entrypoint_request_duration_seconds_sum{code="304",entrypoint="websecure",method="GET",protocol="http"} 0.5765664429999999
+traefik_entrypoint_request_duration_seconds_count{code="304",entrypoint="websecure",method="GET",protocol="http"} 3
+traefik_entrypoint_request_duration_seconds_bucket{code="404",entrypoint="websecure",method="GET",protocol="http",le="0.1"} 3
+traefik_entrypoint_request_duration_seconds_bucket{code="404",entrypoint="websecure",method="GET",protocol="http",le="0.3"} 3
+traefik_entrypoint_request_duration_seconds_bucket{code="404",entrypoint="websecure",method="GET",protocol="http",le="1.2"} 3
+traefik_entrypoint_request_duration_seconds_bucket{code="404",entrypoint="websecure",method="GET",protocol="http",le="5"} 3
+traefik_entrypoint_request_duration_seconds_bucket{code="404",entrypoint="websecure",method="GET",protocol="http",le="+Inf"} 3
+traefik_entrypoint_request_duration_seconds_sum{code="404",entrypoint="websecure",method="GET",protocol="http"} 4.9704000000000004e-05
+traefik_entrypoint_request_duration_seconds_count{code="404",entrypoint="websecure",method="GET",protocol="http"} 3
+traefik_entrypoint_request_duration_seconds_bucket{code="404",entrypoint="websecure",method="GET",protocol="websocket",le="0.1"} 101
+traefik_entrypoint_request_duration_seconds_bucket{code="404",entrypoint="websecure",method="GET",protocol="websocket",le="0.3"} 101
+traefik_entrypoint_request_duration_seconds_bucket{code="404",entrypoint="websecure",method="GET",protocol="websocket",le="1.2"} 101
+traefik_entrypoint_request_duration_seconds_bucket{code="404",entrypoint="websecure",method="GET",protocol="websocket",le="5"} 101
+traefik_entrypoint_request_duration_seconds_bucket{code="404",entrypoint="websecure",method="GET",protocol="websocket",le="+Inf"} 101
+traefik_entrypoint_request_duration_seconds_sum{code="404",entrypoint="websecure",method="GET",protocol="websocket"} 0.09713674500000001
+traefik_entrypoint_request_duration_seconds_count{code="404",entrypoint="websecure",method="GET",protocol="websocket"} 101
+traefik_entrypoint_request_duration_seconds_bucket{code="499",entrypoint="websecure",method="GET",protocol="http",le="0.1"} 1
+traefik_entrypoint_request_duration_seconds_bucket{code="499",entrypoint="websecure",method="GET",protocol="http",le="0.3"} 1
+traefik_entrypoint_request_duration_seconds_bucket{code="499",entrypoint="websecure",method="GET",protocol="http",le="1.2"} 1
+traefik_entrypoint_request_duration_seconds_bucket{code="499",entrypoint="websecure",method="GET",protocol="http",le="5"} 1
+traefik_entrypoint_request_duration_seconds_bucket{code="499",entrypoint="websecure",method="GET",protocol="http",le="+Inf"} 1
+traefik_entrypoint_request_duration_seconds_sum{code="499",entrypoint="websecure",method="GET",protocol="http"} 0.019630915
+traefik_entrypoint_request_duration_seconds_count{code="499",entrypoint="websecure",method="GET",protocol="http"} 1
+# HELP traefik_entrypoint_requests_bytes_total The total size of requests in bytes handled by an entrypoint, partitioned by status code, protocol, and method.
+# TYPE traefik_entrypoint_requests_bytes_total counter
+traefik_entrypoint_requests_bytes_total{code="200",entrypoint="websecure",method="GET",protocol="http"} 0
+traefik_entrypoint_requests_bytes_total{code="200",entrypoint="websecure",method="OPTIONS",protocol="http"} 0
+traefik_entrypoint_requests_bytes_total{code="200",entrypoint="websecure",method="POST",protocol="http"} 32883
+traefik_entrypoint_requests_bytes_total{code="304",entrypoint="websecure",method="GET",protocol="http"} 0
+traefik_entrypoint_requests_bytes_total{code="404",entrypoint="websecure",method="GET",protocol="http"} 0
+traefik_entrypoint_requests_bytes_total{code="404",entrypoint="websecure",method="GET",protocol="websocket"} 0
+traefik_entrypoint_requests_bytes_total{code="499",entrypoint="websecure",method="GET",protocol="http"} 0
+# HELP traefik_entrypoint_requests_tls_total How many HTTP requests with TLS processed on an entrypoint, partitioned by TLS Version and TLS cipher Used.
+# TYPE traefik_entrypoint_requests_tls_total counter
+traefik_entrypoint_requests_tls_total{entrypoint="websecure",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 279
+# HELP traefik_entrypoint_requests_total How many HTTP requests processed on an entrypoint, partitioned by status code, protocol, and method.
+# TYPE traefik_entrypoint_requests_total counter
+traefik_entrypoint_requests_total{code="200",entrypoint="websecure",method="GET",protocol="http"} 47
+traefik_entrypoint_requests_total{code="200",entrypoint="websecure",method="OPTIONS",protocol="http"} 1
+traefik_entrypoint_requests_total{code="200",entrypoint="websecure",method="POST",protocol="http"} 122
+traefik_entrypoint_requests_total{code="304",entrypoint="websecure",method="GET",protocol="http"} 3
+traefik_entrypoint_requests_total{code="404",entrypoint="websecure",method="GET",protocol="http"} 3
+traefik_entrypoint_requests_total{code="404",entrypoint="websecure",method="GET",protocol="websocket"} 101
+traefik_entrypoint_requests_total{code="499",entrypoint="websecure",method="GET",protocol="http"} 1
+# HELP traefik_entrypoint_responses_bytes_total The total size of responses in bytes handled by an entrypoint, partitioned by status code, protocol, and method.
+# TYPE traefik_entrypoint_responses_bytes_total counter
+traefik_entrypoint_responses_bytes_total{code="200",entrypoint="websecure",method="GET",protocol="http"} 306020
+traefik_entrypoint_responses_bytes_total{code="200",entrypoint="websecure",method="OPTIONS",protocol="http"} 2
+traefik_entrypoint_responses_bytes_total{code="200",entrypoint="websecure",method="POST",protocol="http"} 390255
+traefik_entrypoint_responses_bytes_total{code="304",entrypoint="websecure",method="GET",protocol="http"} 0
+traefik_entrypoint_responses_bytes_total{code="404",entrypoint="websecure",method="GET",protocol="http"} 57
+traefik_entrypoint_responses_bytes_total{code="404",entrypoint="websecure",method="GET",protocol="websocket"} 15051
+traefik_entrypoint_responses_bytes_total{code="499",entrypoint="websecure",method="GET",protocol="http"} 21
+# HELP traefik_open_connections How many open connections exist, by entryPoint and protocol
+# TYPE traefik_open_connections gauge
+traefik_open_connections{entrypoint="metrics",protocol="TCP"} 1
+traefik_open_connections{entrypoint="otlp",protocol="TCP"} 0
+traefik_open_connections{entrypoint="web",protocol="TCP"} 0
+traefik_open_connections{entrypoint="websecure",protocol="TCP"} 9
+# HELP traefik_router_request_duration_seconds How long it took to process the request on a router, partitioned by service, status code, protocol, and method.
+# TYPE traefik_router_request_duration_seconds histogram
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="grafana@docker",service="grafana@docker",le="0.1"} 5
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="grafana@docker",service="grafana@docker",le="0.3"} 8
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="grafana@docker",service="grafana@docker",le="1.2"} 8
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="grafana@docker",service="grafana@docker",le="5"} 8
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="grafana@docker",service="grafana@docker",le="+Inf"} 8
+traefik_router_request_duration_seconds_sum{code="200",method="GET",protocol="http",router="grafana@docker",service="grafana@docker"} 0.47432428600000004
+traefik_router_request_duration_seconds_count{code="200",method="GET",protocol="http",router="grafana@docker",service="grafana@docker"} 8
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-alertmanager@docker",service="alertmanager@docker",le="0.1"} 2
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-alertmanager@docker",service="alertmanager@docker",le="0.3"} 2
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-alertmanager@docker",service="alertmanager@docker",le="1.2"} 2
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-alertmanager@docker",service="alertmanager@docker",le="5"} 2
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-alertmanager@docker",service="alertmanager@docker",le="+Inf"} 2
+traefik_router_request_duration_seconds_sum{code="200",method="GET",protocol="http",router="websecure-alertmanager@docker",service="alertmanager@docker"} 0.031540075
+traefik_router_request_duration_seconds_count{code="200",method="GET",protocol="http",router="websecure-alertmanager@docker",service="alertmanager@docker"} 2
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-alloy@docker",service="alloy@docker",le="0.1"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-alloy@docker",service="alloy@docker",le="0.3"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-alloy@docker",service="alloy@docker",le="1.2"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-alloy@docker",service="alloy@docker",le="5"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-alloy@docker",service="alloy@docker",le="+Inf"} 1
+traefik_router_request_duration_seconds_sum{code="200",method="GET",protocol="http",router="websecure-alloy@docker",service="alloy@docker"} 0.002881266
+traefik_router_request_duration_seconds_count{code="200",method="GET",protocol="http",router="websecure-alloy@docker",service="alloy@docker"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-blackbox@docker",service="blackbox@docker",le="0.1"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-blackbox@docker",service="blackbox@docker",le="0.3"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-blackbox@docker",service="blackbox@docker",le="1.2"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-blackbox@docker",service="blackbox@docker",le="5"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-blackbox@docker",service="blackbox@docker",le="+Inf"} 1
+traefik_router_request_duration_seconds_sum{code="200",method="GET",protocol="http",router="websecure-blackbox@docker",service="blackbox@docker"} 0.00433127
+traefik_router_request_duration_seconds_count{code="200",method="GET",protocol="http",router="websecure-blackbox@docker",service="blackbox@docker"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-karma@docker",service="karma@docker",le="0.1"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-karma@docker",service="karma@docker",le="0.3"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-karma@docker",service="karma@docker",le="1.2"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-karma@docker",service="karma@docker",le="5"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-karma@docker",service="karma@docker",le="+Inf"} 1
+traefik_router_request_duration_seconds_sum{code="200",method="GET",protocol="http",router="websecure-karma@docker",service="karma@docker"} 0.002728465
+traefik_router_request_duration_seconds_count{code="200",method="GET",protocol="http",router="websecure-karma@docker",service="karma@docker"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker",le="0.1"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker",le="0.3"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker",le="1.2"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker",le="5"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker",le="+Inf"} 1
+traefik_router_request_duration_seconds_sum{code="200",method="GET",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker"} 0.020194809
+traefik_router_request_duration_seconds_count{code="200",method="GET",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="0.1"} 7
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="0.3"} 15
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="1.2"} 25
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="5"} 25
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="+Inf"} 25
+traefik_router_request_duration_seconds_sum{code="200",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 7.8726864060000015
+traefik_router_request_duration_seconds_count{code="200",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 25
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-loki@docker",service="loki@docker",le="0.1"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-loki@docker",service="loki@docker",le="0.3"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-loki@docker",service="loki@docker",le="1.2"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-loki@docker",service="loki@docker",le="5"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-loki@docker",service="loki@docker",le="+Inf"} 1
+traefik_router_request_duration_seconds_sum{code="200",method="GET",protocol="http",router="websecure-loki@docker",service="loki@docker"} 0.015543778
+traefik_router_request_duration_seconds_count{code="200",method="GET",protocol="http",router="websecure-loki@docker",service="loki@docker"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-minio-api@docker",service="minio-api@docker",le="0.1"} 4
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-minio-api@docker",service="minio-api@docker",le="0.3"} 4
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-minio-api@docker",service="minio-api@docker",le="1.2"} 4
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-minio-api@docker",service="minio-api@docker",le="5"} 4
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-minio-api@docker",service="minio-api@docker",le="+Inf"} 4
+traefik_router_request_duration_seconds_sum{code="200",method="GET",protocol="http",router="websecure-minio-api@docker",service="minio-api@docker"} 0.014442916
+traefik_router_request_duration_seconds_count{code="200",method="GET",protocol="http",router="websecure-minio-api@docker",service="minio-api@docker"} 4
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-otel-collector@docker",service="otel-collector@docker",le="0.1"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-otel-collector@docker",service="otel-collector@docker",le="0.3"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-otel-collector@docker",service="otel-collector@docker",le="1.2"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-otel-collector@docker",service="otel-collector@docker",le="5"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-otel-collector@docker",service="otel-collector@docker",le="+Inf"} 1
+traefik_router_request_duration_seconds_sum{code="200",method="GET",protocol="http",router="websecure-otel-collector@docker",service="otel-collector@docker"} 0.001923183
+traefik_router_request_duration_seconds_count{code="200",method="GET",protocol="http",router="websecure-otel-collector@docker",service="otel-collector@docker"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-podman-exporter@docker",service="podman-exporter@docker",le="0.1"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-podman-exporter@docker",service="podman-exporter@docker",le="0.3"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-podman-exporter@docker",service="podman-exporter@docker",le="1.2"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-podman-exporter@docker",service="podman-exporter@docker",le="5"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-podman-exporter@docker",service="podman-exporter@docker",le="+Inf"} 1
+traefik_router_request_duration_seconds_sum{code="200",method="GET",protocol="http",router="websecure-podman-exporter@docker",service="podman-exporter@docker"} 0.064661176
+traefik_router_request_duration_seconds_count{code="200",method="GET",protocol="http",router="websecure-podman-exporter@docker",service="podman-exporter@docker"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-prometheus@docker",service="prometheus@docker",le="0.1"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-prometheus@docker",service="prometheus@docker",le="0.3"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-prometheus@docker",service="prometheus@docker",le="1.2"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-prometheus@docker",service="prometheus@docker",le="5"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="GET",protocol="http",router="websecure-prometheus@docker",service="prometheus@docker",le="+Inf"} 1
+traefik_router_request_duration_seconds_sum{code="200",method="GET",protocol="http",router="websecure-prometheus@docker",service="prometheus@docker"} 0.011115345
+traefik_router_request_duration_seconds_count{code="200",method="GET",protocol="http",router="websecure-prometheus@docker",service="prometheus@docker"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="OPTIONS",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker",le="0.1"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="OPTIONS",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker",le="0.3"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="OPTIONS",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker",le="1.2"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="OPTIONS",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker",le="5"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="OPTIONS",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker",le="+Inf"} 1
+traefik_router_request_duration_seconds_sum{code="200",method="OPTIONS",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker"} 0.008804857
+traefik_router_request_duration_seconds_count{code="200",method="OPTIONS",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="POST",protocol="http",router="grafana@docker",service="grafana@docker",le="0.1"} 55
+traefik_router_request_duration_seconds_bucket{code="200",method="POST",protocol="http",router="grafana@docker",service="grafana@docker",le="0.3"} 70
+traefik_router_request_duration_seconds_bucket{code="200",method="POST",protocol="http",router="grafana@docker",service="grafana@docker",le="1.2"} 70
+traefik_router_request_duration_seconds_bucket{code="200",method="POST",protocol="http",router="grafana@docker",service="grafana@docker",le="5"} 70
+traefik_router_request_duration_seconds_bucket{code="200",method="POST",protocol="http",router="grafana@docker",service="grafana@docker",le="+Inf"} 70
+traefik_router_request_duration_seconds_sum{code="200",method="POST",protocol="http",router="grafana@docker",service="grafana@docker"} 3.2211335780000003
+traefik_router_request_duration_seconds_count{code="200",method="POST",protocol="http",router="grafana@docker",service="grafana@docker"} 70
+traefik_router_request_duration_seconds_bucket{code="200",method="POST",protocol="http",router="websecure-karma@docker",service="karma@docker",le="0.1"} 47
+traefik_router_request_duration_seconds_bucket{code="200",method="POST",protocol="http",router="websecure-karma@docker",service="karma@docker",le="0.3"} 47
+traefik_router_request_duration_seconds_bucket{code="200",method="POST",protocol="http",router="websecure-karma@docker",service="karma@docker",le="1.2"} 47
+traefik_router_request_duration_seconds_bucket{code="200",method="POST",protocol="http",router="websecure-karma@docker",service="karma@docker",le="5"} 47
+traefik_router_request_duration_seconds_bucket{code="200",method="POST",protocol="http",router="websecure-karma@docker",service="karma@docker",le="+Inf"} 47
+traefik_router_request_duration_seconds_sum{code="200",method="POST",protocol="http",router="websecure-karma@docker",service="karma@docker"} 0.37959686200000003
+traefik_router_request_duration_seconds_count{code="200",method="POST",protocol="http",router="websecure-karma@docker",service="karma@docker"} 47
+traefik_router_request_duration_seconds_bucket{code="200",method="POST",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="0.1"} 0
+traefik_router_request_duration_seconds_bucket{code="200",method="POST",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="0.3"} 1
+traefik_router_request_duration_seconds_bucket{code="200",method="POST",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="1.2"} 5
+traefik_router_request_duration_seconds_bucket{code="200",method="POST",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="5"} 5
+traefik_router_request_duration_seconds_bucket{code="200",method="POST",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="+Inf"} 5
+traefik_router_request_duration_seconds_sum{code="200",method="POST",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 3.028951024
+traefik_router_request_duration_seconds_count{code="200",method="POST",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 5
+traefik_router_request_duration_seconds_bucket{code="304",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="0.1"} 2
+traefik_router_request_duration_seconds_bucket{code="304",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="0.3"} 2
+traefik_router_request_duration_seconds_bucket{code="304",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="1.2"} 3
+traefik_router_request_duration_seconds_bucket{code="304",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="5"} 3
+traefik_router_request_duration_seconds_bucket{code="304",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="+Inf"} 3
+traefik_router_request_duration_seconds_sum{code="304",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 0.575684681
+traefik_router_request_duration_seconds_count{code="304",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 3
+traefik_router_request_duration_seconds_bucket{code="404",method="GET",protocol="websocket",router="websecure-nginx@docker",service="nginx@docker",le="0.1"} 98
+traefik_router_request_duration_seconds_bucket{code="404",method="GET",protocol="websocket",router="websecure-nginx@docker",service="nginx@docker",le="0.3"} 98
+traefik_router_request_duration_seconds_bucket{code="404",method="GET",protocol="websocket",router="websecure-nginx@docker",service="nginx@docker",le="1.2"} 98
+traefik_router_request_duration_seconds_bucket{code="404",method="GET",protocol="websocket",router="websecure-nginx@docker",service="nginx@docker",le="5"} 98
+traefik_router_request_duration_seconds_bucket{code="404",method="GET",protocol="websocket",router="websecure-nginx@docker",service="nginx@docker",le="+Inf"} 98
+traefik_router_request_duration_seconds_sum{code="404",method="GET",protocol="websocket",router="websecure-nginx@docker",service="nginx@docker"} 0.09247745199999996
+traefik_router_request_duration_seconds_count{code="404",method="GET",protocol="websocket",router="websecure-nginx@docker",service="nginx@docker"} 98
+traefik_router_request_duration_seconds_bucket{code="499",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="0.1"} 1
+traefik_router_request_duration_seconds_bucket{code="499",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="0.3"} 1
+traefik_router_request_duration_seconds_bucket{code="499",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="1.2"} 1
+traefik_router_request_duration_seconds_bucket{code="499",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="5"} 1
+traefik_router_request_duration_seconds_bucket{code="499",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker",le="+Inf"} 1
+traefik_router_request_duration_seconds_sum{code="499",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 0.019552813
+traefik_router_request_duration_seconds_count{code="499",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 1
+# HELP traefik_router_requests_bytes_total The total size of requests in bytes handled by a router, partitioned by service, status code, protocol, and method.
+# TYPE traefik_router_requests_bytes_total counter
+traefik_router_requests_bytes_total{code="200",method="GET",protocol="http",router="grafana@docker",service="grafana@docker"} 0
+traefik_router_requests_bytes_total{code="200",method="GET",protocol="http",router="websecure-alertmanager@docker",service="alertmanager@docker"} 0
+traefik_router_requests_bytes_total{code="200",method="GET",protocol="http",router="websecure-alloy@docker",service="alloy@docker"} 0
+traefik_router_requests_bytes_total{code="200",method="GET",protocol="http",router="websecure-blackbox@docker",service="blackbox@docker"} 0
+traefik_router_requests_bytes_total{code="200",method="GET",protocol="http",router="websecure-karma@docker",service="karma@docker"} 0
+traefik_router_requests_bytes_total{code="200",method="GET",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker"} 0
+traefik_router_requests_bytes_total{code="200",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 0
+traefik_router_requests_bytes_total{code="200",method="GET",protocol="http",router="websecure-loki@docker",service="loki@docker"} 0
+traefik_router_requests_bytes_total{code="200",method="GET",protocol="http",router="websecure-minio-api@docker",service="minio-api@docker"} 0
+traefik_router_requests_bytes_total{code="200",method="GET",protocol="http",router="websecure-otel-collector@docker",service="otel-collector@docker"} 0
+traefik_router_requests_bytes_total{code="200",method="GET",protocol="http",router="websecure-podman-exporter@docker",service="podman-exporter@docker"} 0
+traefik_router_requests_bytes_total{code="200",method="GET",protocol="http",router="websecure-prometheus@docker",service="prometheus@docker"} 0
+traefik_router_requests_bytes_total{code="200",method="OPTIONS",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker"} 0
+traefik_router_requests_bytes_total{code="200",method="POST",protocol="http",router="grafana@docker",service="grafana@docker"} 24008
+traefik_router_requests_bytes_total{code="200",method="POST",protocol="http",router="websecure-karma@docker",service="karma@docker"} 8369
+traefik_router_requests_bytes_total{code="200",method="POST",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 506
+traefik_router_requests_bytes_total{code="304",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 0
+traefik_router_requests_bytes_total{code="404",method="GET",protocol="websocket",router="websecure-nginx@docker",service="nginx@docker"} 0
+traefik_router_requests_bytes_total{code="499",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 0
+# HELP traefik_router_requests_tls_total How many HTTP requests with TLS are processed on a router, partitioned by service, TLS Version, and TLS cipher Used.
+# TYPE traefik_router_requests_tls_total counter
+traefik_router_requests_tls_total{router="grafana@docker",service="grafana@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 79
+traefik_router_requests_tls_total{router="websecure-alertmanager@docker",service="alertmanager@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 2
+traefik_router_requests_tls_total{router="websecure-alloy@docker",service="alloy@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 1
+traefik_router_requests_tls_total{router="websecure-blackbox@docker",service="blackbox@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 1
+traefik_router_requests_tls_total{router="websecure-karma@docker",service="karma@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 48
+traefik_router_requests_tls_total{router="websecure-keep-api@docker",service="keep-api@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 2
+traefik_router_requests_tls_total{router="websecure-keep-ui@docker",service="keep-ui@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 34
+traefik_router_requests_tls_total{router="websecure-loki@docker",service="loki@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 1
+traefik_router_requests_tls_total{router="websecure-minio-api@docker",service="minio-api@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 4
+traefik_router_requests_tls_total{router="websecure-nginx@docker",service="nginx@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 98
+traefik_router_requests_tls_total{router="websecure-otel-collector@docker",service="otel-collector@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 1
+traefik_router_requests_tls_total{router="websecure-podman-exporter@docker",service="podman-exporter@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 1
+traefik_router_requests_tls_total{router="websecure-prometheus@docker",service="prometheus@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 1
+# HELP traefik_router_requests_total How many HTTP requests are processed on a router, partitioned by service, status code, protocol, and method.
+# TYPE traefik_router_requests_total counter
+traefik_router_requests_total{code="200",method="GET",protocol="http",router="grafana@docker",service="grafana@docker"} 8
+traefik_router_requests_total{code="200",method="GET",protocol="http",router="websecure-alertmanager@docker",service="alertmanager@docker"} 2
+traefik_router_requests_total{code="200",method="GET",protocol="http",router="websecure-alloy@docker",service="alloy@docker"} 1
+traefik_router_requests_total{code="200",method="GET",protocol="http",router="websecure-blackbox@docker",service="blackbox@docker"} 1
+traefik_router_requests_total{code="200",method="GET",protocol="http",router="websecure-karma@docker",service="karma@docker"} 1
+traefik_router_requests_total{code="200",method="GET",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker"} 1
+traefik_router_requests_total{code="200",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 25
+traefik_router_requests_total{code="200",method="GET",protocol="http",router="websecure-loki@docker",service="loki@docker"} 1
+traefik_router_requests_total{code="200",method="GET",protocol="http",router="websecure-minio-api@docker",service="minio-api@docker"} 4
+traefik_router_requests_total{code="200",method="GET",protocol="http",router="websecure-otel-collector@docker",service="otel-collector@docker"} 1
+traefik_router_requests_total{code="200",method="GET",protocol="http",router="websecure-podman-exporter@docker",service="podman-exporter@docker"} 1
+traefik_router_requests_total{code="200",method="GET",protocol="http",router="websecure-prometheus@docker",service="prometheus@docker"} 1
+traefik_router_requests_total{code="200",method="OPTIONS",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker"} 1
+traefik_router_requests_total{code="200",method="POST",protocol="http",router="grafana@docker",service="grafana@docker"} 70
+traefik_router_requests_total{code="200",method="POST",protocol="http",router="websecure-karma@docker",service="karma@docker"} 47
+traefik_router_requests_total{code="200",method="POST",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 5
+traefik_router_requests_total{code="304",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 3
+traefik_router_requests_total{code="404",method="GET",protocol="websocket",router="websecure-nginx@docker",service="nginx@docker"} 98
+traefik_router_requests_total{code="499",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 1
+# HELP traefik_router_responses_bytes_total The total size of responses in bytes handled by a router, partitioned by service, status code, protocol, and method.
+# TYPE traefik_router_responses_bytes_total counter
+traefik_router_responses_bytes_total{code="200",method="GET",protocol="http",router="grafana@docker",service="grafana@docker"} 32308
+traefik_router_responses_bytes_total{code="200",method="GET",protocol="http",router="websecure-alertmanager@docker",service="alertmanager@docker"} 22319
+traefik_router_responses_bytes_total{code="200",method="GET",protocol="http",router="websecure-alloy@docker",service="alloy@docker"} 5433
+traefik_router_responses_bytes_total{code="200",method="GET",protocol="http",router="websecure-blackbox@docker",service="blackbox@docker"} 2607
+traefik_router_responses_bytes_total{code="200",method="GET",protocol="http",router="websecure-karma@docker",service="karma@docker"} 2866
+traefik_router_responses_bytes_total{code="200",method="GET",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker"} 17901
+traefik_router_responses_bytes_total{code="200",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 55327
+traefik_router_responses_bytes_total{code="200",method="GET",protocol="http",router="websecure-loki@docker",service="loki@docker"} 28446
+traefik_router_responses_bytes_total{code="200",method="GET",protocol="http",router="websecure-minio-api@docker",service="minio-api@docker"} 110062
+traefik_router_responses_bytes_total{code="200",method="GET",protocol="http",router="websecure-otel-collector@docker",service="otel-collector@docker"} 1324
+traefik_router_responses_bytes_total{code="200",method="GET",protocol="http",router="websecure-podman-exporter@docker",service="podman-exporter@docker"} 8155
+traefik_router_responses_bytes_total{code="200",method="GET",protocol="http",router="websecure-prometheus@docker",service="prometheus@docker"} 19272
+traefik_router_responses_bytes_total{code="200",method="OPTIONS",protocol="http",router="websecure-keep-api@docker",service="keep-api@docker"} 2
+traefik_router_responses_bytes_total{code="200",method="POST",protocol="http",router="grafana@docker",service="grafana@docker"} 339583
+traefik_router_responses_bytes_total{code="200",method="POST",protocol="http",router="websecure-karma@docker",service="karma@docker"} 40083
+traefik_router_responses_bytes_total{code="200",method="POST",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 10589
+traefik_router_responses_bytes_total{code="304",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 0
+traefik_router_responses_bytes_total{code="404",method="GET",protocol="websocket",router="websecure-nginx@docker",service="nginx@docker"} 14994
+traefik_router_responses_bytes_total{code="499",method="GET",protocol="http",router="websecure-keep-ui@docker",service="keep-ui@docker"} 21
+# HELP traefik_service_request_duration_seconds How long it took to process the request on a service, partitioned by status code, protocol, and method.
+# TYPE traefik_service_request_duration_seconds histogram
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="alertmanager@docker",le="0.1"} 2
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="alertmanager@docker",le="0.3"} 2
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="alertmanager@docker",le="1.2"} 2
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="alertmanager@docker",le="5"} 2
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="alertmanager@docker",le="+Inf"} 2
+traefik_service_request_duration_seconds_sum{code="200",method="GET",protocol="http",service="alertmanager@docker"} 0.031440914
+traefik_service_request_duration_seconds_count{code="200",method="GET",protocol="http",service="alertmanager@docker"} 2
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="alloy@docker",le="0.1"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="alloy@docker",le="0.3"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="alloy@docker",le="1.2"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="alloy@docker",le="5"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="alloy@docker",le="+Inf"} 1
+traefik_service_request_duration_seconds_sum{code="200",method="GET",protocol="http",service="alloy@docker"} 0.002833492
+traefik_service_request_duration_seconds_count{code="200",method="GET",protocol="http",service="alloy@docker"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="blackbox@docker",le="0.1"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="blackbox@docker",le="0.3"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="blackbox@docker",le="1.2"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="blackbox@docker",le="5"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="blackbox@docker",le="+Inf"} 1
+traefik_service_request_duration_seconds_sum{code="200",method="GET",protocol="http",service="blackbox@docker"} 0.004280718
+traefik_service_request_duration_seconds_count{code="200",method="GET",protocol="http",service="blackbox@docker"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="grafana@docker",le="0.1"} 5
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="grafana@docker",le="0.3"} 8
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="grafana@docker",le="1.2"} 8
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="grafana@docker",le="5"} 8
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="grafana@docker",le="+Inf"} 8
+traefik_service_request_duration_seconds_sum{code="200",method="GET",protocol="http",service="grafana@docker"} 0.47396817799999996
+traefik_service_request_duration_seconds_count{code="200",method="GET",protocol="http",service="grafana@docker"} 8
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="karma@docker",le="0.1"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="karma@docker",le="0.3"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="karma@docker",le="1.2"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="karma@docker",le="5"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="karma@docker",le="+Inf"} 1
+traefik_service_request_duration_seconds_sum{code="200",method="GET",protocol="http",service="karma@docker"} 0.002694521
+traefik_service_request_duration_seconds_count{code="200",method="GET",protocol="http",service="karma@docker"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="keep-api@docker",le="0.1"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="keep-api@docker",le="0.3"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="keep-api@docker",le="1.2"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="keep-api@docker",le="5"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="keep-api@docker",le="+Inf"} 1
+traefik_service_request_duration_seconds_sum{code="200",method="GET",protocol="http",service="keep-api@docker"} 0.020162585
+traefik_service_request_duration_seconds_count{code="200",method="GET",protocol="http",service="keep-api@docker"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="keep-ui@docker",le="0.1"} 7
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="keep-ui@docker",le="0.3"} 15
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="keep-ui@docker",le="1.2"} 25
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="keep-ui@docker",le="5"} 25
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="keep-ui@docker",le="+Inf"} 25
+traefik_service_request_duration_seconds_sum{code="200",method="GET",protocol="http",service="keep-ui@docker"} 7.871443584
+traefik_service_request_duration_seconds_count{code="200",method="GET",protocol="http",service="keep-ui@docker"} 25
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="loki@docker",le="0.1"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="loki@docker",le="0.3"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="loki@docker",le="1.2"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="loki@docker",le="5"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="loki@docker",le="+Inf"} 1
+traefik_service_request_duration_seconds_sum{code="200",method="GET",protocol="http",service="loki@docker"} 0.015499644
+traefik_service_request_duration_seconds_count{code="200",method="GET",protocol="http",service="loki@docker"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="minio-api@docker",le="0.1"} 4
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="minio-api@docker",le="0.3"} 4
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="minio-api@docker",le="1.2"} 4
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="minio-api@docker",le="5"} 4
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="minio-api@docker",le="+Inf"} 4
+traefik_service_request_duration_seconds_sum{code="200",method="GET",protocol="http",service="minio-api@docker"} 0.014221794999999999
+traefik_service_request_duration_seconds_count{code="200",method="GET",protocol="http",service="minio-api@docker"} 4
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="otel-collector@docker",le="0.1"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="otel-collector@docker",le="0.3"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="otel-collector@docker",le="1.2"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="otel-collector@docker",le="5"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="otel-collector@docker",le="+Inf"} 1
+traefik_service_request_duration_seconds_sum{code="200",method="GET",protocol="http",service="otel-collector@docker"} 0.001882197
+traefik_service_request_duration_seconds_count{code="200",method="GET",protocol="http",service="otel-collector@docker"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="podman-exporter@docker",le="0.1"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="podman-exporter@docker",le="0.3"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="podman-exporter@docker",le="1.2"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="podman-exporter@docker",le="5"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="podman-exporter@docker",le="+Inf"} 1
+traefik_service_request_duration_seconds_sum{code="200",method="GET",protocol="http",service="podman-exporter@docker"} 0.06457738
+traefik_service_request_duration_seconds_count{code="200",method="GET",protocol="http",service="podman-exporter@docker"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="prometheus@docker",le="0.1"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="prometheus@docker",le="0.3"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="prometheus@docker",le="1.2"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="prometheus@docker",le="5"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="GET",protocol="http",service="prometheus@docker",le="+Inf"} 1
+traefik_service_request_duration_seconds_sum{code="200",method="GET",protocol="http",service="prometheus@docker"} 0.01101227
+traefik_service_request_duration_seconds_count{code="200",method="GET",protocol="http",service="prometheus@docker"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="OPTIONS",protocol="http",service="keep-api@docker",le="0.1"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="OPTIONS",protocol="http",service="keep-api@docker",le="0.3"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="OPTIONS",protocol="http",service="keep-api@docker",le="1.2"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="OPTIONS",protocol="http",service="keep-api@docker",le="5"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="OPTIONS",protocol="http",service="keep-api@docker",le="+Inf"} 1
+traefik_service_request_duration_seconds_sum{code="200",method="OPTIONS",protocol="http",service="keep-api@docker"} 0.00875385
+traefik_service_request_duration_seconds_count{code="200",method="OPTIONS",protocol="http",service="keep-api@docker"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="POST",protocol="http",service="grafana@docker",le="0.1"} 55
+traefik_service_request_duration_seconds_bucket{code="200",method="POST",protocol="http",service="grafana@docker",le="0.3"} 70
+traefik_service_request_duration_seconds_bucket{code="200",method="POST",protocol="http",service="grafana@docker",le="1.2"} 70
+traefik_service_request_duration_seconds_bucket{code="200",method="POST",protocol="http",service="grafana@docker",le="5"} 70
+traefik_service_request_duration_seconds_bucket{code="200",method="POST",protocol="http",service="grafana@docker",le="+Inf"} 70
+traefik_service_request_duration_seconds_sum{code="200",method="POST",protocol="http",service="grafana@docker"} 3.217901264999999
+traefik_service_request_duration_seconds_count{code="200",method="POST",protocol="http",service="grafana@docker"} 70
+traefik_service_request_duration_seconds_bucket{code="200",method="POST",protocol="http",service="karma@docker",le="0.1"} 47
+traefik_service_request_duration_seconds_bucket{code="200",method="POST",protocol="http",service="karma@docker",le="0.3"} 47
+traefik_service_request_duration_seconds_bucket{code="200",method="POST",protocol="http",service="karma@docker",le="1.2"} 47
+traefik_service_request_duration_seconds_bucket{code="200",method="POST",protocol="http",service="karma@docker",le="5"} 47
+traefik_service_request_duration_seconds_bucket{code="200",method="POST",protocol="http",service="karma@docker",le="+Inf"} 47
+traefik_service_request_duration_seconds_sum{code="200",method="POST",protocol="http",service="karma@docker"} 0.37753157000000004
+traefik_service_request_duration_seconds_count{code="200",method="POST",protocol="http",service="karma@docker"} 47
+traefik_service_request_duration_seconds_bucket{code="200",method="POST",protocol="http",service="keep-ui@docker",le="0.1"} 0
+traefik_service_request_duration_seconds_bucket{code="200",method="POST",protocol="http",service="keep-ui@docker",le="0.3"} 1
+traefik_service_request_duration_seconds_bucket{code="200",method="POST",protocol="http",service="keep-ui@docker",le="1.2"} 5
+traefik_service_request_duration_seconds_bucket{code="200",method="POST",protocol="http",service="keep-ui@docker",le="5"} 5
+traefik_service_request_duration_seconds_bucket{code="200",method="POST",protocol="http",service="keep-ui@docker",le="+Inf"} 5
+traefik_service_request_duration_seconds_sum{code="200",method="POST",protocol="http",service="keep-ui@docker"} 3.028557902
+traefik_service_request_duration_seconds_count{code="200",method="POST",protocol="http",service="keep-ui@docker"} 5
+traefik_service_request_duration_seconds_bucket{code="304",method="GET",protocol="http",service="keep-ui@docker",le="0.1"} 2
+traefik_service_request_duration_seconds_bucket{code="304",method="GET",protocol="http",service="keep-ui@docker",le="0.3"} 2
+traefik_service_request_duration_seconds_bucket{code="304",method="GET",protocol="http",service="keep-ui@docker",le="1.2"} 3
+traefik_service_request_duration_seconds_bucket{code="304",method="GET",protocol="http",service="keep-ui@docker",le="5"} 3
+traefik_service_request_duration_seconds_bucket{code="304",method="GET",protocol="http",service="keep-ui@docker",le="+Inf"} 3
+traefik_service_request_duration_seconds_sum{code="304",method="GET",protocol="http",service="keep-ui@docker"} 0.5755574330000001
+traefik_service_request_duration_seconds_count{code="304",method="GET",protocol="http",service="keep-ui@docker"} 3
+traefik_service_request_duration_seconds_bucket{code="404",method="GET",protocol="websocket",service="nginx@docker",le="0.1"} 98
+traefik_service_request_duration_seconds_bucket{code="404",method="GET",protocol="websocket",service="nginx@docker",le="0.3"} 98
+traefik_service_request_duration_seconds_bucket{code="404",method="GET",protocol="websocket",service="nginx@docker",le="1.2"} 98
+traefik_service_request_duration_seconds_bucket{code="404",method="GET",protocol="websocket",service="nginx@docker",le="5"} 98
+traefik_service_request_duration_seconds_bucket{code="404",method="GET",protocol="websocket",service="nginx@docker",le="+Inf"} 98
+traefik_service_request_duration_seconds_sum{code="404",method="GET",protocol="websocket",service="nginx@docker"} 0.08732379500000001
+traefik_service_request_duration_seconds_count{code="404",method="GET",protocol="websocket",service="nginx@docker"} 98
+traefik_service_request_duration_seconds_bucket{code="499",method="GET",protocol="http",service="keep-ui@docker",le="0.1"} 1
+traefik_service_request_duration_seconds_bucket{code="499",method="GET",protocol="http",service="keep-ui@docker",le="0.3"} 1
+traefik_service_request_duration_seconds_bucket{code="499",method="GET",protocol="http",service="keep-ui@docker",le="1.2"} 1
+traefik_service_request_duration_seconds_bucket{code="499",method="GET",protocol="http",service="keep-ui@docker",le="5"} 1
+traefik_service_request_duration_seconds_bucket{code="499",method="GET",protocol="http",service="keep-ui@docker",le="+Inf"} 1
+traefik_service_request_duration_seconds_sum{code="499",method="GET",protocol="http",service="keep-ui@docker"} 0.019493606
+traefik_service_request_duration_seconds_count{code="499",method="GET",protocol="http",service="keep-ui@docker"} 1
+# HELP traefik_service_requests_bytes_total The total size of requests in bytes received by a service, partitioned by status code, protocol, and method.
+# TYPE traefik_service_requests_bytes_total counter
+traefik_service_requests_bytes_total{code="200",method="GET",protocol="http",service="alertmanager@docker"} 0
+traefik_service_requests_bytes_total{code="200",method="GET",protocol="http",service="alloy@docker"} 0
+traefik_service_requests_bytes_total{code="200",method="GET",protocol="http",service="blackbox@docker"} 0
+traefik_service_requests_bytes_total{code="200",method="GET",protocol="http",service="grafana@docker"} 0
+traefik_service_requests_bytes_total{code="200",method="GET",protocol="http",service="karma@docker"} 0
+traefik_service_requests_bytes_total{code="200",method="GET",protocol="http",service="keep-api@docker"} 0
+traefik_service_requests_bytes_total{code="200",method="GET",protocol="http",service="keep-ui@docker"} 0
+traefik_service_requests_bytes_total{code="200",method="GET",protocol="http",service="loki@docker"} 0
+traefik_service_requests_bytes_total{code="200",method="GET",protocol="http",service="minio-api@docker"} 0
+traefik_service_requests_bytes_total{code="200",method="GET",protocol="http",service="otel-collector@docker"} 0
+traefik_service_requests_bytes_total{code="200",method="GET",protocol="http",service="podman-exporter@docker"} 0
+traefik_service_requests_bytes_total{code="200",method="GET",protocol="http",service="prometheus@docker"} 0
+traefik_service_requests_bytes_total{code="200",method="OPTIONS",protocol="http",service="keep-api@docker"} 0
+traefik_service_requests_bytes_total{code="200",method="POST",protocol="http",service="grafana@docker"} 24008
+traefik_service_requests_bytes_total{code="200",method="POST",protocol="http",service="karma@docker"} 8369
+traefik_service_requests_bytes_total{code="200",method="POST",protocol="http",service="keep-ui@docker"} 506
+traefik_service_requests_bytes_total{code="304",method="GET",protocol="http",service="keep-ui@docker"} 0
+traefik_service_requests_bytes_total{code="404",method="GET",protocol="websocket",service="nginx@docker"} 0
+traefik_service_requests_bytes_total{code="499",method="GET",protocol="http",service="keep-ui@docker"} 0
+# HELP traefik_service_requests_tls_total How many HTTP requests with TLS processed on a service, partitioned by TLS version and TLS cipher.
+# TYPE traefik_service_requests_tls_total counter
+traefik_service_requests_tls_total{service="alertmanager@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 2
+traefik_service_requests_tls_total{service="alloy@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 1
+traefik_service_requests_tls_total{service="blackbox@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 1
+traefik_service_requests_tls_total{service="grafana@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 79
+traefik_service_requests_tls_total{service="karma@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 48
+traefik_service_requests_tls_total{service="keep-api@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 2
+traefik_service_requests_tls_total{service="keep-ui@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 34
+traefik_service_requests_tls_total{service="loki@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 1
+traefik_service_requests_tls_total{service="minio-api@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 4
+traefik_service_requests_tls_total{service="nginx@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 98
+traefik_service_requests_tls_total{service="otel-collector@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 1
+traefik_service_requests_tls_total{service="podman-exporter@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 1
+traefik_service_requests_tls_total{service="prometheus@docker",tls_cipher="TLS_AES_128_GCM_SHA256",tls_version="1.3"} 1
+# HELP traefik_service_requests_total How many HTTP requests processed on a service, partitioned by status code, protocol, and method.
+# TYPE traefik_service_requests_total counter
+traefik_service_requests_total{code="200",method="GET",protocol="http",service="alertmanager@docker"} 2
+traefik_service_requests_total{code="200",method="GET",protocol="http",service="alloy@docker"} 1
+traefik_service_requests_total{code="200",method="GET",protocol="http",service="blackbox@docker"} 1
+traefik_service_requests_total{code="200",method="GET",protocol="http",service="grafana@docker"} 8
+traefik_service_requests_total{code="200",method="GET",protocol="http",service="karma@docker"} 1
+traefik_service_requests_total{code="200",method="GET",protocol="http",service="keep-api@docker"} 1
+traefik_service_requests_total{code="200",method="GET",protocol="http",service="keep-ui@docker"} 25
+traefik_service_requests_total{code="200",method="GET",protocol="http",service="loki@docker"} 1
+traefik_service_requests_total{code="200",method="GET",protocol="http",service="minio-api@docker"} 4
+traefik_service_requests_total{code="200",method="GET",protocol="http",service="otel-collector@docker"} 1
+traefik_service_requests_total{code="200",method="GET",protocol="http",service="podman-exporter@docker"} 1
+traefik_service_requests_total{code="200",method="GET",protocol="http",service="prometheus@docker"} 1
+traefik_service_requests_total{code="200",method="OPTIONS",protocol="http",service="keep-api@docker"} 1
+traefik_service_requests_total{code="200",method="POST",protocol="http",service="grafana@docker"} 70
+traefik_service_requests_total{code="200",method="POST",protocol="http",service="karma@docker"} 47
+traefik_service_requests_total{code="200",method="POST",protocol="http",service="keep-ui@docker"} 5
+traefik_service_requests_total{code="304",method="GET",protocol="http",service="keep-ui@docker"} 3
+traefik_service_requests_total{code="404",method="GET",protocol="websocket",service="nginx@docker"} 98
+traefik_service_requests_total{code="499",method="GET",protocol="http",service="keep-ui@docker"} 1
+# HELP traefik_service_responses_bytes_total The total size of responses in bytes returned by a service, partitioned by status code, protocol, and method.
+# TYPE traefik_service_responses_bytes_total counter
+traefik_service_responses_bytes_total{code="200",method="GET",protocol="http",service="alertmanager@docker"} 22319
+traefik_service_responses_bytes_total{code="200",method="GET",protocol="http",service="alloy@docker"} 5433
+traefik_service_responses_bytes_total{code="200",method="GET",protocol="http",service="blackbox@docker"} 2607
+traefik_service_responses_bytes_total{code="200",method="GET",protocol="http",service="grafana@docker"} 32308
+traefik_service_responses_bytes_total{code="200",method="GET",protocol="http",service="karma@docker"} 2866
+traefik_service_responses_bytes_total{code="200",method="GET",protocol="http",service="keep-api@docker"} 17901
+traefik_service_responses_bytes_total{code="200",method="GET",protocol="http",service="keep-ui@docker"} 55327
+traefik_service_responses_bytes_total{code="200",method="GET",protocol="http",service="loki@docker"} 28446
+traefik_service_responses_bytes_total{code="200",method="GET",protocol="http",service="minio-api@docker"} 110062
+traefik_service_responses_bytes_total{code="200",method="GET",protocol="http",service="otel-collector@docker"} 1324
+traefik_service_responses_bytes_total{code="200",method="GET",protocol="http",service="podman-exporter@docker"} 8155
+traefik_service_responses_bytes_total{code="200",method="GET",protocol="http",service="prometheus@docker"} 19272
+traefik_service_responses_bytes_total{code="200",method="OPTIONS",protocol="http",service="keep-api@docker"} 2
+traefik_service_responses_bytes_total{code="200",method="POST",protocol="http",service="grafana@docker"} 339583
+traefik_service_responses_bytes_total{code="200",method="POST",protocol="http",service="karma@docker"} 40083
+traefik_service_responses_bytes_total{code="200",method="POST",protocol="http",service="keep-ui@docker"} 10589
+traefik_service_responses_bytes_total{code="304",method="GET",protocol="http",service="keep-ui@docker"} 0
+traefik_service_responses_bytes_total{code="404",method="GET",protocol="websocket",service="nginx@docker"} 14994
+traefik_service_responses_bytes_total{code="499",method="GET",protocol="http",service="keep-ui@docker"} 21
+# HELP traefik_tls_certs_not_after Certificate expiration timestamp
+# TYPE traefik_tls_certs_not_after gauge
+traefik_tls_certs_not_after{cn="*.localhost",sans="*.localhost,alertmanager.localhost,alloy.localhost,blackbox.localhost,grafana.localhost,karma.localhost,keep-api.localhost,keep.localhost,localhost,loki.localhost,minio.localhost,node-exporter.localhost,otel-collector.localhost,podman-exporter.localhost,prometheus.localhost,s3.localhost,tempo.localhost,traefik-metrics.localhost,traefik.localhost,webhook-tester.localhost",serial="347037638084616438306171341565243977514630468775"} 2.090730856e+09
