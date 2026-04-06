@@ -18,6 +18,7 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+    # Alertmanager runs as non-root user by default (uid 65534), but we set it explicitly here for clarity. Running as non-root is a good security practice to minimize the potential impact of a compromise.
     user: "65534:65534"
     networks:
       - monitoring-net
@@ -39,6 +40,7 @@ services:
   alloy:
     image: docker.io/grafana/alloy:v1.15.0@sha256:579582bce40049f2e27bd1e445000689c907a41f0495cb0d0c7f65609316ba7c
     container_name: alloy
+    # Alloy needs to run as root to be able to read the journal logs from the host. In a production environment, you should use a more secure way to grant these permissions, such as using capabilities or a custom security profile.
     user: "0:0"
     networks:
       - monitoring-net
@@ -48,6 +50,7 @@ services:
       - --storage.path=/var/lib/alloy/data
       - /etc/alloy/config.alloy
     restart: unless-stopped
+    # The label=disable security option is used to disable SELinux labeling for the container, which can be necessary when the container needs to access files on the host that have different SELinux contexts. In this case, since Alloy needs to read the journal logs from the host, which may have different SELinux contexts, we disable labeling to avoid permission issues. However, be cautious when using this option, as it can have security implications. Always ensure that you understand the risks and have appropriate security measures in place when disabling SELinux labeling.
     security_opt:
       - label=disable
     volumes:
@@ -92,6 +95,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+    # Grafana runs as non-root user by default (uid 472), but we set it explicitly here for clarity. Running as non-root is a good security practice to minimize the potential impact of a compromise.
     user: "472:472"
     networks:
       - monitoring-net
@@ -332,6 +336,7 @@ services:
       - HTTPS_PROXY=
     networks:
       - monitoring-net
+    # This container is used to initialize the MinIO buckets for Loki and Tempo. It runs a simple script that waits for MinIO to be healthy, then creates the necessary buckets. After the script completes successfully, the container will exit. The loki and tempo services depend on this container with a condition of service_completed_successfully to ensure that Loki only starts after the buckets have been created.
     depends_on:
       minio:
         condition: service_healthy
@@ -381,7 +386,7 @@ services:
       retries: 3
     command:
       - '--path.rootfs=/host'
-    # MUST STAY ON HOST NETWORK
+    # MUST STAY ON HOST NETWORK TO ACCESS HOST METRICS!
     pid: host
     network_mode: host
     restart: unless-stopped
@@ -428,12 +433,14 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+    # Podman Exporter needs to run as root to access the Podman socket and gather metrics about all containers. In a production environment, you should use a more secure way to grant these permissions, such as using capabilities or a custom security profile.
     user: "0:0"
     networks:
       - monitoring-net
     environment:
       - CONTAINER_HOST=unix:///run/podman/podman.sock
     restart: unless-stopped
+    # The label=disable security option is used to disable SELinux labeling for the container, which can be necessary when the container needs to access files on the host that have different SELinux contexts. In this case, since the Podman Exporter needs to access the Podman socket on the host, which may have a different SELinux context, we disable labeling to avoid permission issues.
     security_opt:
       - label=disable
     volumes:
@@ -487,8 +494,6 @@ services:
     container_name: tempo
     command: 
       - "-config.file=/etc/tempo.yaml"
-      # - "-health"
-      # - "-health.url=http://localhost:3200/ready"
     user: "0:0"
     networks:
       - monitoring-net
@@ -520,6 +525,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+    # Traefik needs to run as root to bind to low ports (80 and 443) and to access the Docker socket for dynamic configuration. 
     security_opt:
       - label=disable
     ports:
@@ -568,6 +574,7 @@ services:
       - "traefik.http.services.webhook.loadbalancer.server.port=8080"
 
 volumes:
+  # Volumes for persistent data storage
   prometheus-data:
   grafana-data:
   loki-wal:
