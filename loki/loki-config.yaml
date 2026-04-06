@@ -56,8 +56,10 @@ ruler:
   enable_api: true
 
 limits_config:
+  ingestion_rate_mb: 10
+  ingestion_burst_size_mb: 20
   retention_period: 168h # Retain logs for 168 hours (7 days)
   reject_old_samples: true
-  reject_old_samples_max_age: 84h # Accept logs up to a week old
+  reject_old_samples_max_age: 96h # Accept logs up 4 days old
   # Max logs in the future (timezone issues)
   creation_grace_period: 2h
