@@ -386,6 +386,7 @@ services:
       retries: 3
     command:
       - '--path.rootfs=/host'
+      - '--collector.systemd'
     # MUST STAY ON HOST NETWORK TO ACCESS HOST METRICS!
     pid: host
     network_mode: host

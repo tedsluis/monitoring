@@ -43,7 +43,7 @@ groups:
         annotations:
           summary: "Memory almost full ({{ $labels.instance }})"
           description: "RAM memory is almost out (< 10% free)."
-      
+
       # 5. Memory pressure (high page faults)
       - alert: HostMemoryUnderMemoryPressure
         expr: (rate(node_vmstat_pgmajfault[5m]) > 1000)
@@ -399,7 +399,7 @@ groups:
   # ---------------------------------------------------------
   - name: podman_exporter_alerts
     rules:
-      # 39. Alarm if a container stops (except if you stop it yourself, 
+      # 39. Alarm if a container stops (except if you stop it yourself,
         # this looks at containers that are 'not running' but do exist).
         # The podman-exporter uses integers for status:
         # -1=unknown, 0=created, 1=initialized, 2=running,
@@ -431,8 +431,8 @@ groups:
         # We use podman_container_exit_code as basis, so $value is the actual exit_code number.
         expr: >
           (
-            podman_container_exit_code != 0 
-            and on(id, instance) 
+            podman_container_exit_code != 0
+            and on(id, instance)
             podman_container_state == 5
           ) * on(id, instance) group_left(name, image) podman_container_info
         for: 1m
@@ -603,15 +603,43 @@ groups:
   # ---------------------------------------------------------
   - name: grafana_alerts
     rules:
-      # --- GRAFANA ---
-      - alert: GrafanaAlertingError
-        expr: rate(grafana_alerting_schedule_query_errors_total[5m]) > 0
-        for: 5m
+      - alert: GrafanaDown
+        expr: up{job="grafana"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Grafana is offline"
+          description: "The Grafana dashboard cannot be reached by Prometheus."
+
+  # ---------------------------------------------------------
+  # KeepHQ Alerts
+  # ---------------------------------------------------------
+  - name: keephq_alerts
+    rules:
+      # Alerts when KeepHQ API reacts slow
+      - alert: KeepHQApiSlow
+        expr: rate(keep_http_request_duration_seconds_sum[5m]) / rate(keep_http_request_duration_seconds_count[5m]) > 2
+        for: 2m
         labels:
           severity: warning
         annotations:
-          summary: "Grafana Alerting Errors"
-          description: "Grafana cannot evaluate its own alerts."
+          summary: "KeepHQ is traag"
+          description: "Average response time of KeepHQ is greater than 2 seconds."
+
+  # ---------------------------------------------------------
+  # Karma Alerts
+  # ---------------------------------------------------------
+  - name: karma_alerts
+    rules:
+      - alert: KarmaDashboardDown
+        expr: up{job="karma"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Karma is offline"
+          description: "The Karma dashboard cannot be reached by Prometheus."
 
   # ---------------------------------------------------------
   # Alloy Alerts
@@ -620,8 +648,8 @@ groups:
     rules:
       # --- ALLOY ---
       - alert: AlloyUnhealthy
-        # Alloy exposes 'alloy_component_health' (0=healthy, 1=unhealthy)
-        expr: alloy_component_health == 1
+        # This alert assumes that the alloy_component_controller_running_components metric has a label 'health_type' that can be 'healthy' or 'unhealthy'.
+        expr: alloy_component_controller_running_components{health_type="unhealthy"} > 0
         for: 2m
         labels:
           severity: warning
@@ -630,7 +658,7 @@ groups:
           description: "Component {{ $labels.component_id }} in Alloy reports a error."
 
       - alert: GrafanaAlloyServiceDown
-        expr: count by (instance) (alloy_build_info) unless count by (instance) (alloy_build_info offset 2m)  
+        expr: count by (instance) (alloy_build_info) unless count by (instance) (alloy_build_info offset 2m)
         for: 0m
         labels:
           severity: critical
@@ -640,7 +668,7 @@ groups:
 
   # ---------------------------------------------------------
   # Blackbox Exporter Alerts
-  # --------------------------------------------------------- 
+  # ---------------------------------------------------------
   - name: blackbox_alerts
     rules:
       - alert: ServiceHealthCheckFailed
@@ -778,7 +806,7 @@ groups:
 
   # ---------------------------------------------------------
   # MinIO Alerts
-  # --------------------------------------------------------- 
+  # ---------------------------------------------------------
   - name: minio_alerts
     rules:
       - alert: MinioClusterOffline
@@ -790,14 +818,14 @@ groups:
           summary: "MinIO Node Offline"
           description: "A node in the MinIO cluster is offline."
 
-      - alert: MinioDiskOffline
-        expr: minio_cluster_disk_offline_total > 0
+      - alert: MinioDriveOffline
+        expr: minio_cluster_drive_offline_total > 0
         for: 1m
         labels:
           severity: warning
         annotations:
-          summary: "MinIO Disk Offline"
-          description: "A disk in MinIO is not available."
+          summary: "MinIO Drive Offline"
+          description: "A drive in MinIO is not available."
 
   # ---------------------------------------------------------
   # Tempo Alerts
@@ -813,3 +841,27 @@ groups:
         annotations:
           summary: "Service {{ $labels.service }} is slow."
           description: "The 95th percentile latency of traces is higher than 2s."
+
+# ---------------------------------------------------------
+  # Traefik Alerts
+  # ---------------------------------------------------------
+  - name: traefik_alerts
+    rules:
+      - alert: TraefikDown
+        expr: up{job="traefik"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Traefik is offline"
+          description: "Traefik reverse proxy does not respond."
+
+      - alert: TraefikHighHttp5xxErrorRate
+        # Warning if more than 5% of requests result in 5xx errors.
+        expr: sum(rate(traefik_entrypoint_request_duration_seconds_count{code=~"5.."}[5m])) / sum(rate(traefik_entrypoint_request_duration_seconds_count[5m])) * 100 > 5
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Many 5xx errors in Traefik"
+          description: "More than 5% of all incoming requests via Traefik result in a 5xx server error. Check the backend containers!"
