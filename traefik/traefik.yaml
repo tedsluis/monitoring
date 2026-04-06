@@ -10,6 +10,7 @@ log:
 
 # Tracing
 tracing:
+  # The serviceName is used to identify the service in the traces, which can be useful for filtering and analyzing the traces in Tempo and Grafana's Explore feature.
   serviceName: "traefik-proxy"
   otlp:
     grpc:
@@ -17,6 +18,7 @@ tracing:
       insecure: true
 
 entryPoints:
+  # The web entry point is used for HTTP traffic and will redirect to HTTPS.
   web:
     address: ":80"
     http:
@@ -26,6 +28,7 @@ entryPoints:
           scheme: https
   
   websecure:
+    # The websecure entry point is used for HTTPS traffic and will use TLS with the specified certificates. The address is set to ":443" to listen on all interfaces on port 443, which is the standard port for HTTPS traffic.
     address: ":443"
     http:
       tls:
@@ -34,13 +37,16 @@ entryPoints:
             sans:
               - "*.localhost"
   otlp:
+    # The otlp entry point is used for receiving traces from the OpenTelemetry Collector. The address is set to ":4317" to listen on all interfaces on port 4317, which is the standard port for OTLP gRPC traffic.
     address: ":4317"
 
   metrics:
+    # The metrics entry point is used for exposing Traefik's metrics in a format that Prometheus can scrape.
     address: ":8082"
 
 providers:
   docker:
+    # The Docker provider allows Traefik to automatically discover and configure services based on Docker containers. By setting exposedByDefault to false, we ensure that only containers that are explicitly labeled will be exposed by Traefik, which is a good security practice to prevent unintended exposure of services.
     endpoint: "unix:///var/run/docker.sock"
     exposedByDefault: false
   # Here we tell Traefik to look in this directory for dynamic configs (like TLS!)
@@ -49,6 +55,7 @@ providers:
     watch: true
 
 metrics:
+  # The Prometheus entry point is used for exposing Traefik's metrics in a format that Prometheus can scrape.
   prometheus:
     entryPoint: "metrics"
     addEntryPointsLabels: true
@@ -56,4 +63,5 @@ metrics:
     addServicesLabels: true
 
 ping:
+  # The ping entry point is used for health checks, allowing us to monitor the health of Traefik itself. By setting the entryPoint to "metrics", we can use the same port for both metrics and health checks, which simplifies the configuration and reduces the number of open ports.
   entryPoint: "metrics"
