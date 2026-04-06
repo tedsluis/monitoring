@@ -407,7 +407,7 @@ groups:
       - alert: PodmanContainerDown
         # We take the state (!= 2) and multiply it with the info metric (which always has value 1).
         # We 'join' them based on 'id' and 'instance' and pull the 'name' label into it.
-        expr: (podman_container_state != 2) * on(id, instance) group_left(name) podman_container_info
+        expr: (podman_container_state != 2) * on(id, instance) group_left(name) podman_container_info{name!="minio-init"}
         for: 1m
         labels:
           severity: critical
@@ -788,7 +788,7 @@ groups:
           severity: critical
         annotations:
           summary: "MinIO Node Offline"
-          description: "Een node in het MinIO cluster is offline."
+          description: "A node in the MinIO cluster is offline."
 
       - alert: MinioDiskOffline
         expr: minio_cluster_disk_offline_total > 0
