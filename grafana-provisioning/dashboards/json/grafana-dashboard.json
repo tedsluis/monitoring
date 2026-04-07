@@ -18,7 +18,6 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 13,
   "links": [],
   "panels": [
     {
@@ -95,16 +94,18 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "process_start_time_seconds{kubernetes_pod_name=\"$pod\"} * 1000",
+          "editorMode": "code",
+          "expr": "process_start_time_seconds{instance=\"grafana:3000\"} * 1000",
           "format": "time_series",
           "intervalFactor": 2,
+          "range": true,
           "refId": "A"
         }
       ],
@@ -172,7 +173,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
@@ -249,7 +250,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
@@ -326,7 +327,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
@@ -443,7 +444,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
@@ -548,7 +549,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
@@ -664,7 +665,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
@@ -782,7 +783,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
@@ -880,7 +881,7 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "s"
         },
         "overrides": []
       },
@@ -909,17 +910,19 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "http_request_total{kubernetes_pod_name=\"$pod\"}",
+          "editorMode": "code",
+          "expr": "rate(grafana_http_request_duration_seconds_bucket{job=\"grafana\"}[1m])",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "{{handler}} - {{method}} - {{statuscode}}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -1014,7 +1017,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
@@ -1143,7 +1146,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
@@ -1270,7 +1273,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
@@ -1388,17 +1391,19 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_api_dashboard_get_milliseconds{kubernetes_pod_name=\"$pod\", quantile=\"0.5\"}",
+          "editorMode": "code",
+          "expr": "grafana_api_dashboard_get_milliseconds{quantile=\"0.5\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "0.5",
+          "range": true,
           "refId": "A"
         },
         {
@@ -1406,10 +1411,12 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_api_dashboard_get_milliseconds{kubernetes_pod_name=\"$pod\", quantile=\"0.9\"}",
+          "editorMode": "code",
+          "expr": "grafana_api_dashboard_get_milliseconds{ quantile=\"0.9\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "0.9",
+          "range": true,
           "refId": "B"
         },
         {
@@ -1417,10 +1424,12 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_api_dashboard_get_milliseconds{kubernetes_pod_name=\"$pod\", quantile=\"0.99\"}",
+          "editorMode": "code",
+          "expr": "grafana_api_dashboard_get_milliseconds{quantile=\"0.99\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "0.99",
+          "range": true,
           "refId": "C"
         }
       ],
@@ -1515,17 +1524,19 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(grafana_api_dashboard_get_milliseconds_sum{kubernetes_pod_name=\"$pod\"}[5m]) / rate(grafana_api_dashboard_get_milliseconds_count{kubernetes_pod_name=\"$pod\"}[5m])",
+          "editorMode": "code",
+          "expr": "rate(grafana_api_dashboard_get_milliseconds_sum{}[5m]) / rate(grafana_api_dashboard_get_milliseconds_count{}[5m])",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "0.5",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -1633,17 +1644,19 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_api_dashboard_save_milliseconds{kubernetes_pod_name=\"$pod\", quantile=\"0.5\"}",
+          "editorMode": "code",
+          "expr": "grafana_api_dashboard_save_milliseconds{quantile=\"0.5\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "0.5",
+          "range": true,
           "refId": "A"
         },
         {
@@ -1651,10 +1664,12 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_api_dashboard_save_milliseconds{kubernetes_pod_name=\"$pod\", quantile=\"0.9\"}",
+          "editorMode": "code",
+          "expr": "grafana_api_dashboard_save_milliseconds{quantile=\"0.9\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "0.9",
+          "range": true,
           "refId": "B"
         },
         {
@@ -1662,10 +1677,12 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_api_dashboard_save_milliseconds{kubernetes_pod_name=\"$pod\", quantile=\"0.99\"}",
+          "editorMode": "code",
+          "expr": "grafana_api_dashboard_save_milliseconds{quantile=\"0.99\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "0.99",
+          "range": true,
           "refId": "C"
         }
       ],
@@ -1760,17 +1777,19 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(grafana_api_dashboard_save_milliseconds_sum{kubernetes_pod_name=\"$pod\"}[5m]) / rate(grafana_api_dashboard_save_milliseconds_count{kubernetes_pod_name=\"$pod\"}[5m])",
+          "editorMode": "code",
+          "expr": "rate(grafana_api_dashboard_save_milliseconds_sum{}[5m]) / rate(grafana_api_dashboard_save_milliseconds_count{}[5m])",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "0.5",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -1878,17 +1897,19 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_api_dashboard_search_milliseconds{kubernetes_pod_name=\"$pod\", quantile=\"0.5\"}",
+          "editorMode": "code",
+          "expr": "grafana_api_dashboard_search_milliseconds{quantile=\"0.5\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "0.5",
+          "range": true,
           "refId": "A"
         },
         {
@@ -1896,10 +1917,12 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_api_dashboard_search_milliseconds{kubernetes_pod_name=\"$pod\", quantile=\"0.9\"}",
+          "editorMode": "code",
+          "expr": "grafana_api_dashboard_search_milliseconds{quantile=\"0.9\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "0.9",
+          "range": true,
           "refId": "B"
         },
         {
@@ -1907,10 +1930,12 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_api_dashboard_search_milliseconds{kubernetes_pod_name=\"$pod\", quantile=\"0.99\"}",
+          "editorMode": "code",
+          "expr": "grafana_api_dashboard_search_milliseconds{quantile=\"0.99\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "0.99",
+          "range": true,
           "refId": "C"
         }
       ],
@@ -2005,17 +2030,19 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(grafana_api_dashboard_search_milliseconds_sum{kubernetes_pod_name=\"$pod\"}[5m]) / rate(grafana_api_dashboard_search_milliseconds_count{kubernetes_pod_name=\"$pod\"}[5m])",
+          "editorMode": "code",
+          "expr": "rate(grafana_api_dashboard_search_milliseconds_sum{}[5m]) / rate(grafana_api_dashboard_search_milliseconds_count{}[5m])",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "0.5",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -2030,48 +2057,16 @@
     "grafana"
   ],
   "templating": {
-    "list": [
-      {
-        "current": {
-          "text": "",
-          "value": ""
-        },
-        "datasource": "prometheus",
-        "includeAll": false,
-        "label": "Pod",
-        "name": "pod",
-        "options": [],
-        "query": "label_values(grafana_info,kubernetes_pod_name)",
-        "refresh": 2,
-        "regex": "",
-        "sort": 1,
-        "type": "query"
-      },
-      {
-        "current": {
-          "text": "",
-          "value": ""
-        },
-        "datasource": "prometheus",
-        "includeAll": false,
-        "label": "Version",
-        "name": "version",
-        "options": [],
-        "query": "label_values(grafana_info,version)",
-        "refresh": 2,
-        "regex": "",
-        "sort": 1,
-        "type": "query"
-      }
-    ]
+    "list": []
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-6h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "Grafana Internals Dashboard",
   "uid": "grafana-internals-dashboard",
-  "version": 1
+  "version": 2,
+  "weekStart": ""
 }
