@@ -232,7 +232,7 @@ note: The minio-init container only runs when starting MinIo.
 
 *   **What it is:** `podman-compose` is a script that allows you to manage multi-container environments using Podman. It is fully compatible with the Compose specification, meaning you can often use your existing `docker-compose` projects without any modifications.
 *   **How it works:** Under the hood, `podman-compose` reads your configuration file and translates the instructions into native Podman commands. Because Podman is daemonless and rootless, `podman-compose` executes these commands in the context of the user running it. It automatically handles the creation of networks (or Pods, depending on the configuration) so your containers can securely discover and communicate with each other locally.
-*   **The Role of [compose.yml](./compose.yml):** The [compose.yml](./compose.yml) file serves as the definitive blueprint for your application stack. It is a declarative YAML file where you define your entire infrastructure as code: services, image versions, port mappings, persistent volumes, and environment variables. Instead of manually executing long strings of CLI commands, you simply run `podman-compose up -d`, and the tool reads this file to build, connect, and start your entire environment in a reproducible way.
+*   **The Role of [./compose.yml](./compose.yml):** The [./compose.yml](./compose.yml) file serves as the definitive blueprint for your application stack. It is a declarative YAML file where you define your entire infrastructure as code: services, image versions, port mappings, persistent volumes, and environment variables. Instead of manually executing long strings of CLI commands, you simply run `podman-compose up -d`, and the tool reads this file to build, connect, and start your entire environment in a reproducible way.
 
 ```bash
    # Podman Help
@@ -293,7 +293,7 @@ Docs: https://podman.io/docs
 
 Go to **https://localhost**
 
-To make navigating this observability stack effortless, we use NGINX to serve a static landing page [index.html](./landing-page/index.html). This page acts as the central frontend portal for all the monitoring tools. 
+To make navigating this observability stack effortless, we use NGINX to serve a static landing page [./index.html](./landing-page/index.html). This page acts as the central frontend portal for all the monitoring tools. 
 
 ![nginx](./images/nginx-detailed-diagram.svg)
 
@@ -334,7 +334,7 @@ Unlike traditional monitoring tools that wait for systems to send data to them, 
 
 ![prometheus](./images/prometheus-detailed-diagram.svg)
 
-**How it works in this stack (prometheus.yml):** The central brain instructing Prometheus what to do is located in [prometheus/prometheus.yml](./prometheus/prometheus.yml). This configuration file orchestrates several crucial tasks:
+**How it works in this stack (prometheus.yml):** The central brain instructing Prometheus what to do is located in [./prometheus/prometheus.yml](./prometheus/prometheus.yml). This configuration file orchestrates several crucial tasks:
 
 * **Global Settings:** It defines the default scrape_interval (typically 15 seconds), dictating how often Prometheus polls the targets for fresh data.
 * **Rule Files:** It instructs Prometheus to load and evaluate the alert rules defined in alert.rules.yml (e.g., "Alert if disk space is > 90%").
@@ -379,7 +379,7 @@ In a typical workflow, a collector like Grafana Alloy gathers logs from your con
 
 ![loki](./images/loki-detailed-diagram.svg)
 
-**How it works in this stack (loki-config.yaml):** The core behavior of Loki in this environment is defined in [loki/loki-config.yaml](./loki/loki-config.yaml):
+**How it works in this stack (loki-config.yaml):** The core behavior of Loki in this environment is defined in [./loki/loki-config.yaml](./loki/loki-config.yaml):
 
 * **S3 Storage Backend (MinIO):** Rather than saving heavy log files to local disk, Loki is configured to use the s3 storage type. It connects directly to the local MinIO instance (`http://minio:9000`) using the `minio` / `minio123` credentials and stores all log chunks in the loki-data bucket.
 * **TSDB Indexing:** The `schema_config` defines that Loki uses tsdb (Time Series Database) for its index. This is the modern, highly optimized index format for Loki that drastically improves query performance and reduces storage costs compared to older formats.
@@ -414,7 +414,7 @@ In this observability stack, applications (and components like Traefik and Grafa
 
 ![tempo](./images/tempo-detailed-diagram.svg)
 
-**How it works in this stack (tempo.yaml):** The internal workings and storage behaviors of Tempo are configured in [tempo/tempo.yaml](./tempo/tempo.yaml). This file instructs Tempo on how to handle incoming traces and where to put them:
+**How it works in this stack (tempo.yaml):** The internal workings and storage behaviors of Tempo are configured in [./tempo/tempo.yaml](./tempo/tempo.yaml). This file instructs Tempo on how to handle incoming traces and where to put them:
 
 * **Receivers:** Configures Tempo to ingest trace data. In our setup, it primarily receives traces via the OTLP protocol directly from the local OpenTelemetry Collector.
 * **S3 Storage Backend (MinIO):** Instructs Tempo to use the s3 storage backend. It connects to our local MinIO instance (`http://minio:9000`) using the minio credentials and stores all trace blocks securely in the tempo-data bucket.
@@ -628,7 +628,7 @@ https://keep.localhost
 
 **How it works in this stack:** KeepHQ is deployed using three containers: a PostgreSQL database (`keep-db`), the core API and AIOps engine (`keep-backend`), and the web interface (`keep-frontend`).
 
-**Automatic Provider Configuration (IaC):** For KeepHQ to intelligently correlate alerts and execute workflows, it needs access to your metrics and logs. Instead of manually configuring these connections in the Keep UI, this stack automatically provisions them on startup using provider configuration files located in `[keep/providers/](./keep/providers/)`:
+**Automatic Provider Configuration (IaC):** For KeepHQ to intelligently correlate alerts and execute workflows, it needs access to your metrics and logs. Instead of manually configuring these connections in the Keep UI, this stack automatically provisions them on startup using provider configuration files located in `./keep/providers/`:
 
 | provider config                                   | description                                                                                                                                                                                                   |
 |---------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -693,7 +693,7 @@ Go to https://alloy.localhost
 
 ![alloy](./images/alloy-detailed-diagram.svg)
 
-**How it works in this stack (config.alloy):** The configuration file located at [alloy/config.alloy](./alloy/config.alloy) defines two main data streams that converge into a single output pushed to Loki:
+**How it works in this stack (config.alloy):** The configuration file located at [./alloy/config.alloy](./alloy/config.alloy) defines two main data streams that converge into a single output pushed to Loki:
 
 * **Stream 1:** Container Logs (`Podman Socket`): Alloy discovers all running containers via the local Podman socket (/var/run/docker.sock). Instead of just grabbing raw logs, it enriches them with highly useful metadata. It extracts the container_name, shortens the container_id to 12 characters for precision, and tags the image, pod_name, and compose project. This enrichment is what allows you to effortlessly filter logs in Grafana based on specific containers or pods.
 * **Stream 2:** Host System Logs (`Journald`): Alloy also reads the host machine's system logs directly from /var/log/journal. It extracts the systemd unit (e.g., sshd.service), syslog_identifier, and the log level (e.g., info, warning, err) so you can quickly filter for host-level errors.
@@ -722,7 +722,7 @@ https://blackbox.localhost
 
 **How it works in this stack:** The Blackbox Exporter acts as a proxy. Prometheus asks the Blackbox Exporter to probe a specific target using a specific module, and the Exporter returns metrics based on the result of that probe (e.g., probe_success, probe_duration_seconds).
 
-* **Configuration (blackbox.yml):** The configuration file located at [blackbox/blackbox.yml](./blackbox/blackbox.yml) defines the modules (the "how"). For instance, it configures an `http_2xx` module which dictates that a probe is only successful if the target returns an HTTP 200 OK status. It also defines modules like tcp_connect to verify if a raw network port is open.
+* **Configuration (blackbox.yml):** The configuration file located at [./blackbox/blackbox.yml](./blackbox/blackbox.yml) defines the modules (the "how"). For instance, it configures an `http_2xx` module which dictates that a probe is only successful if the target returns an HTTP 200 OK status. It also defines modules like tcp_connect to verify if a raw network port is open.
 * **Prometheus Scrape Jobs** (`prometheus.yaml`): While blackbox.yml defines the methods, prometheus.yaml defines the targets (the "what"). This stack includes several dedicated scrape jobs to ensure critical services are running:
 
 | prometheus scrape Job | description                                                                                                                                                                                                                                                  |
