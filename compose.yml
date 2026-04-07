@@ -488,7 +488,6 @@ services:
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
 
   # ---------------------------------------------------------
-  # ---------------------------------------------------------
   # Tempo
   # ---------------------------------------------------------
   tempo:
@@ -497,6 +496,11 @@ services:
     command: 
       - "-config.file=/etc/tempo.yaml"
     user: "0:0"
+    environment:
+      - http_proxy=
+      - https_proxy=
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
     networks:
       - monitoring-net
     # OTel gaat via Collector of Traefik
