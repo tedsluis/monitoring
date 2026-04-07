@@ -180,7 +180,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_stat_total_orgs{kubernetes_pod_name=\"$pod\"}",
+          "expr": "grafana_stat_total_orgs{instance=\"grafana:3000\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "refId": "A"
@@ -257,7 +257,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_stat_total_users{kubernetes_pod_name=\"$pod\"}",
+          "expr": "grafana_stat_total_users{instance=\"grafana:3000\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "refId": "A"
@@ -334,7 +334,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_stat_totals_dashboard{kubernetes_pod_name=\"$pod\"}",
+          "expr": "grafana_stat_totals_dashboard{instance=\"grafana:3000\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "refId": "A"
@@ -451,7 +451,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "avg(rate(process_cpu_seconds_total{kubernetes_pod_name=\"$pod\"}[5m]))",
+          "expr": "avg(rate(process_cpu_seconds_total{instance=\"grafana:3000\"}[5m]))",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "CPU Time",
@@ -556,7 +556,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "avg(rate(process_resident_memory_bytes{kubernetes_pod_name=\"$pod\"}[5m]))",
+          "expr": "avg(rate(process_resident_memory_bytes{instance=\"grafana:3000\"}[5m]))",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Resident Mem",
@@ -567,7 +567,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "avg(rate(process_virtual_memory_bytes{kubernetes_pod_name=\"$pod\"}[5m]))",
+          "expr": "avg(rate(process_virtual_memory_bytes{instance=\"grafana:3000\"}[5m]))",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Virtual Mem",
@@ -672,7 +672,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "process_open_fds{kubernetes_pod_name=\"$pod\"}",
+          "expr": "process_open_fds{instance=\"grafana:3000\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Open FD",
@@ -790,7 +790,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_api_response_status_total{kubernetes_pod_name=\"$pod\"}",
+          "expr": "grafana_api_response_status_total{instance=\"grafana:3000\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "API {{ code }}",
@@ -801,7 +801,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_page_response_status_total{kubernetes_pod_name=\"$pod\"}",
+          "expr": "grafana_page_response_status_total{instance=\"grafana:3000\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Page {{ code }}",
@@ -812,7 +812,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_proxy_response_status_total{kubernetes_pod_name=\"$pod\"}",
+          "expr": "grafana_proxy_response_status_total{instance=\"grafana:3000\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Proxy {{ code }}",
@@ -1024,7 +1024,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_api_login_post_total{kubernetes_pod_name=\"$pod\"}",
+          "expr": "grafana_api_login_post_total{instance=\"grafana:3000\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "POST",
@@ -1035,7 +1035,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_api_login_oauth_total{kubernetes_pod_name=\"$pod\"}",
+          "expr": "grafana_api_login_oauth_total{instance=\"grafana:3000\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "OAuth",
@@ -1153,7 +1153,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_api_dataproxy_request_all_milliseconds{kubernetes_pod_name=\"$pod\", quantile=\"0.5\"}",
+          "expr": "grafana_api_dataproxy_request_all_milliseconds{instance=\"grafana:3000\", quantile=\"0.5\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "0.5 ",
@@ -1164,7 +1164,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_api_dataproxy_request_all_milliseconds{kubernetes_pod_name=\"$pod\", quantile=\"0.9\"}",
+          "expr": "grafana_api_dataproxy_request_all_milliseconds{instance=\"grafana:3000\", quantile=\"0.9\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "0.9",
@@ -1175,7 +1175,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "grafana_api_dataproxy_request_all_milliseconds{kubernetes_pod_name=\"$pod\", quantile=\"0.99\"}",
+          "expr": "grafana_api_dataproxy_request_all_milliseconds{instance=\"grafana:3000\", quantile=\"0.99\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "0.99",
@@ -1280,7 +1280,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(grafana_api_dataproxy_request_all_milliseconds_sum{kubernetes_pod_name=\"$pod\"}[5m]) / rate(grafana_api_dataproxy_request_all_milliseconds_count{kubernetes_pod_name=\"$pod\"}[5m])",
+          "expr": "rate(grafana_api_dataproxy_request_all_milliseconds_sum{instance=\"grafana:3000\"}[5m]) / rate(grafana_api_dataproxy_request_all_milliseconds_count{instance=\"grafana:3000\"}[5m])",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Average Requests Duration",
