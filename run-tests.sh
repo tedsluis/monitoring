@@ -61,7 +61,7 @@ if [ -z "$NETWORK" ]; then
 fi
 echo "🔌 [INFO] Using internal network: $NETWORK"
 
-CURL_CMD="podman run --rm --network $NETWORK docker.io/curlimages/curl:latest"
+CURL_CMD="podman run --rm -e http_proxy= -e HTTP_PROXY= -e https_proxy= -e HTTPS_PROXY= --network $NETWORK docker.io/curlimages/curl:latest"
 echo "   [INFO] Using ephemeral curl container for internal API testing."
 
 echo "----------------------------------------"
