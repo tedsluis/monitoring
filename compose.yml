@@ -394,6 +394,7 @@ services:
     volumes:
       - '/:/host:ro,rslave'
       - '/run/udev/data:/run/udev/data:ro'
+      - '/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro'
     # Note: Traefik config for this is in traefik/dynamic/services.yaml
 
   # ---------------------------------------------------------
