@@ -224,7 +224,87 @@ af2575426baf  docker.io/grafana/loki@sha256:3c8fd3570dd9219951a60d3f919c7f31923d
 ce958ef62c3e  docker.io/otel/opentelemetry-collector-contrib@sha256:8164eab2e6bca9c9b0837a8d2f118a6618489008a839db7f9d6510e66be3923c   --config=/etc/ote...  13 hours ago  Up 13 hours              4317-4318/tcp, 55679/tcp                                          otel-collector
 66c8b0604c18  docker.io/grafana/grafana@sha256:e932bd6ed0e026595b08483cd0141e5103e1ab7ff8604839ff899b8dc54cabcb                                              13 hours ago  Up 13 hours (healthy)    3000/tcp                                                          grafana
 ```
-note: The minio-init container only runs when starting MinIo.
+note: The `minio-init` container only runs when starting MinIo.
+
+Run the test script:
+```bash
+$ ./run-tests.sh 
+========================================
+🚀 Starting Automated Validation Suite
+========================================
+🔍 [CHECK] Smoketest: Are all defined containers running?
+   [INFO] Expected container count from compose.yml: 19
+   [INFO] Currently running containers: 19
+✅ [SUCCESS] All required containers are running.
+----------------------------------------
+⏳ [WAIT] Checking container health status (Minio, Loki, Tempo)...
+   [INFO] Waiting for minio to become healthy...
+   [SUCCESS] minio is healthy!
+   [INFO] Waiting for keep-db to become healthy...
+   [SUCCESS] keep-db is healthy!
+🔍 [CHECK] Identifying internal Podman network...
+🔌 [INFO] Using internal network: monitoring_monitoring-net
+   [INFO] Using ephemeral curl container for internal API testing.
+----------------------------------------
+🔍 [TEST] Prometheus API & Base Health
+✅ [SUCCESS] Prometheus API is reachable and reports healthy.
+----------------------------------------
+🔍 [TEST] Prometheus Targets (Max 2 minutes wait)
+   [INFO] Fetching Prometheus targets (Attempt 1/12)...
+⚠️  [WARN] Still 1 target(s) DOWN or not scraped yet. Retrying in 10s...
+   [INFO] Fetching Prometheus targets (Attempt 2/12)...
+✅ [SUCCESS] All Prometheus targets are UP and successfully scraped.
+----------------------------------------
+🔍 [TEST] Grafana API
+✅ [SUCCESS] Grafana is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Alertmanager
+✅ [SUCCESS] Alertmanager is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Keep API
+✅ [SUCCESS] Keep API is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Traefik Routing (using Nginx)
+✅ [SUCCESS] Traefik is routing requests correctly.
+----------------------------------------
+🔍 [TEST] Alloy
+✅ [SUCCESS] Alloy is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Blackbox Exporter
+✅ [SUCCESS] Blackbox Exporter is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Karma Dashboard
+✅ [SUCCESS] Karma is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Keep Frontend
+✅ [SUCCESS] Keep Frontend is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Loki
+✅ [SUCCESS] Loki is reachable and healthy.
+----------------------------------------
+🔍 [TEST] MinIO
+✅ [SUCCESS] MinIO is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Nginx
+✅ [SUCCESS] Nginx is reachable.
+----------------------------------------
+🔍 [TEST] Node Exporter
+✅ [SUCCESS] Node Exporter is reachable.
+----------------------------------------
+🔍 [TEST] OpenTelemetry Collector
+✅ [SUCCESS] OTel Collector is reachable.
+----------------------------------------
+🔍 [TEST] Podman Exporter
+✅ [SUCCESS] Podman Exporter is reachable.
+----------------------------------------
+🔍 [TEST] Tempo
+✅ [SUCCESS] Tempo is reachable and healthy.
+----------------------------------------
+🔍 [TEST] Webhook Tester
+✅ [SUCCESS] Webhook Tester is reachable.
+========================================
+🎉 [COMPLETE] All tests completed successfully! Stack is stable.
+```
 
 ### 6.6 Stop, start or restart with podman-compose
 
@@ -661,7 +741,7 @@ Go to https://minio.localhost
 
 **How it works in this stack:** 
 
-* **Automatic Bucket Provisioning:** When you start the stack, a temporary helper container named minio-init runs alongside the main MinIO server. It automatically connects to the server and creates the necessary storage buckets (loki-data and tempo-data). Once done, the helper container gracefully exits.
+* **Automatic Bucket Provisioning:** When you start the stack, a temporary helper container named `minio-init` runs alongside the main MinIO server. It automatically connects to the server and creates the necessary storage buckets (loki-data and tempo-data). Once done, the helper container gracefully exits.
 * **Storage Flow:** Loki and Tempo are configured to treat MinIO just like AWS S3. As they collect logs and traces, they bundle them into chunks and push them to their respective buckets in MinIO.
 * **Console & Management:** Through the MinIO UI (link above), you can browse these objects, inspect bucket policies, and see exactly how much storage your logs and traces are consuming.
 
