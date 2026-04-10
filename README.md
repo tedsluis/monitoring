@@ -479,7 +479,7 @@ Loki does not include a built-in user interface. Instead, it relies entirely on 
 Like most modern containers, Loki exposes Prometheus metrics too, which are used to monitor Loki using the dashboard below:
 
 *See the screenshot below for an impression of the Loki metrics dashboard:*
-![loki-metrics-dashboard](/images/loki-metrics-dashboard.png)
+![loki-metrics-dashboard](./images/loki-metrics-dashboard.png)
 
 **Docs:**
 
@@ -542,7 +542,7 @@ Go to https://alertmanager.localhost
 
 
 *See the screenshot below for an impression of the Alertmanager UI:*
-![alertmanager](/images/alertmanager.png)
+![alertmanager](./images/alertmanager.png)
 
 | configuration        | configuration file                                                  |
 |----------------------|---------------------------------------------------------------------|
@@ -590,21 +590,21 @@ The Explore mode provides an advanced interface for ad-hoc analysis and troubles
  The Loki datasource combined with LogQL makes it possible to efficiently filter log streams by labels, search for specific text patterns or regular expressions, and visualize log volumes alongside raw log lines.
 
  *See the screenshot below for an impression of the Explore logs:*
-![Loki-explore](/images/explore-logs.png)
+![Loki-explore](./images/explore-logs.png)
 
 **Prometheus metrics explore**
 
 The Prometheus datasource, combined with PromQL queries, enables iterative exploration of time-series data, trend visualization, and comparison of metrics using split-view functionality.
 
 *See the screenshot below for an impression of the Explore metrics:*
-![prometheus-explore](/images/explore-metrics.png)
+![prometheus-explore](./images/explore-metrics.png)
 
 **Tempo tracing explore**
 
 The Tempo datasource combined with TraceQL provides a detailed visualization of the lifecycle of requests through the distributed architecture. Using the waterfall view, users can analyze latency per component, isolating performance bottlenecks and errors within specific spans. Integration with TraceQL enables targeted filtering of traces, which, combined with correlated logs and metrics, allows efficient root-cause analysis during incidents. For example, it can be interesting to filter for requests that do not have an HTTP status code of 4xx or 5xx, or requests that take longer than 500ms.
 
 *See the screenshot below for an impression of the Explore traces:*
-![tempo-explore](/images/explore-traces.png)
+![tempo-explore](./images/explore-traces.png)
 
 
 To manually test the proxy path by sending a traceparent header, run this command in your terminal:
@@ -615,27 +615,27 @@ Next, in Grafana, go to Tempo Explore and search for the exact Trace ID: 1111222
 If propagation works, you'll see a beautiful trace tree with the Traefik span at the top and the Grafana span below.
 
 *See the screenshot below for an impression of the Explore traces - service graph:*
-![traces-explore](/images/explore-traces-service-graph.png)
+![traces-explore](./images/explore-traces-service-graph.png)
 
 #### 7.7.3 Drilldown
 
 The drill-down functionality within Grafana offers the ability to connect in-depth error analysis through metrics, logs and traces contextually with each other. From an anomaly in a metrics dashboard, you can directly navigate to the correlated log lines in Loki, and then use automatically detected trace IDs to switch to detailed request spans in Tempo. This integration eliminates the need to manually synchronize timestamps and identifiers between different datasources, significantly increasing the efficiency of root cause analysis and performance optimization.
 
 *See the screenshot below for an impression of the Metrics drilldown:*
-![Metrics-drilldown](/images/drilldown-metrics-dashboard.png)
+![Metrics-drilldown](./images/drilldown-metrics-dashboard.png)
 
 *See the screenshot below for an impression of the Logs drilldown:*
-![loki-drilldown](/images/drill-down-logs-dashboard.png)
+![loki-drilldown](./images/drill-down-logs-dashboard.png)
 
 *See the screenshot below for an impression of the Traces drilldown:*
-![traces-drilldown](/images/drilldown-breakdown.png)
+![traces-drilldown](./images/drilldown-breakdown.png)
 
 #### 7.7.4 Grafana alerts
 
 Grafana Alerting provides a central interface for monitoring alerts. This module aggregates alert rules from both Prometheus (for metrics) and Loki (for log data), creating an overview of the operational status. Through this dashboard you can analyze the real-time status of alerts (‘Pending’ or ‘Firing’), examine the underlying query definitions, and gain insight into the evaluation criteria that safeguard the platform’s stability and availability.
 
 *See the screenshot below for an impression of the Grafana Alerting:*
-![grafana-alerting](/images/grafana-alerts.png)
+![grafana-alerting](./images/grafana-alerts.png)
 
 #### 7.7.5 Grafana datasources
 
@@ -664,7 +664,6 @@ Go to https://karma.localhost
 * **Noise Reduction:** It automatically filters out constant background alerts like the 'Watchdog' (dead man's switch) and strips redundant receiver labels to keep the dashboard clean and actionable.
 * **Live Auto-Refresh:** The dashboard automatically refreshes every 20 seconds so you never miss a critical state change.
 
-
 | configuration        | configuration file                         |
 |----------------------|--------------------------------------------|
 | Karma config         | [./karma/karma.yaml](./karma/karma.yaml)   |
@@ -672,6 +671,9 @@ Go to https://karma.localhost
 **See the screenshot below for an impression of the Karma UI:*
 ![karma](images/karma.png)
 An overview of all active warnings (e.g., "Disk almost full", "Container down" or "Health Check Failed").
+
+*See the screenshot below for an impression of the karma metrics dashboard:*
+![karma-metrics-dashboard](./images/karma-metrics-dashboard.png)
 
 **Docs:**
 
@@ -692,7 +694,7 @@ Go to https://webhook-tester.localhost
 * **Integration Testing:** Verifying that the alert routing rules in Alertmanager are working correctly and actually triggering the appropriate webhooks.
 
 *See the screenshot below for an impression of the Webhook-tester UI:*
-![webhook-tester-ui](/images/webhook-tester.png)
+![webhook-tester-ui](./images/webhook-tester.png)
 
 **Docs:**
 
@@ -775,8 +777,8 @@ Go to https://alloy.localhost
 
 **How it works in this stack (config.alloy):** The configuration file located at [./alloy/config.alloy](./alloy/config.alloy) defines two main data streams that converge into a single output pushed to Loki:
 
-* **Stream 1:** Container Logs (`Podman Socket`): Alloy discovers all running containers via the local Podman socket (/var/run/docker.sock). Instead of just grabbing raw logs, it enriches them with highly useful metadata. It extracts the container_name, shortens the container_id to 12 characters for precision, and tags the image, pod_name, and compose project. This enrichment is what allows you to effortlessly filter logs in Grafana based on specific containers or pods.
-* **Stream 2:** Host System Logs (`Journald`): Alloy also reads the host machine's system logs directly from /var/log/journal. It extracts the systemd unit (e.g., sshd.service), syslog_identifier, and the log level (e.g., info, warning, err) so you can quickly filter for host-level errors.
+* **Stream 1:** Container Logs (`Podman Socket`): Alloy discovers all running containers via the local Podman socket (`/var/run/docker.sock`). Instead of just grabbing raw logs, it enriches them with highly useful metadata. It extracts the container_name, shortens the container_id to 12 characters for precision, and tags the image, pod_name, and compose project. This enrichment is what allows you to effortlessly filter logs in Grafana based on specific containers or pods.
+* **Stream 2:** Host System Logs (`Journald`): Alloy also reads the host machine's system logs directly from `/var/log/journal`. It extracts the systemd unit (e.g., sshd.service), syslog_identifier, and the log level (e.g., info, warning, err) so you can quickly filter for host-level errors.
 * **Smart Deduplication:** Because rootless Podman automatically writes container logs to the host's system journal as well, simply collecting both streams would result in duplicate logs in Loki. The config.alloy explicitly prevents this by applying a loki.relabel rule that drops any journald log containing a container ID. This ensures your logs remain clean and accurate.
 
 Through the Alloy web UI, you can view the health of these components and visually inspect the data flow pipeline using the Graph tab.
@@ -814,7 +816,7 @@ https://blackbox.localhost
 | blackbox_exporter     | This job doesn't probe external targets. Instead, it scrapes the internal metrics of the Blackbox Exporter container itself, allowing you to monitor how many probes have been executed, how long they took, and if the exporter is experiencing any errors. |
 
 *See the screenshot below for an impression of the Blackbox dashboard:*
-![blackbox-dashboard](/images/blackbox-dashboard.png)
+![blackbox-dashboard](./images/blackbox-dashboard.png)
 
 **Docs:**
 
@@ -829,7 +831,7 @@ The Prometheus Node Exporter is a fundamental component for infrastructure monit
 **Bypassing Container Isolation (compose.yml):** By design, containers are isolated from the host. To accurately measure the host's hardware, the Node Exporter container requires special configuration. In the compose.yml, it is explicitly set to use network_mode: host and pid: host. Additionally, it mounts the host's entire root filesystem (/) to a /host directory inside the container. This deliberately breaks the container's isolation, allowing the exporter to read the actual /proc and /sys files of the underlying host operating system.
 
 *See the screenshot below for an impression of the node-exporter-full dashboard:*
-![nodes-exporter-full-dashboard](/images/node-exporter-dashbaord.png)
+![nodes-exporter-full-dashboard](./images/node-exporter-dashbaord.png)
 
 **Docs:**
 
@@ -845,7 +847,7 @@ The Prometheus Podman Exporter is designed to extract metrics specifically from 
 **Rootless Socket Connection (compose.yml):** To gather these metrics securely, the exporter needs to talk to the Podman API. In the compose.yml, this is achieved by mapping the host user's specific rootless Podman socket (`/run/user/1000/podman/podman.sock`) directly into the container. Furthermore, an environment variable `CONTAINER_HOST=unix:///run/podman/podman.sock` directs the exporter to listen to this specific socket, allowing it to monitor the containers without requiring root privileges on the host machine.
 
 *See the screenshot below for an impression of the podman-exporter dashboard:*
-![podman-exporter-dashboard](/images/podman-exporter-dashboard.png)
+![podman-exporter-dashboard](./images/podman-exporter-dashboard.png)
 
 **Docs:**
 
@@ -864,7 +866,7 @@ The OpenTelemetry (OTel) Collector is a vendor-agnostic proxy, router, and proce
 * **Traefik gRPC Routing (compose.yml):** To allow external applications or microservices to securely send traces to the collector, Traefik is configured with a dedicated TCP router using Server Name Indication (SNI). The rule `HostSNI('otel-collector.localhost')` routes incoming gRPC traffic directly to the collector. Additionally, the collector exposes its own internal health and performance metrics via an HTTP endpoint on port `8888`.
 
 *See the screenshot below for an impression of the OpenTelemetry-collector dashboard:*
-![opentelemetry-collector-dashboard](/images/opentelemetry-collector-dashboard.png)
+![opentelemetry-collector-dashboard](./images/opentelemetry-collector-dashboard.png)
 
 **Docs:**
 
@@ -887,10 +889,10 @@ Go to: https://traefik.localhost
 * **Dynamic Routing** ([./traefik/dynamic/traefik-dynamic.yaml](./traefik/dynamic/traefik-dynamic.yaml)): While most routing is handled automatically via labels, some services require manual rules. Because the Node Exporter runs on the host network (network_mode: host) to collect accurate hardware data, it lives outside the standard container bridge network. This file explicitly tells Traefik to route requests for node-exporter.localhost out of the container network and into the host machine via `http://host.containers.internal:9100`.
 
 *See the screenshot below for an impression of the Traefik UI:*
-![traefik](/images/traefik.png)
+![traefik](./images/traefik.png)
 
 *See the screenshot below for an impression of the Traefik dashboard:*
-![traefik](/images/traefik.dashboard.png)
+![traefik](./images/traefik.dashboard.png)
 
 **Docs:**
 
