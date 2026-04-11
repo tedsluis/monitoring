@@ -789,6 +789,9 @@ Through the Alloy web UI, you can view the health of these components and visual
 *See the screenshot below for an impression of the Alloy Graph:*
 ![alloy-graph](./images/alloy-graph.png)
 
+*See the screenshot below for an impression of the Alloy metrics dashboard:*
+![alloy-graph](./images/alloy-dashboard.png)
+
 **Docs:**
 
 * https://grafana.com/docs/alloy/latest
