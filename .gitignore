@@ -1,6 +1,9 @@
 # Do not commit generated certificates/keys
+/.env
 /traefik/certs/*
+/landing-page/index.html 
+/traefik/dynamic/traefik-dynamic.yaml 
+/traefik/traefik.yaml
 !/traefik/certs/.gitkeep
 pr_state.json
 /logs/*
-

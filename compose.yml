@@ -30,7 +30,7 @@ services:
       - '--storage.path=/alertmanager'
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.alertmanager.rule=Host(`alertmanager.localhost`)"
+      - "traefik.http.routers.alertmanager.rule=Host(`alertmanager.${DOMAIN}`)"
       - "traefik.http.routers.alertmanager.tls=true"
       - "traefik.http.services.alertmanager.loadbalancer.server.port=9093"
 
@@ -61,7 +61,7 @@ services:
       - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.alloy.rule=Host(`alloy.localhost`)"
+      - "traefik.http.routers.alloy.rule=Host(`alloy.${DOMAIN}`)"
       - "traefik.http.routers.alloy.tls=true"
       - "traefik.http.services.alloy.loadbalancer.server.port=12345"
 
@@ -80,7 +80,7 @@ services:
       - '--config.file=/config/blackbox.yml'
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.blackbox.rule=Host(`blackbox.localhost`)"
+      - "traefik.http.routers.blackbox.rule=Host(`blackbox.${DOMAIN}`)"
       - "traefik.http.routers.blackbox.tls=true"
       - "traefik.http.services.blackbox.loadbalancer.server.port=9115"
 
@@ -107,8 +107,8 @@ services:
       - loki
       - tempo
     environment:
-      - GF_SERVER_ROOT_URL=https://grafana.localhost
-      - GF_SERVER_DOMAIN=grafana.localhost
+      - GF_SERVER_ROOT_URL=https://grafana.${DOMAIN}
+      - GF_SERVER_DOMAIN=grafana.${DOMAIN}
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
@@ -120,7 +120,7 @@ services:
       - GF_TRACING_OPENTELEMETRY_ENABLED=true
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(`grafana.localhost`)"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)"
       - "traefik.http.routers.grafana.entrypoints=websecure"
       - "traefik.http.routers.grafana.tls=true"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
@@ -146,7 +146,7 @@ services:
       - alertmanager
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.karma.rule=Host(`karma.localhost`)"
+      - "traefik.http.routers.karma.rule=Host(`karma.${DOMAIN}`)"
       - "traefik.http.routers.karma.tls=true"
       - "traefik.http.services.karma.loadbalancer.server.port=8080"
 
@@ -213,7 +213,7 @@ services:
       - /prometheus_multiproc_dir
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.keep-api.rule=Host(`keep-api.localhost`)"
+      - "traefik.http.routers.keep-api.rule=Host(`keep-api.${DOMAIN}`)"
       - "traefik.http.routers.keep-api.tls=true"
       - "traefik.http.services.keep-api.loadbalancer.server.port=8080"
 
@@ -237,7 +237,7 @@ services:
       - API_URL=http://keep-backend:8080
       - ENABLE_AI=true
       - KEEP_ENABLE_AI=true
-      - NEXTAUTH_URL=https://keep.localhost
+      - NEXTAUTH_URL=https://keep.${DOMAIN}
       - NEXTAUTH_SECRET=keep
       # --- AI Configuratie ---
       - OPENAI_BASE_URL=http://host.containers.internal:8111/v1
@@ -245,7 +245,7 @@ services:
       - OPENAI_MODEL_NAME=gpt-5.1
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.keep-ui.rule=Host(`keep.localhost`)"
+      - "traefik.http.routers.keep-ui.rule=Host(`keep.${DOMAIN}`)"
       - "traefik.http.routers.keep-ui.tls=true"
       - "traefik.http.services.keep-ui.loadbalancer.server.port=3000"
 
@@ -276,7 +276,7 @@ services:
       - loki-wal:/loki/wal:Z,U
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.loki.rule=Host(`loki.localhost`)"
+      - "traefik.http.routers.loki.rule=Host(`loki.${DOMAIN}`)"
       - "traefik.http.routers.loki.tls=true"
       - "traefik.http.services.loki.loadbalancer.server.port=3100"
 
@@ -308,13 +308,13 @@ services:
       retries: 5
     labels:
       - "traefik.enable=true"
-      # MinIO Console (https://minio.localhost)
-      - "traefik.http.routers.minio.rule=Host(`minio.localhost`)"
+      # MinIO Console (https://minio.${DOMAIN})
+      - "traefik.http.routers.minio.rule=Host(`minio.${DOMAIN}`)"
       - "traefik.http.routers.minio.service=minio-console"
       - "traefik.http.routers.minio.tls=true"
       - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
       # S3 API (Internal use, but nice to have accessible)
-      - "traefik.http.routers.minio-api.rule=Host(`s3.localhost`)"
+      - "traefik.http.routers.minio-api.rule=Host(`s3.${DOMAIN}`)"
       - "traefik.http.routers.minio-api.service=minio-api"
       - "traefik.http.routers.minio-api.tls=true"
       - "traefik.http.services.minio-api.loadbalancer.server.port=9000"
@@ -367,8 +367,8 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      # Route to https://localhost (or http which is upgraded by traefik)
-      - "traefik.http.routers.nginx.rule=Host(`localhost`)"
+      # Route to https://${DOMAIN} (or http which is upgraded by traefik)
+      - "traefik.http.routers.nginx.rule=Host(`${DOMAIN}`)"
       - "traefik.http.routers.nginx.tls=true"
       # Nginx listens internally on port 80
       - "traefik.http.services.nginx.loadbalancer.server.port=80"
@@ -415,12 +415,12 @@ services:
       - "traefik.enable=true"
       # TCP Router for OTLP gRPC (port 4317)
       # NOTE: Clients must send SNI 'otel-collector.localhost'!
-      - "traefik.tcp.routers.otel.rule=HostSNI(`otel-collector.localhost`)"
+      - "traefik.tcp.routers.otel.rule=HostSNI(`otel-collector.${DOMAIN}`)"
       - "traefik.tcp.routers.otel.entrypoints=otlp"
       - "traefik.tcp.routers.otel.tls=true"
       - "traefik.tcp.services.otel.loadbalancer.server.port=4317"
       # HTTP Router for OTel Collector Metrics (port 8888)
-      - "traefik.http.routers.otel-collector.rule=Host(`otel-collector.localhost`)"
+      - "traefik.http.routers.otel-collector.rule=Host(`otel-collector.${DOMAIN}`)"
       - "traefik.http.routers.otel-collector.tls=true"
       - "traefik.http.services.otel-collector.loadbalancer.server.port=8888"
 
@@ -449,7 +449,7 @@ services:
       - /run/user/1000/podman/podman.sock:/run/podman/podman.sock:ro
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.podman-exporter.rule=Host(`podman-exporter.localhost`)"
+      - "traefik.http.routers.podman-exporter.rule=Host(`podman-exporter.${DOMAIN}`)"
       - "traefik.http.routers.podman-exporter.tls=true"
       - "traefik.http.services.podman-exporter.loadbalancer.server.port=9882"
 
@@ -483,7 +483,7 @@ services:
       - "host.containers.internal:host-gateway" 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.prometheus.rule=Host(`prometheus.localhost`)"
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus.${DOMAIN}`)"
       - "traefik.http.routers.prometheus.tls=true"
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
 
@@ -516,7 +516,7 @@ services:
     # Tempo is normally not exposed publicly, but on request:
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.tempo.rule=Host(`tempo.localhost`)"
+      - "traefik.http.routers.tempo.rule=Host(`tempo.${DOMAIN}`)"
       - "traefik.http.routers.tempo.tls=true"
       - "traefik.http.services.tempo.loadbalancer.server.port=3200"
 
@@ -552,13 +552,13 @@ services:
       - "host.containers.internal:host-gateway"
     labels:
       - "traefik.enable=true"
-      # Dashboard routing (https://traefik.localhost)
-      - "traefik.http.routers.api.rule=Host(`traefik.localhost`)"
+      # Dashboard routing (https://traefik.${DOMAIN})
+      - "traefik.http.routers.api.rule=Host(`traefik.${DOMAIN}`)"
       - "traefik.http.routers.api.service=api@internal"
       - "traefik.http.routers.api.tls=true"
       - "traefik.http.routers.api.entrypoints=websecure"
       # Traefik Metrics (Publicly viewable via browser)
-      - "traefik.http.routers.traefik-metrics.rule=Host(`traefik-metrics.localhost`)"
+      - "traefik.http.routers.traefik-metrics.rule=Host(`traefik-metrics.${DOMAIN}`)"
       - "traefik.http.routers.traefik-metrics.service=prometheus@internal"
       - "traefik.http.routers.traefik-metrics.tls=true"
 
@@ -575,7 +575,7 @@ services:
       - AUTO_CREATE_SESSIONS=true
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.webhook.rule=Host(`webhook-tester.localhost`)"
+      - "traefik.http.routers.webhook.rule=Host(`webhook-tester.${DOMAIN}`)"
       - "traefik.http.routers.webhook.tls=true"
       - "traefik.http.services.webhook.loadbalancer.server.port=8080"
 

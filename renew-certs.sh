@@ -16,10 +16,13 @@ BASE_DIR="${REPO_ROOT}/traefik/certs"
 CA_KEY="myCA.key"
 CA_CERT="myCA.pem"
 CA_CONF="ca.conf"
-SERVER_KEY="localhost.key"
-SERVER_CSR="localhost.csr"
-SERVER_CERT="localhost.crt"
-EXT_FILE="localhost.ext"
+
+# We genereren altijd server.key en server.crt, ongeacht het domein.
+# De Traefik tls.yaml kan daar dan vast naar verwijzen.
+SERVER_KEY="server.key"
+SERVER_CSR="server.csr"
+SERVER_CERT="server.crt"
+EXT_FILE="server.ext"
 
 # Fedora paths
 SYS_ANCHOR="/etc/pki/ca-trust/source/anchors/my-local-ca.pem"
@@ -31,7 +34,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-echo -e "${YELLOW}=== Start Certificate Renewal (Version 3.2) ===${NC}"
+echo -e "${YELLOW}=== Start Certificate Renewal for ${DOMAIN} ===${NC}"
 
 # Ensure the directory exists
 mkdir -p "$BASE_DIR"
@@ -51,26 +54,26 @@ keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
 subjectAltName = @alt_names
 
 [alt_names]
-DNS.1 = localhost
-DNS.2 = *.localhost
-DNS.3 = alertmanager.localhost
-DNS.4 = alloy.localhost
-DNS.5 = blackbox.localhost
-DNS.6 = grafana.localhost
-DNS.7 = minio.localhost
-DNS.8 = loki.localhost
-DNS.9 = karma.localhost
-DNS.10 = keep.localhost
-DNS.11 = keep-api.localhost
-DNS.12 = node-exporter.localhost
-DNS.13 = otel-collector.localhost
-DNS.14 = podman-exporter.localhost
-DNS.15 = prometheus.localhost
-DNS.16 = s3.localhost
-DNS.17 = tempo.localhost
-DNS.18 = traefik.localhost
-DNS.19 = traefik-metrics.localhost
-DNS.20 = webhook-tester.localhost
+DNS.1 = ${DOMAIN}
+DNS.2 = *.${DOMAIN}
+DNS.3 = alertmanager.${DOMAIN}
+DNS.4 = alloy.${DOMAIN}
+DNS.5 = blackbox.${DOMAIN}
+DNS.6 = grafana.${DOMAIN}
+DNS.7 = minio.${DOMAIN}
+DNS.8 = loki.${DOMAIN}
+DNS.9 = karma.${DOMAIN}
+DNS.10 = keep.${DOMAIN}
+DNS.11 = keep-api.${DOMAIN}
+DNS.12 = node-exporter.${DOMAIN}
+DNS.13 = otel-collector.${DOMAIN}
+DNS.14 = podman-exporter.${DOMAIN}
+DNS.15 = prometheus.${DOMAIN}
+DNS.16 = s3.${DOMAIN}
+DNS.17 = tempo.${DOMAIN}
+DNS.18 = traefik.${DOMAIN}
+DNS.19 = traefik-metrics.${DOMAIN}
+DNS.20 = webhook-tester.${DOMAIN}
 IP.1 = 127.0.0.1
 EOF
 
@@ -87,7 +90,7 @@ ST = Utrecht
 L = Utrecht
 O = Utrecht
 OU = Utrecht
-CN = Fedora Localhost Root CA
+CN = Fedora Monitoring Root CA
 
 [ v3_ca ]
 subjectKeyIdentifier=hash
@@ -109,11 +112,11 @@ fi
 # 5. Generate Server Certificate
 echo "Generating Server Certificate..."
 openssl genrsa -out "$SERVER_KEY" 2048
-openssl req -new -key "$SERVER_KEY" -out "$SERVER_CSR" -subj "/C=NL/ST=Utrecht/L=Utrecht/O=Utrecht/OU=Utrecht/CN=*.localhost"
+openssl req -new -key "$SERVER_KEY" -out "$SERVER_CSR" -subj "/C=NL/ST=Utrecht/L=Utrecht/O=Utrecht/OU=Utrecht/CN=*.${DOMAIN}"
 openssl x509 -req -in "$SERVER_CSR" -CA "$CA_CERT" -CAkey "$CA_KEY" -CAcreateserial \
 -out "$SERVER_CERT" -days 3650 -sha256 -extfile "$EXT_FILE"
 
-# 6. FIX: File permissions
+# 6. File permissions
 # This is critical: Traefik (non-root in container) must be able to read these files!
 echo -e "${YELLOW}Fixing permissions (chmod 644)...${NC}"
 chmod 644 "$SERVER_KEY" "$SERVER_CERT" "$CA_CERT"
@@ -171,4 +174,4 @@ else
 fi
 
 echo -e "${GREEN}=== Done! ===${NC}"
-echo "Test now with: curl -v https://grafana.localhost"
+echo "Test now with: curl -v https://grafana.${DOMAIN}"

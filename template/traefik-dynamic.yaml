@@ -2,7 +2,7 @@ http:
   routers:
     # Route for Node Exporter
     node-exporter:
-      rule: "Host(`node-exporter.localhost`)"
+      rule: "Host(`node-exporter.${DOMAIN}`)"
       service: "node-exporter-service"
       entryPoints:
         - "websecure"
