@@ -12,8 +12,8 @@ Diagram
 2. Architecture & Data Flow
 3. Service Port Map
 4. Tooling & Functionality
-5. Prerequisites
-6. Installation & Startup
+5. Installation & Startup
+6. Additional scripts
 7. Usage & Exploration (Screenshots)
 8. Teardown & Cleanup
 
@@ -37,7 +37,7 @@ Node-exporter, Podman-exporter, and Blackbox-exporter expose metrics -> Promethe
 
 ![metrics](./images/prometheus-metrics-diagram.svg)
 
-### 2.2 Logging Flow 
+### 2.2 Logging Flow
 
 System (journald) and Container logs -> Grafana Alloy collects them -> Pushed to Loki -> Stored in MinIO -> Visualized in Grafana.
 
@@ -76,6 +76,7 @@ Prometheus evaluates alert.rules.yml -> Fires to Alertmanager -> Alertmanager ro
 | podman-exporter | 9882          | https://podman-exporter.localhost   | Container metrics                        |
 | Blackbox        | 9115          | https://blackbox-exporter.localhost | HTTP/TCP endpoint probe                  |
 
+**note:** Instead of `localhost` you can configure your own `DOMAIN` using an environment variable.
 
 ## 4. Tooling & Functionality
 
@@ -109,24 +110,25 @@ Prometheus evaluates alert.rules.yml -> Fires to Alertmanager -> Alertmanager ro
    * KeepHQ: Centralized alert management and AIOps platform.
    * Webhook Tester: A simple tool to view the raw JSON payloads Alertmanager sends out.
 
-## 5. Installation & setup
+## 5. Installation & startup
 
 ### 5.1 Overview
 
+This monitoring stack has been tested on Fedora Linux (tested on Fedora 43 and 44).
+
 The installation script (`install.sh`) will automatically configure the following:
-- **OS:** Fedora Linux (tested on Fedora 43 and 44).
-- **Tools:** `podman` and `podman-compose` will be installed if missing.
-- **Podman Socket:** The rootless user socket will be enabled for the Podman Exporter and Grafana Alloy.
+- **Tools:** `podman`, `podman-compose` and `gettext` will be installed if missing.
+- **Podman Socket:** The rootless user socket will be enabled for the Podman Exporter, Grafana Alloy and Traefik.
 - **Networking:** Unprivileged ports will be enabled, and `/etc/hosts` will be updated dynamically with your chosen domain.
-- **TLS/SSL:** A self-signed wildcard certificate will be generated and trusted by the OS.
-- **Domain:** The stack will be configured to run on your custom `$DOMAIN` (defaults to `localhost`).
-   
+- **TLS/SSL:** A self-signed wildcard certificate will be generated and added to the Fedora trust store.
+- **Domain:** The stack will be configured to run on your custom `DOMAIN` (defaults to `localhost`).
+
 ### 5.2 Podman & podman-compose to run containers
 
 This stack is using `podman` and `podman-compose` where you may be used to `docker` and `docker-compose`. While Docker is commonly used, there are good reasons to use Podman due to several key architectural and security advantages:
 
 *   **Daemonless Architecture:** Unlike Docker, which requires a heavy, central background daemon (`dockerd`) running as root to manage containers, Podman is daemonless. It interacts directly with the container registry and runtime. This means no single point of failure—if the Docker daemon crashes, container management halts. With Podman, each container runs as an independent process.
-*   **Rootless by Design (Enhanced Security):** Security is a primary focus for Podman. It allows you to run containers as a standard, non-root user out of the box. If a container is somehow compromised, the attacker is confined to the privileges of that standard user, preventing them from gaining root access to the host machine. 
+*   **Rootless by Design (Enhanced Security):** Security is a primary focus for Podman. It allows you to run containers as a standard, non-root user out of the box. If a container is somehow compromised, the attacker is confined to the privileges of that standard user, preventing them from gaining root access to the host machine.
 *   **Fully Open Source & Unrestricted:** Podman is a fully open-source project driven by the community and Red Hat. Unlike Docker Desktop, which has introduced commercial licensing and subscription models for enterprise environments, Podman remains completely free and unrestricted for all use cases.
 *   **Drop-in Replacement:** The transition is practically seamless. Podman's CLI is intentionally designed to be identical to Docker's. You can simply add `alias docker=podman` to your shell profile, and all your familiar commands (`build`, `run`, `ps`, `pull`) will work exactly as expected.
 *   **Native Systemd Integration:** Podman integrates fully into Linux environments. It can easily generate and manage `systemd` unit files from running containers, allowing you to treat containers as native system services that start automatically on boot.
@@ -142,7 +144,9 @@ This stack is using `podman` and `podman-compose` where you may be used to `dock
 ### 5.4 Install
 
 ```bash
-   export DOMAIN=monitoring.home # Set your own domain (defaults to localhost if left empty)
+   # Set your own domain (defaults to localhost if left empty)
+   export DOMAIN=monitoring.home
+
    ./install.sh
 ```
 **note:** You can rerun this `install.sh` everytime you want to change the `DOMAIN`.
@@ -184,7 +188,7 @@ ce958ef62c3e  docker.io/otel/opentelemetry-collector-contrib@sha256:8164eab2e6bc
 
 To ensure all components are successfully communicating with each other, you can run the automated test suite:
 ```bash
-$ ./run-tests.sh 
+$ ./run-tests.sh
 ========================================
 🚀 Starting Automated Validation Suite
 ========================================
@@ -276,16 +280,16 @@ $ ./run-tests.sh
 
    # stop all containers
    podman-compose down
-   
+
    # start all containers
    podman-compose up -d
-   
+
    # restart all containers
    podman-compose down && podman-compose up -d
-   
+
    # restart a specific container and include changes from compose.yaml
    podman-compose down webhook-tester && podman-compose up -d --force-recreate webhook-tester
-   
+
    # restart a specific container without applying compose.yaml changes
    podman restart webhook-tester
 ```
@@ -309,7 +313,7 @@ $ ./run-tests.sh
    podman ps -a
 
    # restart a container
-   podman restart loki 
+   podman restart loki
 
    # execute a query in a Postgres container
    podman exec -it keep-db psql -U keep -d keep -c "\d tenant;"
@@ -327,13 +331,13 @@ Docs: https://podman.io/docs
 
 ### 6.2 Using an HTTP proxy? Update your no_proxy
 
-This script is optional if you use an HTTP proxy for your internet connection and you have configured environment variables like `http_proxy`, `https_proxy`, `no_proxy`, `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. In that case, you need to add hostnames and IP addresses that are used inside this monitoring stack to your `no_proxy` and `NO_PROXY`. 
+This script is optional if you use an HTTP proxy for your internet connection and you have configured environment variables like `http_proxy`, `https_proxy`, `no_proxy`, `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. In that case, you need to add hostnames and IP addresses that are used inside this monitoring stack to your `no_proxy` and `NO_PROXY`.
 
 The `install.sh` script already executes this during setup. However, because environment variables are session-specific, you might need to run this again when you open a new terminal shell:
 
 Source the script below to add the necessary hostnames and IP addresses:
 ```bash
-  source ./prepare_no_proxy.sh 
+  source ./prepare_no_proxy.sh
 ```
 
 ### 6.4 Generate Local TLS Certificates
@@ -344,7 +348,7 @@ Note: The `install.sh` script already generates these TLS certificates automatic
 ```bash
 export DOMAIN=localhost # set your own domain, like monitoring.home
 
-./renew-certs.sh 
+./renew-certs.sh
 === Start Certificate Renewal ===
 Cleaning up old files...
 Generating SAN configuration...
@@ -360,7 +364,7 @@ Updating Fedora Trust Store...
 Checking if System Bundle trusts the certificate...
 ✓ SUCCESS: System bundle now trusts your certificate!
 Restarting Traefik...
-WARN[0010] StopSignal SIGTERM failed to stop container traefik in 10 seconds, resorting to SIGKILL 
+WARN[0010] StopSignal SIGTERM failed to stop container traefik in 10 seconds, resorting to SIGKILL
 traefik
 traefik
 5d693930d305bbc871c7b212eeb1bc0f830ddc24318fd993e721d346f9dca013
@@ -374,9 +378,9 @@ Test now with: curl -v https://grafana.localhost
 
 ### 7.1 NGINX landing page
 
-Go to **https://localhost**
+Go to **https://localhost** (or your own custom `DOMAIN`).
 
-To make navigating this observability stack effortless, we use NGINX to serve a static landing page [./index.html](./landing-page/index.html). This page acts as the central frontend portal for all the monitoring tools. 
+To make navigating this observability stack effortless, we use NGINX to serve a static landing page [./landing-page/index.html](./template/index.html). This page acts as the central frontend portal for all the monitoring tools.
 
 ![nginx](./images/nginx-detailed-diagram.svg)
 
@@ -744,7 +748,7 @@ Go to https://minio.localhost
 
 **Why use MinIO?** Modern observability tools like Loki and Tempo have deliberately moved away from requiring heavy, complex databases (like Elasticsearch or Cassandra) for storage. Instead, they maintain a lightweight local index and push the bulk of their compressed log chunks and trace data into cheap, scalable object storage. MinIO provides this exact S3-like API locally, mimicking what you would use in the cloud (like AWS S3 or Google Cloud Storage).
 
-**How it works in this stack:** 
+**How it works in this stack:**
 
 * **Automatic Bucket Provisioning:** When you start the stack, a temporary helper container named `minio-init` runs alongside the main MinIO server. It automatically connects to the server and creates the necessary storage buckets (loki-data and tempo-data). Once done, the helper container gracefully exits.
 * **Storage Flow:** Loki and Tempo are configured to treat MinIO just like AWS S3. As they collect logs and traces, they bundle them into chunks and push them to their respective buckets in MinIO.
@@ -890,9 +894,9 @@ Go to: https://traefik.localhost
 **How it works in this stack:** Traefik uses a combination of auto-discovery and file-based configurations to manage routing:
 
 * **Container Auto-Discovery** ([./compose.yml](./compose.yml)): By mounting the rootless Podman socket, Traefik automatically discovers running containers. The routing rules are defined directly on the containers using Docker labels (e.g., `traefik.http.routers.grafana.rule=Host('grafana.localhost'`)).
-* **Static Configuration** ([./traefik/traefik.yaml](./traefik/traefik.yaml)): This is the main startup configuration. It defines the global "EntryPoints" (port 80 for HTTP, 443 for HTTPS, and 4317 for OTLP). It enforces an automatic redirect from HTTP to HTTPS for all traffic. Additionally, it configures Traefik to send its own internal distributed traces to the OpenTelemetry Collector and exposes its metrics for Prometheus to scrape.
+* **Static Configuration** ([./traefik/traefik.yaml](./template/traefik.yaml)): This is the main startup configuration. It defines the global "EntryPoints" (port 80 for HTTP, 443 for HTTPS, and 4317 for OTLP). It enforces an automatic redirect from HTTP to HTTPS for all traffic. Additionally, it configures Traefik to send its own internal distributed traces to the OpenTelemetry Collector and exposes its metrics for Prometheus to scrape.
 * **Dynamic Certificates** ([./traefik/dynamic/tls.yaml](./traefik/dynamic/tls.yaml)): Traefik continuously watches the dynamic directory. This specific file instructs Traefik where to find the custom wildcard certificates (`localhost.crt` and `localhost.key`) generated by the `renew-certs.sh` script, applying them automatically to all `.localhost` routes.
-* **Dynamic Routing** ([./traefik/dynamic/traefik-dynamic.yaml](./traefik/dynamic/traefik-dynamic.yaml)): While most routing is handled automatically via labels, some services require manual rules. Because the Node Exporter runs on the host network (network_mode: host) to collect accurate hardware data, it lives outside the standard container bridge network. This file explicitly tells Traefik to route requests for node-exporter.localhost out of the container network and into the host machine via `http://host.containers.internal:9100`.
+* **Dynamic Routing** ([./traefik/dynamic/traefik-dynamic.yaml](./template/traefik-dynamic.yaml)): While most routing is handled automatically via labels, some services require manual rules. Because the Node Exporter runs on the host network (network_mode: host) to collect accurate hardware data, it lives outside the standard container bridge network. This file explicitly tells Traefik to route requests for node-exporter.localhost out of the container network and into the host machine via `http://host.containers.internal:9100`.
 
 *See the screenshot below for an impression of the Traefik UI:*
 ![traefik](./images/traefik.png)
@@ -912,7 +916,7 @@ This section explains how to remove everything.
 ```bash
    # stop all containers
    podman-compose down
-   
+
    # (optional) remove the compose network if it still exists
    # check the network name first; typically 'monitoring_monitoring-net'
    podman network ls | grep monitoring || true
@@ -927,18 +931,18 @@ This section explains how to remove everything.
    local       monitoring_grafana-data
    local       monitoring_keep-db-data
    local       monitoring_keep-state
-   
+
    # one-shot removal of any remaining project volumes
    podman volume rm $(podman volume ls -q | grep '^monitoring_') 2>/dev/null || true
-   
+
    # remove certificates
    sudo rm /etc/pki/ca-trust/source/anchors/my-local-ca.pem
    sudo rm /etc/pki/ca-trust/source/anchors/my-local-ca.crt
    sudo update-ca-trust extract
-   
+
    # disable podman socket
    systemctl --user disable --now podman.socket
-   
+
    # remove rootless ports configuration file
    sudo rm /etc/sysctl.d/99-rootless-ports.conf
    # reset the runtime sysctl to the default privileged port start (1024)
@@ -947,7 +951,7 @@ This section explains how to remove everything.
    # (optional) prune any stopped containers, unused networks, and images
    # This impacts your whole Podman host, not just this project.
    podman system prune -a -f
-   
+
    # remove monitoring repo
    rm -rf path-to-your-repo/monitoring
 ```
