@@ -109,13 +109,17 @@ Prometheus evaluates alert.rules.yml -> Fires to Alertmanager -> Alertmanager ro
    * KeepHQ: Centralized alert management and AIOps platform.
    * Webhook Tester: A simple tool to view the raw JSON payloads Alertmanager sends out.
 
-## 5. Prerequisites
+## 5. Installation & setup
 
 ### 5.1 Overview
 
--   OS: Fedora Linux (tested on Fedora 43 and 44).
--   Tools: podman and podman-compose.
--   Podman Socket: The user socket must be active for the Podman Exporter and Alloy.
+The installation script (`install.sh`) will automatically configure the following:
+- **OS:** Fedora Linux (tested on Fedora 43 and 44).
+- **Tools:** `podman` and `podman-compose` will be installed if missing.
+- **Podman Socket:** The rootless user socket will be enabled for the Podman Exporter and Grafana Alloy.
+- **Networking:** Unprivileged ports will be enabled, and `/etc/hosts` will be updated dynamically with your chosen domain.
+- **TLS/SSL:** A self-signed wildcard certificate will be generated and trusted by the OS.
+- **Domain:** The stack will be configured to run on your custom `$DOMAIN` (defaults to `localhost`).
    
 ### 5.2 Podman & podman-compose to run containers
 
@@ -128,79 +132,31 @@ This stack is using `podman` and `podman-compose` where you may be used to `dock
 *   **Native Systemd Integration:** Podman integrates fully into Linux environments. It can easily generate and manage `systemd` unit files from running containers, allowing you to treat containers as native system services that start automatically on boot.
 *   **Kubernetes Readiness:** Podman introduces the concept of "pods" (groups of containers sharing the same network and namespaces) locally, mirroring how Kubernetes operates. It can even generate Kubernetes YAML from local containers or run existing Kubernetes YAML directly, making the transition from local development to production orchestration much smoother.
 
+### 5.3 Clone the repository
 
-### 5.3 Install requirements
 ```bash
-   # Install packages
-   sudo dnf install podman podman-compose -y
-   
-   # Activate the Podman socket for your user (Rootless)
-   # run as a regular user, not as root!
-   systemctl --user enable --now podman.socket
-   
-   # Check if the socket works
-   ls -l /run/user/$(id -u)/podman/podman.sock
-   
-   # Enable using port 80
-   sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
-   net.ipv4.ip_unprivileged_port_start = 80
-   echo "net.ipv4.ip_unprivileged_port_start=80" | sudo tee /etc/sysctl.d/99-rootless-ports.conf
-   net.ipv4.ip_unprivileged_port_start=80
+   git clone https://github.com/tedsluis/monitoring.git
+   cd monitoring
 ```
 
-## 6. Installation & Startup
+### 5.4 Install
 
-### 6.1 Clone the repository
 ```bash
-    git clone https://github.com/tedsluis/monitoring.git
-    cd monitoring
+   export DOMAIN=monitoring.home # Set your own domain (defaults to localhost if left empty)
+   ./install.sh
 ```
+**note:** You can rerun this `install.sh` everytime you want to change the `DOMAIN`.
 
-### 6.2 Using an HTTP proxy? Update your no_proxy
-
-This step is optional if you use an HTTP proxy for your internet connection and you have configured environment variables like `http_proxy`, `https_proxy`, `no_proxy`, `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. In that case, you need to add hostnames and IP addresses that are used inside this monitoring stack to your `no_proxy` and `NO_PROXY`. Source the script below to add the necessary hostnames and IP addresses.
+### 5.5 Start the stack
 
 ```bash
-  source ./prepare_no_proxy.sh 
-```
-
-### 6.3 Start the stack
-```bash
-   # Important: only run this step after you have finished all the steps in the Prerequisites!
+   # Important: Only run this step after you have successfully executed the install.sh script!
    podman-compose up -d
 ```
 The first time, the `minio-init` container will automatically create the required buckets (`loki-data` and `tempo-data`).
 
-### 6.4 Generate Local TLS Certificates
-To ensure secure connections (https://*.localhost) without browser warnings, run the certificate script. This generates a local CA and adds it to your Fedora Trust Store.
-```bash
-./renew-certs.sh 
-=== Start Certificate Renewal (Version 3.2) ===
-Cleaning up old files...
-Generating SAN configuration...
-Generating Root CA...
-..+.......+..+......+............+++++++++++++++++++++++++++++++++++++++*.......+.........+....+.....+.+..+++++++++++++++++++++++++++++++++++++++*.......+...+......+..+...+.+...............+.....+..................+......+.+...+...+..+...+.........+.+...+..............+.+.........+..+...+...+...+...................+...........+.......+.....+...+.......+..+.......+...+...........+....+.....+.+..+.........+...................+.....+.+......+...+......+.....+...+...+...+......+..........+...+..+.........+...................+.....+...+...+....+.....+.......+......+........+.+......+..+.+....................+..........+.....+.......+.....+....+...+.....+.........................+..+.........+......+.+..+...........................+......+.........+.............+...........+...............+....+...+..+.+...........+....+..+....+...+............+...........+.......+......+......+........+...+.......+...+...+..+...+......+...+......+.+......+.........+........+..........++++++
-............+++++++++++++++++++++++++++++++++++++++*......+.....+...+....+...+..+...+....+..............+.......+...+..+.......+......+++++++++++++++++++++++++++++++++++++++*....+.....+..........+...........+....+...+..+.+........+...............+.......+..+...++++++
------
-Generating Server Certificate...
-Certificate request self-signature ok
-subject=C=NL, ST=Utrecht, L=Utrecht, O=Utrecht, OU=Utrecht, CN=*.localhost
-Fixing permissions (chmod 644)...
-Updating Fedora Trust Store...
-Checking if System Bundle trusts the certificate...
-✓ SUCCESS: System bundle now trusts your certificate!
-Restarting Traefik...
-WARN[0010] StopSignal SIGTERM failed to stop container traefik in 10 seconds, resorting to SIGKILL 
-traefik
-traefik
-5d693930d305bbc871c7b212eeb1bc0f830ddc24318fd993e721d346f9dca013
-traefik
-=== Done! ===
-Test now with: curl -v https://grafana.localhost
-```
-**note:** Before you try `https://localhost` in your web browser, make sure you restart your browser first!
+### 5.6 Check the status
 
-### 6.5 Check the status
 ```bash
 podman ps -a
 CONTAINER ID  IMAGE                                                                                                                    COMMAND               CREATED       STATUS                   PORTS                                                             NAMES
@@ -224,9 +180,9 @@ af2575426baf  docker.io/grafana/loki@sha256:3c8fd3570dd9219951a60d3f919c7f31923d
 ce958ef62c3e  docker.io/otel/opentelemetry-collector-contrib@sha256:8164eab2e6bca9c9b0837a8d2f118a6618489008a839db7f9d6510e66be3923c   --config=/etc/ote...  13 hours ago  Up 13 hours              4317-4318/tcp, 55679/tcp                                          otel-collector
 66c8b0604c18  docker.io/grafana/grafana@sha256:e932bd6ed0e026595b08483cd0141e5103e1ab7ff8604839ff899b8dc54cabcb                                              13 hours ago  Up 13 hours (healthy)    3000/tcp                                                          grafana
 ```
-note: The `minio-init` container only runs when starting MinIo.
+**note**: The `minio-init` container only runs briefly when starting MinIo and will have an Exited (0) status.
 
-Run the test script:
+To ensure all components are successfully communicating with each other, you can run the automated test suite:
 ```bash
 $ ./run-tests.sh 
 ========================================
@@ -306,7 +262,7 @@ $ ./run-tests.sh
 🎉 [COMPLETE] All tests completed successfully! Stack is stable.
 ```
 
-### 6.6 Stop, start or restart with podman-compose
+### 5.7 Stop, start or restart with podman-compose
 
 **podman-compose** is a utility designed to help you define and run multi-container applications seamlessly without relying on a central daemon.
 
@@ -334,7 +290,7 @@ $ ./run-tests.sh
    podman restart webhook-tester
 ```
 
-### 6.7 Generic Podman commands
+### 5.8 Generic Podman commands
 
 ```bash
    # Podman Compose Help
@@ -366,6 +322,53 @@ $ ./run-tests.sh
 ```
 
 Docs: https://podman.io/docs
+
+## 6. Additional scripts
+
+### 6.2 Using an HTTP proxy? Update your no_proxy
+
+This script is optional if you use an HTTP proxy for your internet connection and you have configured environment variables like `http_proxy`, `https_proxy`, `no_proxy`, `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`. In that case, you need to add hostnames and IP addresses that are used inside this monitoring stack to your `no_proxy` and `NO_PROXY`. 
+
+The `install.sh` script already executes this during setup. However, because environment variables are session-specific, you might need to run this again when you open a new terminal shell:
+
+Source the script below to add the necessary hostnames and IP addresses:
+```bash
+  source ./prepare_no_proxy.sh 
+```
+
+### 6.4 Generate Local TLS Certificates
+
+To ensure secure connections (https://*.${DOMAIN}) without browser warnings, you need a TLS certificate and a local CA, added it to your Fedora Trust Store.
+
+Note: The `install.sh` script already generates these TLS certificates automatically. You only need to run this script manually if your certificates expire, or if you have issues with your local tust store.
+```bash
+export DOMAIN=localhost # set your own domain, like monitoring.home
+
+./renew-certs.sh 
+=== Start Certificate Renewal ===
+Cleaning up old files...
+Generating SAN configuration...
+Generating Root CA...
+..+.......+..+......+............+++++++++++++++++++++++++++++++++++++++*.......+.........+....+.....+.+..+++++++++++++++++++++++++++++++++++++++*.......+...+......+..+...+.+...............+.....+..................+......+.+...+...+..+...+.........+.+...+..............+.+.........+..+...+...+...+...................+...........+.......+.....+...+.......+..+.......+...+...........+....+.....+.+..+.........+...................+.....+.+......+...+......+.....+...+...+...+......+..........+...+..+.........+...................+.....+...+...+....+.....+.......+......+........+.+......+..+.+....................+..........+.....+.......+.....+....+...+.....+.........................+..+.........+......+.+..+...........................+......+.........+.............+...........+...............+....+...+..+.+...........+....+..+....+...+............+...........+.......+......+......+........+...+.......+...+...+..+...+......+...+......+.+......+.........+........+..........++++++
+............+++++++++++++++++++++++++++++++++++++++*......+.....+...+....+...+..+...+....+..............+.......+...+..+.......+......+++++++++++++++++++++++++++++++++++++++*....+.....+..........+...........+....+...+..+.+........+...............+.......+..+...++++++
+-----
+Generating Server Certificate...
+Certificate request self-signature ok
+subject=C=NL, ST=Utrecht, L=Utrecht, O=Utrecht, OU=Utrecht, CN=*.localhost
+Fixing permissions (chmod 644)...
+Updating Fedora Trust Store...
+Checking if System Bundle trusts the certificate...
+✓ SUCCESS: System bundle now trusts your certificate!
+Restarting Traefik...
+WARN[0010] StopSignal SIGTERM failed to stop container traefik in 10 seconds, resorting to SIGKILL 
+traefik
+traefik
+5d693930d305bbc871c7b212eeb1bc0f830ddc24318fd993e721d346f9dca013
+traefik
+=== Done! ===
+Test now with: curl -v https://grafana.localhost
+```
+**note:** Before you try `https://localhost` in your web browser, make sure you restart your browser first!
 
 ## 7. Usage
 
