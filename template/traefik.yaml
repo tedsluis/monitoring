@@ -33,9 +33,9 @@ entryPoints:
     http:
       tls:
         domains:
-          - main: "localhost"
+          - main: "${DOMAIN}"
             sans:
-              - "*.localhost"
+              - "*.${DOMAIN}"
   otlp:
     # The otlp entry point is used for receiving traces from the OpenTelemetry Collector. The address is set to ":4317" to listen on all interfaces on port 4317, which is the standard port for OTLP gRPC traffic.
     address: ":4317"
