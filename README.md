@@ -148,6 +148,56 @@ This stack is using `podman` and `podman-compose` where you may be used to `dock
    export DOMAIN=monitoring.home
 
    ./install.sh
+   ======================================================
+   🚀 Starting installation for domain: monitoring.home
+   ======================================================
+   📦 Checking prerequisites...
+
+   ======================================================
+   📝 Saving domain to .env file for podman-compose...
+   ======================================================
+   
+   ======================================================
+   📝 Generating static configuration files from templates...
+   ======================================================
+   
+   ======================================================
+   🔐 Generating TLS certificates...
+   === Start Certificate Renewal for monitoring.home ===
+   Cleaning up old files...
+   Generating SAN configuration...
+   Generating Root CA...
+   ....+.+........+....+............+.........+.....+.+........+.+......+...+...+..+.+......+........+.+..+..........+.....+.......+..+.+.....+...................+...+.....+.+.....+....+......+..+...+....+...+..................+...........+.+........+++++++++++++++++++++++++++++++++++++++*.+......+............+...+++++++++++++++++++++++++++++++++++++++*.....+......+......+...+.................+..........+..............+......+............+.....................+.+..............+....+...+..+......+..........+...........+.+..............++++++
+   .+.....+...+.+..+..........+++++++++++++++++++++++++++++++++++++++*......+...+++++++++++++++++++++++++++++++++++++++*.+.+....................+...............+.........+......+.+...+......+.........+...+...+.........+.....+.............+...+............+........+..........+..+.......+........+..................+......+.+.........+.....+...+................+..+.........+....+...............+.....+....+...............+...............+......+......+........+.............+.....+...+.+...+..................+..+...+...+...............+.+.........+.........+...+..............+....+..+.......+...+.....+.......+......+.....+.+.........+......+.....+.+..+............+....+..+.......+..+...+.......+.....+.............+.....+......+.+...+...+........................+...+..+.+...............+.....+.......+..+.+..+.+......+...+..+.........+.........+...++++++
+   -----
+   Generating Server Certificate...
+   Certificate request self-signature ok
+   subject=C=NL, ST=Utrecht, L=Utrecht, O=Utrecht, OU=Utrecht, CN=*.localhost
+   Fixing permissions (chmod 644)...
+   Updating Fedora Trust Store...
+   Checking if System Bundle trusts the certificate...
+   ✓ SUCCESS: System bundle now trusts your certificate!
+   Restarting Traefik...
+   012a813112b66f64b1f3b42c45bafbd6ffef7a775df5abf6c98bae81b7baef9a
+   Trying to pull docker.io/library/traefik@sha256:5ae9c349154d5298a5d61a7b25e5f3a9f53314f1515e87632120b95051c7917c...
+   Getting image source signatures
+   Copying blob 082d991da747 done   | 
+   Copying blob 2637a87d2636 done   | 
+   Copying blob 9e73946ffb91 done   | 
+   Copying blob 589002ba0eae skipped: already exists  
+   Copying config aa4b5cf274 done   | 
+   Writing manifest to image destination
+   2fc76a107e2f59aa6a4bb7d38315ba46649847b12e978c8ad722904b8eef598d
+   traefik
+   === Done! ===
+   Test now with: curl -v https://grafana.monitoring.home
+   ======================================================
+   
+   ======================================================
+   🔀 Configuring proxy settings...
+   Are you are not using a http proxy.
+   Neither http_proxy, https_proxy, HTTP_PROXY nor HTTPS_PROXY is set. The no_proxy variable will not have any effect.
+   Please set http_proxy, https_proxy, HTTP_PROXY and HTTPS_PROXY environment variables if you intend to use a proxy.
 ```
 **note:** You can rerun this `install.sh` everytime you want to change the `DOMAIN`.
 
