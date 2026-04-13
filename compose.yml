@@ -566,7 +566,7 @@ services:
   # Webhook Tester
   # ---------------------------------------------------------
   webhook-tester:
-    image: docker.io/tarampampam/webhook-tester:2.2.6@sha256:7df929897b150aec5b60d77529ae863f69238cf74f0e47c161258fcc185f3e0c
+    image: docker.io/tarampampam/webhook-tester:2.2.7@sha256:f6581180affb655aaff5b00209b2b54932b69c19a3c102433bc5aa4ea72ab784
     container_name: webhook-tester
     networks:
       - monitoring-net
