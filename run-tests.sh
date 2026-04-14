@@ -61,7 +61,7 @@ if [ -z "$NETWORK" ]; then
 fi
 echo "🔌 [INFO] Using internal network: $NETWORK"
 
-CURL_CMD="podman run --rm -e http_proxy= -e HTTP_PROXY= -e https_proxy= -e HTTPS_PROXY= --network $NETWORK docker.io/curlimages/curl:latest"
+CURL_CMD="podman run --rm -v ./traefik/certs/myCA.pem:/myCA.pem:ro,z -e http_proxy= -e HTTP_PROXY= -e https_proxy= -e HTTPS_PROXY= --network $NETWORK docker.io/curlimages/curl:latest --cacert /myCA.pem"
 echo "   [INFO] Using ephemeral curl container for internal API testing."
 
 echo "----------------------------------------"
@@ -114,7 +114,7 @@ echo "✅ [SUCCESS] Keep API is reachable and healthy."
 
 echo "----------------------------------------"
 echo "🔍 [TEST] Traefik Routing (using Nginx)"
-$CURL_CMD -sSf -H "Host: localhost" -o /dev/null http://traefik:80 || { echo "❌ [ERROR] Traefik routing is failing"; exit 1; }
+$CURL_CMD -sSf -H "Host: ${DOMAIN:-localhost}" -o /dev/null http://traefik:80 || { echo "❌ [ERROR] Traefik routing is failing"; exit 1; }
 echo "✅ [SUCCESS] Traefik is routing requests correctly."
 
 echo "----------------------------------------"
@@ -177,6 +177,53 @@ echo "----------------------------------------"
 echo "🔍 [TEST] Webhook Tester"
 $CURL_CMD -sSf -o /dev/null http://webhook-tester:8080/ || { echo "❌ [ERROR] Webhook Tester is not healthy"; exit 1; }
 echo "✅ [SUCCESS] Webhook Tester is reachable."
+echo ''
+
+echo "========================================"
+echo "🌐 Starting Reverse Proxy Tests (via HTTPS/443)"
+echo "========================================"
+# AANPASSING: -k is verwijderd omdat de container nu de Fedora trust store gebruikt!
+PROXY_CURL_CMD="$CURL_CMD -sSf -o /dev/null"
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Proxy: Alloy"
+$PROXY_CURL_CMD --connect-to "alloy.${DOMAIN}:443:traefik:443" https://alloy.${DOMAIN}/-/healthy || { echo "❌ [ERROR] alloy.${DOMAIN} routing failed"; exit 1; }
+echo "✅ [SUCCESS] alloy.${DOMAIN} is reachable."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Proxy: Alertmanager"
+$PROXY_CURL_CMD --connect-to "alertmanager.${DOMAIN}:443:traefik:443" https://alertmanager.${DOMAIN}/-/healthy || { echo "❌ [ERROR] alertmanager.${DOMAIN} routing failed"; exit 1; }
+echo "✅ [SUCCESS] alertmanager.${DOMAIN} is reachable."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Proxy: Grafana"
+$PROXY_CURL_CMD --connect-to "grafana.${DOMAIN}:443:traefik:443" https://grafana.${DOMAIN}/api/health || { echo "❌ [ERROR] grafana.${DOMAIN} routing failed"; exit 1; }
+echo "✅ [SUCCESS] grafana.${DOMAIN} is reachable."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Proxy: Karma"
+$PROXY_CURL_CMD --connect-to "karma.${DOMAIN}:443:traefik:443" https://karma.${DOMAIN}/health || { echo "❌ [ERROR] karma.${DOMAIN} routing failed"; exit 1; }
+echo "✅ [SUCCESS] karma.${DOMAIN} is reachable."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Proxy: KeepHQ (Frontend)"
+$PROXY_CURL_CMD --connect-to "keep.${DOMAIN}:443:traefik:443" https://keep.${DOMAIN}/api/healthcheck || { echo "❌ [ERROR] keep.${DOMAIN} routing failed"; exit 1; }
+echo "✅ [SUCCESS] keep.${DOMAIN} is reachable."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Proxy: MinIO Console"
+$PROXY_CURL_CMD --connect-to "minio.${DOMAIN}:443:traefik:443" https://minio.${DOMAIN}/ || { echo "❌ [ERROR] minio.${DOMAIN} routing failed"; exit 1; }
+echo "✅ [SUCCESS] minio.${DOMAIN} is reachable."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Proxy: Traefik Dashboard"
+$PROXY_CURL_CMD --connect-to "traefik.${DOMAIN}:443:traefik:443" https://traefik.${DOMAIN}/dashboard/ || { echo "❌ [ERROR] traefik.${DOMAIN} routing failed"; exit 1; }
+echo "✅ [SUCCESS] traefik.${DOMAIN} is reachable."
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Proxy: Webhook Tester"
+$PROXY_CURL_CMD --connect-to "webhook-tester.${DOMAIN}:443:traefik:443" https://webhook-tester.${DOMAIN}/ || { echo "❌ [ERROR] webhook-tester.${DOMAIN} routing failed"; exit 1; }
+echo "✅ [SUCCESS] webhook-tester.${DOMAIN} is reachable."
 
 echo "========================================"
 echo "🎉 [COMPLETE] All tests completed successfully! Stack is stable."
