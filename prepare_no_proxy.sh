@@ -4,7 +4,7 @@
 
 # 1. Ensure http_proxy and https_proxy are set, otherwise no_proxy is irrelevant
 if [ -z "$http_proxy" ] && [ -z "$https_proxy" ] && [ -z "$HTTP_PROXY" ] && [ -z "$HTTPS_PROXY" ]; then
-    echo "Are you are not using a http proxy."
+    echo "You are not using a HTTP proxy."
     echo "Neither http_proxy, https_proxy, HTTP_PROXY nor HTTPS_PROXY is set. The no_proxy variable will not have any effect."
     echo "Please set http_proxy, https_proxy, HTTP_PROXY and HTTPS_PROXY environment variables if you intend to use a proxy."
     exit 0
