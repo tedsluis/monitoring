@@ -394,6 +394,127 @@ if [ "$LOG_FOUND" = false ]; then
     exit 1
 fi
 
+echo ""
+echo "========================================"
+echo "🪵 Starting Alloy Auto-Discovery Test"
+echo "========================================"
+echo "🔍 [TEST] Flow: Container Logs -> Alloy -> Loki"
+echo "   [INFO] Verifying if Alloy is actively scraping containers and sending them to Loki..."
+
+# We query Loki to check if logs from the 'grafana' container exist.
+# This proves Alloy's podman socket auto-discovery and log shipping works!
+ALLOY_QUERY='{container_name="grafana"}'
+
+ALLOY_RESP=$($CURL_CMD -sG --data-urlencode "query=${ALLOY_QUERY}" --data-urlencode "start=${START_TS}" --data-urlencode "end=${END_TS}" http://loki:3100/loki/api/v1/query_range || echo '{"data":{"result":[]}}')
+HAS_ALLOY_LOGS=$(echo "$ALLOY_RESP" | jq -r '.data.result | length' 2>/dev/null || echo "0")
+
+if [ "$HAS_ALLOY_LOGS" -gt 0 ]; then
+    echo "   ✅ [SUCCESS] Alloy is actively scraping container logs and shipping them to Loki!"
+else
+    echo "   ❌ [ERROR] No container logs found in Loki. Alloy might be failing to read the Podman socket."
+    exit 1
+fi
+
+echo ""
+echo "========================================"
+echo "🚨 Starting End-to-End Alerting Pipeline Tests"
+echo "========================================"
+
+echo "🔍 [TEST] Flow: Prometheus (Rules Engine) -> Alertmanager"
+echo "   [INFO] Checking if Alertmanager is receiving the 'Watchdog' alert from Prometheus..."
+# Prometheus should be constantly firing the 'Watchdog' alert
+PROM_WATCHDOG=$($CURL_CMD -sG --data-urlencode "filter=alertname=\"Watchdog\"" http://alertmanager:9093/api/v2/alerts || echo "[]")
+HAS_PROM_WATCHDOG=$(echo "$PROM_WATCHDOG" | jq -r 'length' 2>/dev/null || echo "0")
+
+if [ "$HAS_PROM_WATCHDOG" -gt 0 ]; then
+    echo "   ✅ [SUCCESS] Alertmanager is receiving alerts from Prometheus!"
+else
+    echo "   ❌ [ERROR] The 'Watchdog' alert was not found in Alertmanager. Prometheus -> Alertmanager link is broken."
+    exit 1
+fi
+
+echo "----------------------------------------"
+echo "🔍 [TEST] Flow: Loki (Ruler) -> Alertmanager"
+echo "   [INFO] Checking if Alertmanager is receiving the 'LokiWatchdog' alert from Loki..."
+
+# Loki ruler might take ~1 minute to fire the first alert after startup, so we do a quick retry loop
+LOKI_WATCHDOG_FOUND=false
+for i in {1..6}; do
+    LOKI_WATCHDOG=$($CURL_CMD -sG --data-urlencode "filter=alertname=\"LokiWatchdog\"" http://alertmanager:9093/api/v2/alerts || echo "[]")
+    HAS_LOKI_WATCHDOG=$(echo "$LOKI_WATCHDOG" | jq -r 'length' 2>/dev/null || echo "0")
+
+    if [ "$HAS_LOKI_WATCHDOG" -gt 0 ]; then
+        LOKI_WATCHDOG_FOUND=true
+        echo "   ✅ [SUCCESS] Alertmanager is receiving alerts from Loki!"
+        break
+    fi
+    echo "   [INFO] LokiWatchdog not yet in Alertmanager. Waiting for Loki Ruler to evaluate (retrying)..."
+    sleep 10 &
+    BG_PID=$!
+    spinner "$BG_PID"
+    wait "$BG_PID"
+done
+
+if [ "$LOKI_WATCHDOG_FOUND" = false ]; then
+    echo "   ❌ [ERROR] The 'LokiWatchdog' alert was not found in Alertmanager. Loki -> Alertmanager link is broken."
+    exit 1
+fi
+
+echo ""
+echo "========================================"
+echo "📊 Starting PromQL Data Integrity Test"
+echo "========================================"
+echo "🔍 [TEST] Flow: Exporters -> Prometheus TSDB -> PromQL Evaluation"
+
+# 1. Execute a PromQL query to ensure the database is actually receiving and parsing data (Node Exporter)
+PROMQL_TEST_QUERY='up{job="node-exporter"}'
+echo "   [INFO] Evaluating PromQL: $PROMQL_TEST_QUERY"
+
+PROMQL_TEST_RESP=$($CURL_CMD -sG --data-urlencode "query=${PROMQL_TEST_QUERY}" http://prometheus:9090/api/v1/query || echo '{"data":{"result":[]}}')
+PROMQL_VAL=$(echo "$PROMQL_TEST_RESP" | jq -r '.data.result[0].value[1]' 2>/dev/null || echo "null")
+
+if [ "$PROMQL_VAL" == "1" ]; then
+    echo "   ✅ [SUCCESS] PromQL successfully evaluated the metric (value: 1)."
+else
+    echo "   ❌ [ERROR] PromQL evaluation failed. Expected '1', got: '$PROMQL_VAL'."
+    exit 1
+fi
+
+# 2. Blackbox E2E validation: Verify Blackbox successfully probed an external target
+echo "   [INFO] Verifying Blackbox Exporter End-to-End flow..."
+BLACKBOX_QUERY='probe_success{job="blackbox-http"} == 1'
+BLACKBOX_RESP=$($CURL_CMD -sG --data-urlencode "query=${BLACKBOX_QUERY}" http://prometheus:9090/api/v1/query || echo '{"data":{"result":[]}}')
+HAS_SUCCESSFUL_PROBES=$(echo "$BLACKBOX_RESP" | jq -r '.data.result | length' 2>/dev/null || echo "0")
+
+if [ "$HAS_SUCCESSFUL_PROBES" -gt 0 ]; then
+    echo "   ✅ [SUCCESS] Prometheus confirms Blackbox Exporter is successfully executing HTTP probes!"
+else
+    echo "   ⚠️  [WARN] No successful Blackbox probes found yet in Prometheus. The initial probe might still be running."
+fi
+
+echo ""
+echo "========================================"
+echo "🪣 Starting Storage Verification Test (MinIO)"
+echo "========================================"
+echo "🔍 [TEST] Flow: minio-init -> MinIO Buckets"
+
+echo "   [INFO] Checking if Loki and Tempo buckets exist in MinIO..."
+MINIO_BUCKET_METRICS=$($CURL_CMD -s http://minio:9000/minio/v2/metrics/bucket || echo "")
+
+if echo "$MINIO_BUCKET_METRICS" | grep -q 'bucket="loki-data"'; then
+    echo "   ✅ [SUCCESS] Bucket 'loki-data' exists."
+else
+    echo "   ❌ [ERROR] Bucket 'loki-data' is missing!"
+    exit 1
+fi
+
+if echo "$MINIO_BUCKET_METRICS" | grep -q 'bucket="tempo-data"'; then
+    echo "   ✅ [SUCCESS] Bucket 'tempo-data' exists."
+else
+    echo "   ❌ [ERROR] Bucket 'tempo-data' is missing!"
+    exit 1
+fi
+
 echo "========================================"
 echo "🎉 [COMPLETE] All tests completed successfully! Stack is stable."
 exit 0
