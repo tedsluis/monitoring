@@ -1026,6 +1026,9 @@ This section explains how to remove everything.
    # reset the runtime sysctl to the default privileged port start (1024)
    sudo sysctl -w net.ipv4.ip_unprivileged_port_start=1024
 
+   # remove images
+   for I in $(cat compose.yml | grep image: | awk '{print $2}' | sed -r 's/:.+$//'); do echo $I; for ID in $(podman images | grep $I | awk '{print $3}'); do podman rmi $ID; done; done
+
    # (optional) prune any stopped containers, unused networks, and images
    # This impacts your whole Podman host, not just this project.
    podman system prune -a -f
