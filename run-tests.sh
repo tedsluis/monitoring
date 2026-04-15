@@ -59,12 +59,12 @@ for service in alertmanager grafana keep-db keep-frontend minio nginx node-expor
     for i in {1..12}; do
         # Podman inspect reads the native container health status
         STATUS=$(podman inspect -f '{{.State.Health.Status}}' $service 2>/dev/null || echo "unknown")
-        
+
         if [ "$STATUS" == "healthy" ]; then
             echo "   [SUCCESS] $service is healthy!"
             break
         fi
-        
+
         if [ "$i" -eq 12 ]; then
             echo "❌ [ERROR] $service failed to become healthy within 60 seconds. Final status: $STATUS"
             podman logs --tail 20 $service
@@ -103,9 +103,9 @@ FAILED_TARGETS=1
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
     echo "   [INFO] Fetching Prometheus targets (Attempt $((RETRY_COUNT+1))/$MAX_RETRIES)..."
     TARGET_JSON=$($CURL_CMD -s http://prometheus:9090/api/v1/targets || echo '{"status":"error"}')
-    
+
     FAILED_TARGETS=$(echo "$TARGET_JSON" | jq -e 'if .status == "success" and (.data.activeTargets | length) > 0 then [.data.activeTargets[] | select(.health != "up")] | length else 1 end' 2>/dev/null || echo "1")
-    
+
     if [ "$FAILED_TARGETS" == "0" ]; then
         echo "✅ [SUCCESS] All Prometheus targets are UP and successfully scraped."
         break
@@ -219,69 +219,72 @@ PROXY_CURL_CMD="$CURL_CMD -sSf -o /dev/null"
 
 echo "----------------------------------------"
 echo "🔍 [TEST] Proxy: Alloy"
-$PROXY_CURL_CMD --connect-to "alloy.${DOMAIN}:443:traefik:443" https://alloy.${DOMAIN}/-/healthy || { echo "❌ [ERROR] https://alloy.${DOMAIN}/-/healthy routing failed"; exit 1; }
-echo "✅ [SUCCESS] https://alloy.${DOMAIN}/-/healthy is reachable."
+$PROXY_CURL_CMD --connect-to "alloy.${DOMAIN:-localhost}:443:traefik:443" https://alloy.${DOMAIN:-localhost}/-/healthy || { echo "❌ [ERROR] https://alloy.${DOMAIN:-localhost}/-/healthy routing failed"; exit 1; }
+echo "✅ [SUCCESS] https://alloy.${DOMAIN:-localhost}/-/healthy is reachable."
 
 echo "----------------------------------------"
 echo "🔍 [TEST] Proxy: Alertmanager"
-$PROXY_CURL_CMD --connect-to "alertmanager.${DOMAIN}:443:traefik:443" https://alertmanager.${DOMAIN}/-/healthy || { echo "❌ [ERROR] https://alertmanager.${DOMAIN}/-/healthy routing failed"; exit 1; }
-echo "✅ [SUCCESS] https://alertmanager.${DOMAIN}/-/healthy is reachable."
+$PROXY_CURL_CMD --connect-to "alertmanager.${DOMAIN:-localhost}:443:traefik:443" https://alertmanager.${DOMAIN:-localhost}/-/healthy || { echo "❌ [ERROR] https://alertmanager.${DOMAIN:-localhost}/-/healthy routing failed"; exit 1; }
+echo "✅ [SUCCESS] https://alertmanager.${DOMAIN:-localhost}/-/healthy is reachable."
 
 echo "----------------------------------------"
 echo "🔍 [TEST] Proxy: Grafana"
-$PROXY_CURL_CMD --connect-to "grafana.${DOMAIN}:443:traefik:443" https://grafana.${DOMAIN}/api/health || { echo "❌ [ERROR] https://grafana.${DOMAIN}/api/health routing failed"; exit 1; }
-echo "✅ [SUCCESS] https://grafana.${DOMAIN}/api/health is reachable."
+$PROXY_CURL_CMD --connect-to "grafana.${DOMAIN:-localhost}:443:traefik:443" https://grafana.${DOMAIN:-localhost}/api/health || { echo "❌ [ERROR] https://grafana.${DOMAIN:-localhost}/api/health routing failed"; exit 1; }
+echo "✅ [SUCCESS] https://grafana.${DOMAIN:-localhost}/api/health is reachable."
 
 echo "----------------------------------------"
 echo "🔍 [TEST] Proxy: Karma"
-$PROXY_CURL_CMD --connect-to "karma.${DOMAIN}:443:traefik:443" https://karma.${DOMAIN}/health || { echo "❌ [ERROR] https://karma.${DOMAIN}/health routing failed"; exit 1; }
-echo "✅ [SUCCESS] https://karma.${DOMAIN}/health is reachable."
+$PROXY_CURL_CMD --connect-to "karma.${DOMAIN:-localhost}:443:traefik:443" https://karma.${DOMAIN:-localhost}/health || { echo "❌ [ERROR] https://karma.${DOMAIN:-localhost}/health routing failed"; exit 1; }
+echo "✅ [SUCCESS] https://karma.${DOMAIN:-localhost}/health is reachable."
 
 echo "----------------------------------------"
 echo "🔍 [TEST] Proxy: KeepHQ (Frontend)"
-$PROXY_CURL_CMD --connect-to "keep.${DOMAIN}:443:traefik:443" https://keep.${DOMAIN}/api/healthcheck || { echo "❌ [ERROR] https://keep.${DOMAIN}/api/healthcheck routing failed"; exit 1; }
-echo "✅ [SUCCESS] https://keep.${DOMAIN}/api/healthcheck is reachable."
+$PROXY_CURL_CMD --connect-to "keep.${DOMAIN:-localhost}:443:traefik:443" https://keep.${DOMAIN:-localhost}/api/healthcheck || { echo "❌ [ERROR] https://keep.${DOMAIN:-localhost}/api/healthcheck routing failed"; exit 1; }
+echo "✅ [SUCCESS] https://keep.${DOMAIN:-localhost}/api/healthcheck is reachable."
 
 echo "----------------------------------------"
 echo "🔍 [TEST] Proxy: MinIO Console"
-$PROXY_CURL_CMD --connect-to "minio.${DOMAIN}:443:traefik:443" https://minio.${DOMAIN}/ || { echo "❌ [ERROR] https://minio.${DOMAIN}/ routing failed"; exit 1; }
-echo "✅ [SUCCESS] https://minio.${DOMAIN}/ is reachable."
+$PROXY_CURL_CMD --connect-to "minio.${DOMAIN:-localhost}:443:traefik:443" https://minio.${DOMAIN:-localhost}/ || { echo "❌ [ERROR] https://minio.${DOMAIN:-localhost}/ routing failed"; exit 1; }
+echo "✅ [SUCCESS] https://minio.${DOMAIN:-localhost}/ is reachable."
 
 echo "----------------------------------------"
 echo "🔍 [TEST] Proxy: Traefik Dashboard"
-$PROXY_CURL_CMD --connect-to "traefik.${DOMAIN}:443:traefik:443" https://traefik.${DOMAIN}/dashboard/ || { echo "❌ [ERROR] https://traefik.${DOMAIN}/dashboard/ routing failed"; exit 1; }
-echo "✅ [SUCCESS] https://traefik.${DOMAIN}/dashboard/ is reachable."
+$PROXY_CURL_CMD --connect-to "traefik.${DOMAIN:-localhost}:443:traefik:443" https://traefik.${DOMAIN:-localhost}/dashboard/ || { echo "❌ [ERROR] https://traefik.${DOMAIN:-localhost}/dashboard/ routing failed"; exit 1; }
+echo "✅ [SUCCESS] https://traefik.${DOMAIN:-localhost}/dashboard/ is reachable."
 
 echo "----------------------------------------"
 echo "🔍 [TEST] Proxy: Webhook Tester"
-$PROXY_CURL_CMD --connect-to "webhook-tester.${DOMAIN}:443:traefik:443" https://webhook-tester.${DOMAIN}/ || { echo "❌ [ERROR] https://webhook-tester.${DOMAIN}/ routing failed"; exit 1; }
-echo "✅ [SUCCESS] https://webhook-tester.${DOMAIN}/ is reachable."
+$PROXY_CURL_CMD --connect-to "webhook-tester.${DOMAIN:-localhost}:443:traefik:443" https://webhook-tester.${DOMAIN:-localhost}/ || { echo "❌ [ERROR] https://webhook-tester.${DOMAIN:-localhost}/ routing failed"; exit 1; }
+echo "✅ [SUCCESS] https://webhook-tester.${DOMAIN:-localhost}/ is reachable."
 
 echo "========================================"
 echo "🔗 Starting End-to-End Tracing Pipeline Test"
 echo "========================================"
 echo "🔍 [TEST] Flow: Traefik -> Grafana -> OTel -> Tempo -> Prometheus"
 
-# 1. Genereer een unieke, willekeurige traceparent (W3C format: 00-traceid-spanid-01)
-# 32 karakters voor trace ID, 16 voor span ID
+# 1. Generate an unique, random traceparent (W3C format: 00-traceid-spanid-01)
+# 32 characters for trace ID, 16 for span ID
 TRACE_ID=$(cat /proc/sys/kernel/random/uuid | tr -d '-')
 SPAN_ID=$(cat /proc/sys/kernel/random/uuid | tr -d '-' | cut -c1-16)
 TRACEPARENT="00-${TRACE_ID}-${SPAN_ID}-01"
 
 echo "   [INFO] Injected Traceparent: $TRACEPARENT"
 
-# 2. Vuur het request af via Traefik naar Grafana
-$PROXY_CURL_CMD -H "traceparent: $TRACEPARENT" --connect-to "grafana.${DOMAIN}:443:traefik:443" https://grafana.${DOMAIN}/api/health || { echo "❌ [ERROR] HTTP Request failed"; exit 1; }
+# 2. Fire the request via Traefik to Grafana
+$PROXY_CURL_CMD -H "traceparent: $TRACEPARENT" --connect-to "grafana.${DOMAIN:-localhost}:443:traefik:443" https://grafana.${DOMAIN:-localhost}/api/health || { echo "❌ [ERROR] HTTP Request failed"; exit 1; }
 
 echo "   [INFO] Waiting for the tracing pipeline to buffer and flush (max 30s)..."
 
-# 3. Controleer Tempo of de specifieke Trace ID is aangekomen (met een retry loop)
+# 3. Check Tempo if the specific Trace ID has arrived (with a retry loop)
 TRACE_FOUND=false
 for i in {1..6}; do
-    sleep 5
-    # Tempo heeft een API op poort 3200 om specifieke traces op te vragen
+    sleep 5 &
+    BG_PID=$!
+    spinner "$BG_PID"
+    wait "$BG_PID"
+    # Tempo API runs on port 3200 to query specific traces
     TRACE_STATUS=$($CURL_CMD -s -o /dev/null -w "%{http_code}" http://tempo:3200/api/traces/$TRACE_ID || echo "000")
-    
+
     if [ "$TRACE_STATUS" == "200" ]; then
         TRACE_FOUND=true
         echo "   ✅ [SUCCESS] Tempo successfully received and stored the exact Trace ID!"
@@ -294,9 +297,9 @@ if [ "$TRACE_FOUND" = false ]; then
     echo "   ⚠️  [WARN] Exact trace not found in Tempo within 30s. The pipeline might be delayed or misconfigured."
 fi
 
-# 4. Controleer Prometheus of de tracing metrics worden gepusht/gescraped
+# 4. Check Prometheus if the tracing metrics are being pushed/scraped
 echo "   [INFO] Verifying tracing metrics flow in Prometheus..."
-# We checken in Prometheus of OTel of Tempo de afgelopen minuten spans hebben geregistreerd
+# We check in Prometheus if OTel or Tempo have registered spans in the last few minutes
 PROM_QUERY='sum(rate(otelcol_receiver_accepted_spans[5m])) > 0 or sum(rate(tempo_distributor_spans_received_total[5m])) > 0'
 PROM_RESP=$($CURL_CMD -sG --data-urlencode "query=${PROM_QUERY}" http://prometheus:9090/api/v1/query || echo '{"data":{"result":[]}}')
 HAS_RESULTS=$(echo "$PROM_RESP" | jq -r '.data.result | length' 2>/dev/null || echo "0")
@@ -305,6 +308,90 @@ if [ "$HAS_RESULTS" -gt 0 ]; then
     echo "   ✅ [SUCCESS] Prometheus confirms that tracing metrics are actively flowing!"
 else
     echo "   ⚠️  [WARN] Prometheus metrics for trace ingestion are 0. The metrics push might be delayed."
+fi
+
+echo ""
+echo "========================================"
+echo "📜 Starting End-to-End Logging Pipeline Test"
+echo "========================================"
+echo "🔍 [TEST] Flow: Script -> Loki API (Push) -> MinIO (Storage) -> Loki API (Query)"
+
+# 1. Generate a unique log ID and a nanosecond timestamp
+LOG_UUID=$(cat /proc/sys/kernel/random/uuid)
+# Loki expects timestamps in nanoseconds. We use %N, but fallback to padded seconds if %N is unsupported on the system.
+NANO_TS=$(date +%s%N)
+if [[ "$NANO_TS" == *"N"* ]]; then
+    NANO_TS=$(date +%s)000000000
+fi
+LOG_MSG="e2e-test-log-entry-${LOG_UUID}"
+
+echo "   [INFO] Injected Log Message: $LOG_MSG"
+
+# Construct the JSON payload according to the Loki Push API specification
+LOKI_PAYLOAD=$(cat <<EOF
+{
+  "streams": [
+    {
+      "stream": {
+        "job": "e2e-test-script",
+        "source": "automated-test"
+      },
+      "values": [
+        [ "${NANO_TS}", "${LOG_MSG}" ]
+      ]
+    }
+  ]
+}
+EOF
+)
+
+# 2. Push the log to Loki
+PUSH_STATUS=$($CURL_CMD -s -o /dev/null -w "%{http_code}" -X POST -H "Content-Type: application/json" -d "$LOKI_PAYLOAD" http://loki:3100/loki/api/v1/push || echo "000")
+
+if [ "$PUSH_STATUS" != "204" ]; then
+    echo "❌ [ERROR] Failed to push log to Loki. HTTP Status: $PUSH_STATUS"
+    exit 1
+fi
+echo "   [INFO] Successfully pushed log to Loki API."
+
+echo "   [INFO] Waiting for Loki to index the log (max 50s)..."
+
+# 3. Query Loki for the specific log line with a retry loop
+LOG_FOUND=false
+
+# SIMPLIFIED QUERY: We only ask Loki for the broad job tag to prevent 
+# URL encoding issues or shell escaping errors with |= and double quotes.
+LOKI_QUERY='{job="e2e-test-script"}'
+
+# Calculate a wide time window (-5 mins to +5 mins) to prevent issues with container/host clock drift
+START_TS=$(($(date +%s) - 300))000000000
+END_TS=$(($(date +%s) + 300))000000000
+
+for i in {1..10}; do
+    sleep 5 &
+    BG_PID=$!
+    spinner "$BG_PID"
+    wait "$BG_PID"
+
+    # We use query_range to search the wide time boundaries
+    LOKI_RESP=$($CURL_CMD -sG --data-urlencode "query=${LOKI_QUERY}" --data-urlencode "start=${START_TS}" --data-urlencode "end=${END_TS}" http://loki:3100/loki/api/v1/query_range || echo '{"data":{"result":[]}}')
+
+    # We use local jq to strictly filter the results and find the exact UUID inside the log text.
+    HAS_LOG=$(echo "$LOKI_RESP" | jq -r "[.data.result[].values[]? | select(.[1] | contains(\"${LOG_UUID}\"))] | length" 2>/dev/null || echo "0")
+
+    if [ "$HAS_LOG" -gt 0 ]; then
+        LOG_FOUND=true
+        echo "   ✅ [SUCCESS] Loki successfully ingested, indexed, and returned the test log!"
+        break
+    fi
+    echo "   [INFO] Log not found in Loki yet. Retrying..."
+done
+
+if [ "$LOG_FOUND" = false ]; then
+    echo "   ❌ [ERROR] Exact log not found in Loki within 50s. The logging pipeline might be broken."
+    echo "   [DEBUG] Dumping raw Loki API Response to investigate why it failed:"
+    echo "$LOKI_RESP" | jq . || echo "$LOKI_RESP"
+    exit 1
 fi
 
 echo "========================================"
