@@ -257,6 +257,7 @@ echo "🔍 [TEST] Proxy: Webhook Tester"
 $PROXY_CURL_CMD --connect-to "webhook-tester.${DOMAIN:-localhost}:443:traefik:443" https://webhook-tester.${DOMAIN:-localhost}/ || { echo "❌ [ERROR] https://webhook-tester.${DOMAIN:-localhost}/ routing failed"; exit 1; }
 echo "✅ [SUCCESS] https://webhook-tester.${DOMAIN:-localhost}/ is reachable."
 
+echo ""
 echo "========================================"
 echo "🔗 Starting End-to-End Tracing Pipeline Test"
 echo "========================================"
@@ -460,13 +461,42 @@ if [ "$LOKI_WATCHDOG_FOUND" = false ]; then
     exit 1
 fi
 
+echo "----------------------------------------"
+echo "🔍 [TEST] Flow: Alertmanager -> Karma Dashboard"
+echo "   [INFO] Checking if Karma is actively parsing and visualizing alerts from Alertmanager..."
+
+KARMA_FOUND=false
+for i in {1..6}; do
+    # FIX: Karma /alerts.json requires a POST request and returns 'totalAlerts' at the root
+    KARMA_RESP=$($CURL_CMD -sSf -X POST -H "Content-Type: application/json" -d '{}' http://karma:8080/alerts.json || echo '{"totalAlerts":0}')
+    HAS_KARMA_ALERTS=$(echo "$KARMA_RESP" | jq -r '.totalAlerts // 0' 2>/dev/null || echo "0")
+
+    if [ "$HAS_KARMA_ALERTS" -gt 0 ]; then
+        KARMA_FOUND=true
+        echo "   ✅ [SUCCESS] Karma is successfully receiving and grouping alerts from Alertmanager (Total: $HAS_KARMA_ALERTS)!"
+        break
+    fi
+    echo "   [INFO] Karma has not synced alerts yet. Waiting for Karma to scrape Alertmanager (retrying)..."
+    sleep 10 &
+    BG_PID=$!
+    spinner "$BG_PID"
+    wait "$BG_PID"
+done
+
+if [ "$KARMA_FOUND" = false ]; then
+    echo "   ❌ [ERROR] Karma is not showing any alerts. Integration with Alertmanager might be broken."
+    echo "   [DEBUG] Dumping raw Karma API Response to investigate:"
+    echo "$KARMA_RESP" | jq . || echo "$KARMA_RESP"
+    exit 1
+fi
+
 echo ""
 echo "========================================"
 echo "📊 Starting PromQL Data Integrity Test"
 echo "========================================"
 echo "🔍 [TEST] Flow: Exporters -> Prometheus TSDB -> PromQL Evaluation"
 
-# 1. Execute a PromQL query to ensure the database is actually receiving and parsing data (Node Exporter)
+# Execute a PromQL query to ensure the database is actually receiving and parsing data (Node Exporter)
 PROMQL_TEST_QUERY='up{job="node-exporter"}'
 echo "   [INFO] Evaluating PromQL: $PROMQL_TEST_QUERY"
 
@@ -480,7 +510,7 @@ else
     exit 1
 fi
 
-# 2. Blackbox E2E validation: Verify Blackbox successfully probed an external target
+# Blackbox E2E validation: Verify Blackbox successfully probed an external target
 echo "   [INFO] Verifying Blackbox Exporter End-to-End flow..."
 BLACKBOX_QUERY='probe_success{job="blackbox-http"} == 1'
 BLACKBOX_RESP=$($CURL_CMD -sG --data-urlencode "query=${BLACKBOX_QUERY}" http://prometheus:9090/api/v1/query || echo '{"data":{"result":[]}}')
@@ -490,6 +520,31 @@ if [ "$HAS_SUCCESSFUL_PROBES" -gt 0 ]; then
     echo "   ✅ [SUCCESS] Prometheus confirms Blackbox Exporter is successfully executing HTTP probes!"
 else
     echo "   ⚠️  [WARN] No successful Blackbox probes found yet in Prometheus. The initial probe might still be running."
+fi
+
+# Podman E2E validation: Verify Podman Exporter is successfully reading the rootless socket
+echo "   [INFO] Verifying Podman Exporter End-to-End flow (Rootless Socket)..."
+PODMAN_QUERY='podman_container_info{name="grafana"}'
+PODMAN_RESP=$($CURL_CMD -sG --data-urlencode "query=${PODMAN_QUERY}" http://prometheus:9090/api/v1/query || echo '{"data":{"result":[]}}')
+HAS_PODMAN_DATA=$(echo "$PODMAN_RESP" | jq -r '.data.result | length' 2>/dev/null || echo "0")
+
+if [ "$HAS_PODMAN_DATA" -gt 0 ]; then
+    echo "   ✅ [SUCCESS] Prometheus confirms Podman Exporter is actively reading container metrics from the rootless socket!"
+else
+    echo "   ❌ [ERROR] No Podman container metrics found in Prometheus. The rootless socket mount might be failing."
+    exit 1
+fi
+
+# Traefik Metrics validation
+echo "   [INFO] Verifying Traefik Metrics End-to-End flow..."
+TRAEFIK_QUERY='traefik_entrypoint_request_duration_seconds_count > 0'
+TRAEFIK_RESP=$($CURL_CMD -sG --data-urlencode "query=${TRAEFIK_QUERY}" http://prometheus:9090/api/v1/query || echo '{"data":{"result":[]}}')
+HAS_TRAEFIK_DATA=$(echo "$TRAEFIK_RESP" | jq -r '.data.result | length' 2>/dev/null || echo "0")
+
+if [ "$HAS_TRAEFIK_DATA" -gt 0 ]; then
+    echo "   ✅ [SUCCESS] Prometheus confirms Traefik is actively exposing internal metrics!"
+else
+    echo "   ⚠️  [WARN] No Traefik request metrics found in Prometheus yet. This usually populates after a few API calls."
 fi
 
 echo ""
