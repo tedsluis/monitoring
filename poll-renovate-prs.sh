@@ -133,6 +133,7 @@ while read -r pr_number branch updated; do
     TEST_LOG="$LOG_DIR/pr-${pr_number}-$(date +%s).log"
     stack_started=true
 
+    ./install.sh
     # Check podman-compose up -d exit-code
     echo "[INFO] Bringing up the new stack with '--force-recreate'..."
     if ! podman-compose up -d --force-recreate; then
@@ -202,6 +203,7 @@ $LOG_CONTENT
             git reset --hard origin/"$base_branch"
             
             podman-compose down -t 30
+            ./install.sh
             podman-compose up -d --force-recreate
         fi
 
@@ -262,6 +264,7 @@ $FAIL_LOG
         echo "[INFO] Destroying failed test stack..."
         podman-compose down -t 30
         echo "[INFO] Starting stable stack..."
+        ./install.sh
         podman-compose up -d --force-recreate
     fi
 
@@ -285,6 +288,7 @@ if [ "$MAIN_NEEDS_UPDATE" = true ]; then
     
     echo "🔄 Restarting stack with latest main branch..."
     podman-compose down -t 30
+    ./install.sh
     podman-compose up -d --force-recreate
     
     echo "🎉 Main stack successfully updated and running on the latest versions!"
