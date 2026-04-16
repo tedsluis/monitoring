@@ -353,7 +353,7 @@ services:
   # NGINX (Static HTML)
   # ---------------------------------------------------------
   nginx:
-    image: docker.io/library/nginx:alpine@sha256:582c496ccf79d8aa6f8203a79d32aaf7ffd8b13362c60a701a2f9ac64886c93d
+    image: docker.io/library/nginx:alpine@sha256:8aa63af009a39ecd6c28d61da578a5447378c10bb097a069e3a3e0fb42bb6b19
     container_name: nginx
     healthcheck:
       test: ["CMD-SHELL", "http_proxy= HTTP_PROXY= wget -q --tries=1 --spider http://127.0.0.1:80/ || exit 1"]
