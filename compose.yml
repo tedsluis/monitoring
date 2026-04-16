@@ -198,6 +198,7 @@ services:
       - KEEP_API_KEY=585af6cc-5c07-427f-966f-a263473ad402 # Note: In a production environment, you should use a more secure way to store the api key, such as using environment variables or a secret manager.
       - KEEP_PROVIDERS_DIRECTORY=/config/providers
       - KEEP_ENABLE_AI=true
+      - KEEP_WORKFLOWS_DIRECTORY=/config/workflows
       - PORT=8080
       - SECRET_MANAGER_TYPE=FILE
       - SECRET_MANAGER_DIRECTORY=/state
@@ -209,6 +210,7 @@ services:
     volumes:
       - keep-state:/state:Z
       - ./keep/providers:/config/providers:ro,Z
+      - ./keep/workflows:/config/workflows:ro,Z
     tmpfs:
       - /prometheus_multiproc_dir
     labels:

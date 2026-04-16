@@ -1,0 +1,22 @@
+id: enrich-container-errors
+name: "Enrich Container Errors with Loki Logs"
+description: "Automatically fetches the latest error logs from Loki for the affected container and enriches the alert in KeepHQ."
+
+triggers:
+  - type: alert
+    filters:
+      - key: name
+        value: MonitoringStackErrors
+      - key: status
+        value: firing
+
+steps:
+  - name: fetch_loki_logs
+    provider:
+      type: http
+      with:
+        method: GET
+        # We manually URL-encode the static parts of the LogQL query to completely bypass 
+        # KeepHQ's Jinja parser limitations. 
+        # Decoded query: {container_name="{{ alert.labels.container_name }}"} |~ "(?i)error"
+        url: 'http://loki:3100/loki/api/v1/query_range?query=%7Bcontainer_name%3D%22{{ alert.labels.container_name }}%22%7D%20%7C~%20%22%28%3Fi%29error%22&limit=10'
