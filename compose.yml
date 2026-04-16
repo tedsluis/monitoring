@@ -154,7 +154,7 @@ services:
   # Keep Database (PostgreSQL)
   # ---------------------------------------------------------
   keep-db:
-    image: docker.io/library/postgres:18-alpine@sha256:c48f944df2efbcece2dc4ea6725554f97d430fc0a4fbcfbeb31803b22dc33331
+    image: docker.io/library/postgres:18-alpine@sha256:52098013b4b64a746626437d38afc03cabff6cdeb4d3d92e2342aa95f0ce56ea
     container_name: keep-db
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U keep -d keep"]
