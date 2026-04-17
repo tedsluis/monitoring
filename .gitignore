@@ -1,5 +1,7 @@
 # Do not commit generated certificates/keys
 /.env
+/alertmanager/alertmanager.yml
+!/alertmanager/.gitkeep
 /traefik/certs/*
 /landing-page/index.html 
 /traefik/dynamic/traefik-dynamic.yaml 
