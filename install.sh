@@ -3,11 +3,32 @@
 
 set -e
 
-# 1. Define the domain (default: localhost)
+
+echo "======================================================"
+echo "🚀 Starting installation"
+echo "======================================================"
+
+# 1. Controleer of de .env file bestaat
+if [ ! -f .env ]; then
+    echo "⚠️ .env file not found."
+    if [ -f .env.example ]; then
+        echo "Copying .env.example to .env"
+        cp .env.example .env
+        echo "🛑 ACTION REQUIRED: Please fill in your passwords, domain, and API keys in the .env file."
+        echo "Run this script (./install.sh) again after you have done so."
+    else
+        echo "❌ Error: .env.example does not exist. Please ensure it is in the repository."
+    fi
+    exit 1
+fi
+
+# Load environment variables from the .env file
+export $(grep -v '^#' .env | xargs)
+
+# Fallback DOMAIN to localhost if not set in .env
 export DOMAIN="${DOMAIN:-localhost}"
-echo "======================================================"
-echo "🚀 Starting installation for domain: ${DOMAIN}"
-echo "======================================================"
+echo "✅ Installation is running for domain: ${DOMAIN}"
+echo ""
 
 # 2. Check and install prerequisites
 echo "📦 Checking prerequisites..."
@@ -38,27 +59,24 @@ fi
 # 3. Create necessary directories
 mkdir -p traefik/dynamic traefik/certs landing-page
 
-# 4. Save the DOMAIN to an .env file for podman-compose
+# 4. Generate configuration from templates
 echo "======================================================"
-echo "📝 Saving domain to .env file for podman-compose..."
-echo "DOMAIN=${DOMAIN}" > .env
+echo "📝 Generating configuration from templates..."
+# Define wich environment variables we want to inject into the configuration files
+VARS='${DOMAIN} ${KEEP_API_KEY} ${WEBHOOK_TESTER_UUID}'
+
+envsubst "$VARS" < template/traefik.yaml > traefik/traefik.yaml
+envsubst "$VARS" < template/traefik-dynamic.yaml > traefik/dynamic/traefik-dynamic.yaml
+envsubst "$VARS" < template/index.html > landing-page/index.html
+envsubst "$VARS" < template/alertmanager.yml > alertmanager/alertmanager.yml
+echo "✅ Templates successfully processed."
 echo "======================================================"
 echo ""
 
-# 5. Generate configuration from templates (only for static files that don't support env vars natively)
-echo "======================================================"
-echo "📝 Generating static configuration files from templates..."
-# Note: single quotes around '${DOMAIN}' prevent replacing other $ variables in the files
-envsubst '${DOMAIN}' < template/traefik.yaml > traefik/traefik.yaml
-envsubst '${DOMAIN}' < template/traefik-dynamic.yaml > traefik/dynamic/traefik-dynamic.yaml
-envsubst '${DOMAIN}' < template/index.html > landing-page/index.html
-echo "======================================================"
-echo ""
-
-# 6. Make scripts executable
+# 5. Make scripts executable
 chmod +x renew-certs.sh prepare_no_proxy.sh run-tests.sh
 
-# 7. Update /etc/hosts
+# 6. Update /etc/hosts
 if [ "$DOMAIN" != "localhost" ]; then
     echo "======================================================"
     echo "🌐 Updating /etc/hosts..."
@@ -78,14 +96,14 @@ if [ "$DOMAIN" != "localhost" ]; then
     echo ""
 fi
 
-# 8. Renew certificates
+# 7. Renew certificates
 echo "======================================================"
 echo "🔐 Generating TLS certificates..."
 ./renew-certs.sh
 echo "======================================================"
 echo ""
 
-# 9. Configure proxy settings
+# 8. Configure proxy settings
 echo "======================================================"
 echo "🔀 Configuring proxy settings..."
 source ./prepare_no_proxy.sh

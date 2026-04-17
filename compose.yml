@@ -109,8 +109,8 @@ services:
     environment:
       - GF_SERVER_ROOT_URL=https://grafana.${DOMAIN:-localhost}
       - GF_SERVER_DOMAIN=grafana.${DOMAIN:-localhost}
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_TRACING_ENABLED=true
       - GF_TRACING_PROVIDER=opentelemetry
@@ -157,16 +157,16 @@ services:
     image: docker.io/library/postgres:18-alpine@sha256:c48f944df2efbcece2dc4ea6725554f97d430fc0a4fbcfbeb31803b22dc33331
     container_name: keep-db
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U keep -d keep"]
+      test: ["CMD-SHELL", "pg_isready -U ${KEEP_DB_USER} -d ${KEEP_DB_NAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
       - monitoring-net
     environment:
-      - POSTGRES_USER=keep
-      - POSTGRES_PASSWORD=keep
-      - POSTGRES_DB=keep
+      - POSTGRES_USER=${KEEP_DB_USER}
+      - POSTGRES_PASSWORD=${KEEP_DB_PASSWORD}
+      - POSTGRES_DB=${KEEP_DB_NAME}
     volumes:
       - keep-db-data:/var/lib/postgresql:Z
     restart: unless-stopped
@@ -189,13 +189,13 @@ services:
       - keep-db
     environment:
       # Database connectie
-      - DATABASE_CONNECTION_STRING=postgresql://keep:keep@keep-db:5432/keep
+      - DATABASE_CONNECTION_STRING=postgresql://${KEEP_DB_USER}:${KEEP_DB_PASSWORD}@keep-db:5432/${KEEP_DB_NAME}
       - DISABLE_POSTHOG=true
       - ENABLE_AI=true
       - LOG_LEVEL=DEBUG
       - KEEP_APP_LOG_LEVEL=DEBUG
       - KEEP_API_URL=https://keep-api.${DOMAIN:-localhost}
-      - KEEP_API_KEY=585af6cc-5c07-427f-966f-a263473ad402 # Note: In a production environment, you should use a more secure way to store the api key, such as using environment variables or a secret manager.
+      - KEEP_API_KEY=${KEEP_API_KEY}
       - KEEP_PROVIDERS_DIRECTORY=/config/providers
       - KEEP_ENABLE_AI=true
       - KEEP_WORKFLOWS_DIRECTORY=/config/workflows
@@ -204,7 +204,7 @@ services:
       - SECRET_MANAGER_DIRECTORY=/state
       # --- AI Configuratie ---
       - OPENAI_BASE_URL=http://host.containers.internal:8111/v1
-      - OPENAI_API_KEY=dummy-key
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_MODEL_NAME=gpt-5.1
       - PROMETHEUS_MULTIPROC_DIR=/prometheus_multiproc_dir
     volumes:
@@ -240,10 +240,10 @@ services:
       - ENABLE_AI=true
       - KEEP_ENABLE_AI=true
       - NEXTAUTH_URL=https://keep.${DOMAIN:-localhost}
-      - NEXTAUTH_SECRET=keep
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       # --- AI Configuratie ---
       - OPENAI_BASE_URL=http://host.containers.internal:8111/v1
-      - OPENAI_API_KEY=dummy-key
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_MODEL_NAME=gpt-5.1
     labels:
       - "traefik.enable=true"
@@ -296,8 +296,8 @@ services:
       - https_proxy=
       - HTTP_PROXY=
       - HTTPS_PROXY=
-      - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=minio123
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - MINIO_PROMETHEUS_AUTH_TYPE=public
     command: server /data --console-address ":9001"
     volumes:
@@ -344,7 +344,7 @@ services:
         condition: service_healthy
     entrypoint: |
       /bin/sh -c "
-      until mc alias set myminio http://minio:9000 minio minio123; do echo '...waiting for minio...'; sleep 1; done;
+      until mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}; do echo '...waiting for minio...'; sleep 1; done;
       mc mb myminio/loki-data --ignore-existing;
       mc mb myminio/tempo-data --ignore-existing;
       echo 'Buckets created';
@@ -533,7 +533,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-    # Traefik needs to run as root to bind to low ports (80 and 443) and to access the Docker socket for dynamic configuration. 
+    # Traefik needs to run as root to bind to low ports (80 and 443) and to access the Podman socket for dynamic configuration. 
     security_opt:
       - label=disable
     ports:

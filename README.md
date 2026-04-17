@@ -76,7 +76,7 @@ Prometheus evaluates alert.rules.yml -> Fires to Alertmanager -> Alertmanager ro
 | podman-exporter | 9882          | https://podman-exporter.localhost   | Container metrics                        |
 | Blackbox        | 9115          | https://blackbox-exporter.localhost | HTTP/TCP endpoint probe                  |
 
-**note:** Instead of `localhost` you can configure your own `DOMAIN` using an environment variable.
+**note:** Instead of `localhost` you can configure your own `DOMAIN` using the `.env` file.
 
 ## 4. Tooling & Functionality
 
@@ -144,62 +144,56 @@ This stack is using `podman` and `podman-compose` where you may be used to `dock
 ### 5.4 Install
 
 ```bash
-   # Set your own domain (defaults to localhost if left empty)
-   export DOMAIN=monitoring.home
+   # 1. Copy the example environment file
+   cp .env.example .env
 
-   ./install.sh
+   # 2. Edit the .env file and fill in your secure passwords and custom DOMAIN (using an editor like vi, vim or nano).
+   vi .env
+
+   # 3. Run the installation script
+   ./install.sh 
    ======================================================
-   🚀 Starting installation for domain: monitoring.home
+   🚀 Starting installation
    ======================================================
+   ✅ Installation is running for domain: localhost
+
    📦 Checking prerequisites...
+   ======================================================
+   📝 Generating configuration from templates...
+   ✅ Templates successfully processed.
+   ======================================================
 
-   ======================================================
-   📝 Saving domain to .env file for podman-compose...
-   ======================================================
-   
-   ======================================================
-   📝 Generating static configuration files from templates...
-   ======================================================
-   
    ======================================================
    🔐 Generating TLS certificates...
-   === Start Certificate Renewal for monitoring.home ===
+   === Start Certificate Renewal for localhost ===
    Cleaning up old files...
    Generating SAN configuration...
    Generating Root CA...
-   ....+.+........+....+............+.........+.....+.+........+.+......+...+...+..+.+......+........+.+..+..........+.....+.......+..+.+.....+...................+...+.....+.+.....+....+......+..+...+....+...+..................+...........+.+........+++++++++++++++++++++++++++++++++++++++*.+......+............+...+++++++++++++++++++++++++++++++++++++++*.....+......+......+...+.................+..........+..............+......+............+.....................+.+..............+....+...+..+......+..........+...........+.+..............++++++
-   .+.....+...+.+..+..........+++++++++++++++++++++++++++++++++++++++*......+...+++++++++++++++++++++++++++++++++++++++*.+.+....................+...............+.........+......+.+...+......+.........+...+...+.........+.....+.............+...+............+........+..........+..+.......+........+..................+......+.+.........+.....+...+................+..+.........+....+...............+.....+....+...............+...............+......+......+........+.............+.....+...+.+...+..................+..+...+...+...............+.+.........+.........+...+..............+....+..+.......+...+.....+.......+......+.....+.+.........+......+.....+.+..+............+....+..+.......+..+...+.......+.....+.............+.....+......+.+...+...+........................+...+..+.+...............+.....+.......+..+.+..+.+......+...+..+.........+.........+...++++++
+   ...+......+.+...+.....+................+...+++++++++++++++++++++++++++++++++++++++*.......+...+..+.........+.......+...+..+.......+...+..+.+.....+......+++++++++++++++++++++++++++++++++++++++*.....+.+............+...+...+.....+......+...+...+.........+......+..........+..+.......+......+..+.+.....+......+.............+...+.....+...+.+.....+......+..........+..............+...................+..+....+...+...+..+.....................+....+..+.+........+....+..++++++
+   ...+........+.+......+..+.......+.....+.+.....+.......+...............+...+.....+.........+.+..+.......+.....+....+............+++++++++++++++++++++++++++++++++++++++*....+...+....+...+.....+++++++++++++++++++++++++++++++++++++++*.+.............+...+..+...+.+.....+.+...............+.....+...+....+.....+.......+...+...........+......+....+..+.........++++++
    -----
    Generating Server Certificate...
    Certificate request self-signature ok
-   subject=C=NL, ST=Utrecht, L=Utrecht, O=Utrecht, OU=Utrecht, CN=*.monitoring.home
+   subject=C=NL, ST=Utrecht, L=Utrecht, O=Utrecht, OU=Utrecht, CN=*.localhost
    Fixing permissions (chmod 644)...
    Updating Fedora Trust Store...
    Checking if System Bundle trusts the certificate...
    ✓ SUCCESS: System bundle now trusts your certificate!
    Restarting Traefik...
-   012a813112b66f64b1f3b42c45bafbd6ffef7a775df5abf6c98bae81b7baef9a
-   Trying to pull docker.io/library/traefik@sha256:5ae9c349154d5298a5d61a7b25e5f3a9f53314f1515e87632120b95051c7917c...
-   Getting image source signatures
-   Copying blob 082d991da747 done   | 
-   Copying blob 2637a87d2636 done   | 
-   Copying blob 9e73946ffb91 done   | 
-   Copying blob 589002ba0eae skipped: already exists  
-   Copying config aa4b5cf274 done   | 
-   Writing manifest to image destination
-   2fc76a107e2f59aa6a4bb7d38315ba46649847b12e978c8ad722904b8eef598d
+   babb3439e401e4547964fc3fd4ba8f44bfa9340758ba2ff59819e4660f0f4f49
+   a67a1bfb5808194eb99314bb47b54e5bc451d1b7bb8a754bb05fc3afacf73b18
    traefik
    === Done! ===
-   Test now with: curl -v https://grafana.monitoring.home
+   Test now with: curl -v https://grafana.localhost
    ======================================================
-   
+
    ======================================================
    🔀 Configuring proxy settings...
    You are not using a HTTP proxy.
    Neither http_proxy, https_proxy, HTTP_PROXY nor HTTPS_PROXY is set. The no_proxy variable will not have any effect.
    Please set http_proxy, https_proxy, HTTP_PROXY and HTTPS_PROXY environment variables if you intend to use a proxy.
 ```
-**note:** You can rerun this `install.sh` everytime you want to change the `DOMAIN`.
+**note:** You can edit the `.env` file and rerun this `install.sh` every time you want to change the `DOMAIN` or update a secret in the templates.
 
 ### 5.5 Start the stack
 
@@ -238,7 +232,7 @@ ce958ef62c3e  docker.io/otel/opentelemetry-collector-contrib@sha256:8164eab2e6bc
 
 To ensure all components are successfully communicating with each other, you can run `run-tests.sh`, the automated test suite:
 ```bash
-✔ tedsluis@fedora ~/monitoring [main|…7] $ ./run-tests.sh 
+./run-tests.sh 
 ========================================
 🚀 Starting Automated Validation Suite
 ========================================
@@ -507,7 +501,8 @@ To ensure secure connections (https://*.${DOMAIN}) without browser warnings, you
 
 Note: The `install.sh` script already generates these TLS certificates automatically. You only need to run this script manually if your certificates expire, or if you have issues with your local tust store.
 ```bash
-export DOMAIN=localhost # set your own domain, like monitoring.home
+# set your own DOMAIN, like monitoring.home
+vi .env
 
 ./renew-certs.sh
 === Start Certificate Renewal ===
@@ -565,14 +560,14 @@ Instead of memorizing various ports and subdomains, this portal provides a clean
 
 ![startpagina4](./images/startpagina4.png)
 
-### 7.2 Login credentials (Defaults)
+### 7.2 Login credentials
 
-In case you navigate to Grafana or MinIO, you need to log in with the user accounts below:
+In case you navigate to Grafana or MinIO, you need to log in with the user accounts defined in your `.env` file. By default (if you used the example values), these are:
 
-| Service | Username       | Password   | Note                                   |
-|---------|----------------|------------|----------------------------------------|
-| Grafana | admin          | admin      | You can change this after first login. |
-| MinIO   | minio          | minio123   | Can be changed in compose.yml          |
+| Service | Username       | Password                            | Note                        |
+|---------|----------------|-------------------------------------|-----------------------------|
+| Grafana | admin          | *<value of GRAFANA_ADMIN_PASSWORD>* | Configured via `.env` file. |
+| MinIO   | minio123       | *<value of MINIO_ROOT_PASSWORD>*    | Configured via `.env` file. |
 
 ### 7.3 Prometheus Metrics
 
