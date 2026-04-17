@@ -501,7 +501,8 @@ To ensure secure connections (https://*.${DOMAIN}) without browser warnings, you
 
 Note: The `install.sh` script already generates these TLS certificates automatically. You only need to run this script manually if your certificates expire, or if you have issues with your local tust store.
 ```bash
-export DOMAIN=localhost # set your own domain, like monitoring.home
+# set your own DOMAIN, like monitoring.home
+vi .env
 
 ./renew-certs.sh
 === Start Certificate Renewal ===
