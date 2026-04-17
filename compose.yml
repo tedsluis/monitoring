@@ -403,7 +403,7 @@ services:
   # OpenTelemetry Collector
   # ---------------------------------------------------------
   otel-collector:
-    image: docker.io/otel/opentelemetry-collector-contrib:0.149.0@sha256:0fba96233274f6d665ac8831ad99dfe6479a9a20459f6e2719c0d20945773b46
+    image: docker.io/otel/opentelemetry-collector-contrib:0.150.1@sha256:a516c26968aa1feb5e5fc0562e3338ea13755cb4f373603226bcc4e276374ad0
     container_name: otel-collector
     command: ["--config=/etc/otel-config.yaml"]
     networks:
@@ -568,7 +568,7 @@ services:
   # Webhook Tester
   # ---------------------------------------------------------
   webhook-tester:
-    image: docker.io/tarampampam/webhook-tester:2.2.7@sha256:f6581180affb655aaff5b00209b2b54932b69c19a3c102433bc5aa4ea72ab784
+    image: docker.io/tarampampam/webhook-tester:2.3.0@sha256:85818267b450d3d386cad6510c561e09b974183ed2832c373bc83b125fc1b221
     container_name: webhook-tester
     networks:
       - monitoring-net
