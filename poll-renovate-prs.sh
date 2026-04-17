@@ -217,8 +217,9 @@ $LOG_CONTENT
         
         if [ -z "$ISSUE_NUM" ] || [ "$ISSUE_NUM" == "null" ]; then
             echo "[INFO] Creating a new GitHub Issue for the failed test..."
-            # Safe ISSUE_NUM parsing via --json
-            ISSUE_NUM=$(gh issue create --repo "$REPO" \
+            
+            # Create the issue and capture the resulting URL
+            ISSUE_URL=$(gh issue create --repo "$REPO" \
                 --title "🚨 Test Failed: Renovate PR #$pr_number" \
                 --body "The automatic test failed for PR #$pr_number (Commit \`$current_sha\`).
                 
@@ -230,8 +231,10 @@ $FAIL_LOG
 </details>
 
 *System rolled back to the stable branch.*" \
-                --label "bug" \
-                --json number --jq .number)
+                --label "bug")
+
+            # Extract the issue number from the URL (e.g. https://github.com/.../issues/42 -> 42)
+            ISSUE_NUM=$(basename "$ISSUE_URL")
 
             echo "[INFO] New issue created: #$ISSUE_NUM. Updating state file."
             safe_state_update ".\"$pr_number\".issue_number = \"$ISSUE_NUM\""
