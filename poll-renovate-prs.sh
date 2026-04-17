@@ -160,7 +160,7 @@ while read -r pr_number branch updated; do
         
         retry gh pr edit "$pr_number" --repo "$REPO" --add-label "test-passed" --remove-label "test-failed" 2>/dev/null || true
         
-        LOG_CONTENT=$(grep -v "waiting..." "$TEST_LOG" | tail -n 150)
+        LOG_CONTENT=$(grep -v "waiting..." "$TEST_LOG" | tail -n 250)
         retry gh pr comment "$pr_number" --repo "$REPO" --body "✅ **Automatic Validation Passed!**
 The stack successfully started on commit \`$current_sha\`. No healthcheck errors found.
 
@@ -212,7 +212,7 @@ $LOG_CONTENT
         
         retry gh pr edit "$pr_number" --repo "$REPO" --add-label "test-failed" --remove-label "test-passed" 2>/dev/null || true
         
-        FAIL_LOG=$(tail -n 50 "$TEST_LOG")
+        FAIL_LOG=$(grep -v "waiting..." "$TEST_LOG" | tail -n 250)
         ISSUE_NUM=$(jq -r ".\"$pr_number\".issue_number // empty" "$STATE_FILE")
         
         if [ -z "$ISSUE_NUM" ] || [ "$ISSUE_NUM" == "null" ]; then
