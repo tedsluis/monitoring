@@ -258,7 +258,7 @@
                 <p>Reverse proxy status, routers and services overview.</p>
                 <div class="port-badge">traefik.${DOMAIN}</div>
             </a>
-            <a href="https://webhook-tester.${DOMAIN}/s/65ae26f0-131e-4390-8daa-bdaec17e77c2" class="card core" target="_blank" rel="noopener noreferrer">
+            <a href="https://webhook-tester.${DOMAIN}/s/${WEBHOOK_TESTER_UUID}" class="card core" target="_blank" rel="noopener noreferrer">
                 <div class="card-header">
                     <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                     <h2>Webhook tester</h2>
@@ -623,7 +623,7 @@
                 // Make the request with the correct API key header
                 const response = await fetch('https://keep-api.${DOMAIN}/metrics/processing', {
                     headers: {
-                        'x-api-key': '585af6cc-5c07-427f-966f-a263473ad402'
+                        'x-api-key': '${KEEP_API_KEY}'
                     }
                 });
 
