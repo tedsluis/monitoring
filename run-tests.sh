@@ -12,7 +12,7 @@ spinner() {
     local frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
     local i=0
 
-    tput civis  # hide cursor
+    tput civis 2>/dev/null || true  # hide cursor (ignore errors in cron)
 
     while kill -0 "$pid" 2>/dev/null; do
         printf "\r  %s  waiting..." "${frames[$i]}"
@@ -20,7 +20,7 @@ spinner() {
         sleep "$delay"
     done
 
-    tput cnorm  # restore cursor
+    tput cnorm 2>/dev/null || true  # restore cursor (ignore errors in cron)
     printf "\r  ✔  Continue!          \n"
 }
 
