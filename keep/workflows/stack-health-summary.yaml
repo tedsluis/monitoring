@@ -1,0 +1,40 @@
+workflow:
+  id: stack-health-summary
+  name: "Periodic Stack Health Check"
+  description: "Every 5 minutes, check if critical containers are missing from Prometheus."
+  triggers:
+    - type: interval
+      value: 300
+  steps:
+    - name: get-container-states
+      provider:
+        type: prometheus
+        config: "{{ providers.prometheus-local }}"
+        with:
+          query: >
+            container_last_seen{
+              name=~"prometheus|loki|tempo|grafana|alertmanager|keep-backend|minio|traefik|alloy"
+            }
+    - name: get-down-containers
+      provider:
+        type: prometheus
+        config: "{{ providers.prometheus-local }}"
+        with:
+          query: >
+            count by (name) (
+              (time() - container_last_seen{
+                name=~"prometheus|loki|tempo|grafana|alertmanager|keep-backend|minio|traefik|alloy"
+              }) > 60
+            )
+  actions:
+    - name: notify-containers-down
+      if: "{{ steps.get-down-containers.results | length > 0 }}"
+      provider:
+        type: http
+        with:
+          url: "http://webhook-tester:8080/65ae26f0-131e-4390-8daa-bdaec17e77c2"
+          method: POST
+          body: >
+            {"alert": "stack-health-summary",
+             "containers_down": "{{ steps.get-down-containers.results }}",
+             "all_containers": "{{ steps.get-container-states.results }}"}

@@ -1,0 +1,35 @@
+workflow:
+  id: blackbox-probe-failure-enrichment
+  name: "Blackbox Probe Failed - Add availability history"
+  description: "When an HTTP probe fails, show the probe success rate trend from Prometheus."
+  triggers:
+    - type: alert
+      filters:
+        - key: name
+          value: "BlackboxProbeFailed"
+  steps:
+    - name: get-probe-history
+      provider:
+        type: prometheus
+        config: "{{ providers.prometheus-local }}"
+        with:
+          query: >
+            avg_over_time(
+              probe_success{instance="{{ alert.labels.instance }}"}[30m]
+            ) * 100
+    - name: get-probe-duration
+      provider:
+        type: prometheus
+        config: "{{ providers.prometheus-local }}"
+        with:
+          query: >
+            probe_duration_seconds{instance="{{ alert.labels.instance }}"}
+  actions:
+    - name: enrich-probe-alert
+      provider:
+        type: keep
+        with:
+          enrichments:
+            probe_success_rate_pct: "{{ steps.get-probe-history.results }}"
+            last_probe_duration_seconds: "{{ steps.get-probe-duration.results }}"
+            grafana_blackbox_dashboard: "https://grafana.localhost/d/blackbox"

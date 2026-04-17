@@ -1,0 +1,29 @@
+workflow:
+  id: container-down-loki-enrichment
+  name: "Container Down - Enrich with Loki logs"
+  description: "When a container is down, fetch its recent logs from Loki and attach them to the alert."
+  triggers:
+    - type: alert
+      filters:
+        - key: name
+          value: "ContainerDown"
+  steps:
+    - name: get-container-logs
+      provider:
+        type: grafana_loki
+        config: "{{ providers.loki-local }}"
+        with:
+          query: '{container_name="{{ alert.labels.container }}"}'
+          since: "15m"
+          limit: 20
+          direction: backward
+  actions:
+    - name: enrich-with-logs
+      provider:
+        type: mock
+        with:
+          enrich_alert:
+            - key: loki_logs
+              value: "{{ steps.get-container-logs.results }}"
+            - key: loki_query_link
+              value: "https://grafana.localhost/explore"

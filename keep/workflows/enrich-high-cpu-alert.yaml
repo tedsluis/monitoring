@@ -1,0 +1,26 @@
+# keep/workflows/enrich-with-logs.yaml
+workflow:
+  id: enrich-high-cpu-alert
+  name: "Enrich High CPU Alert with Loki Logs"
+  description: "Haalt relevante logs op uit Loki en voegt ze toe aan de alert."
+  triggers:
+    - type: alert
+      filters:
+        - key: alertname
+          value: HighCpuUsage
+  steps:
+    - name: get-loki-logs
+      provider:
+        type: grafana_loki
+        config: "{{ providers.loki-local }}"
+        with:
+          query: "{container_name=\"{{ alert.labels.container_name }}\"} |= \"error\""
+          limit: 5
+  actions:
+    - name: enrich-alert
+      provider:
+        type: keep
+        with:
+          alert_id: "{{ alert.id }}"
+          note: |
+            *Gerelateerde Logs van Loki:*

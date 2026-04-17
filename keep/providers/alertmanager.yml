@@ -1,0 +1,6 @@
+id: alertmanager
+name: alertmanager-local
+type: alertmanager
+description: "Internal Alertmanager (IaC)"
+authentication:
+  url: "http://alertmanager:9093"

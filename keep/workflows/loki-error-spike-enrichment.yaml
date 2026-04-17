@@ -1,0 +1,35 @@
+workflow:
+  id: loki-error-spike-enrichment
+  name: "Log Error Spike - Fetch actual error messages"
+  description: "When Loki fires an error-rate alert, retrieve the actual error log lines."
+  triggers:
+    - type: alert
+      filters:
+        - key: name
+          value: "HighLogErrorRate"
+  steps:
+    - name: get-error-logs
+      provider:
+        type: grafana_loki
+        config: "{{ providers.loki-local }}"
+        with:
+          query: '{job="{{ alert.labels.job }}"} |~ "(?i)(error|exception|fatal|panic)"'
+          timerange: 10
+          limit: 25
+    - name: get-error-rate
+      provider:
+        type: prometheus
+        config: "{{ providers.prometheus-local }}"
+        with:
+          query: >
+            sum(rate(
+              {job="{{ alert.labels.job }}"} |~ "(?i)error" [5m]
+            )) by (container_name)
+  actions:
+    - name: enrich-error-alert
+      provider:
+        type: keep
+        with:
+          enrichments:
+            recent_errors: "{{ steps.get-error-logs.results }}"
+            error_rate_per_sec: "{{ steps.get-error-rate.results }}"

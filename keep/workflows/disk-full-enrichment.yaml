@@ -1,0 +1,40 @@
+workflow:
+  id: disk-full-enrichment
+  name: "Disk Almost Full - Multi-source enrichment"
+  description: "Enrich disk alerts with Prometheus disk metrics and Loki filesystem errors."
+  triggers:
+    - type: alert
+      filters:
+        - key: name
+          value: "DiskAlmostFull"
+  steps:
+    - name: get-disk-metrics
+      provider:
+        type: prometheus
+        config: "{{ providers.prometheus-local }}"
+        with:
+          query: >
+            sort_desc(
+              100 - (
+                node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs"} /
+                node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs"} * 100
+              )
+            )
+    - name: get-fs-errors
+      provider:
+        type: grafana_loki
+        config: "{{ providers.loki-local }}"
+        with:
+          query: '{job="systemd-journal"} |~ "(?i)(disk|filesystem|i/o error|no space left)"'
+          since: "30m"
+          limit: 10
+  actions:
+    - name: enrich-disk-alert
+      provider:
+        type: mock
+        with:
+          enrich_alert:
+            - key: disk_usage_pct
+              value: "{{ steps.get-disk-metrics.results }}"
+            - key: recent_fs_errors
+              value: "{{ steps.get-fs-errors.results }}"
