@@ -2,6 +2,9 @@
 # run-tests.sh - Runs validations on the monitoring stack via an internal ephemeral container
 set -e
 
+# Load environment variables from the .env file
+export $(grep -v '^#' .env | xargs)
+
 # shows a spinner while waiting for background processes, adapted from
 spinner() {
     local pid=$1

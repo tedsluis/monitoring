@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Load environment variables from the .env file
+export $(grep -v '^#' .env | xargs)
+
 # prepare_no_proxy.sh - Dynamically generates a comprehensive no_proxy variable based on the compose.yml services and common local addresses.
 
 # 1. Ensure http_proxy and https_proxy are set, otherwise no_proxy is irrelevant

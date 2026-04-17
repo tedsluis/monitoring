@@ -7,6 +7,9 @@
 
 set -e
 
+# Load environment variables from the .env file
+export $(grep -v '^#' .env | xargs)
+
 # Configuration
 # Resolve repository root relative to this script so the script works
 # regardless of where the repository is cloned.
