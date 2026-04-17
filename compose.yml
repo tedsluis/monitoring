@@ -154,7 +154,7 @@ services:
   # Keep Database (PostgreSQL)
   # ---------------------------------------------------------
   keep-db:
-    image: docker.io/library/postgres:18-alpine@sha256:c48f944df2efbcece2dc4ea6725554f97d430fc0a4fbcfbeb31803b22dc33331
+    image: docker.io/library/postgres:18-alpine@sha256:52098013b4b64a746626437d38afc03cabff6cdeb4d3d92e2342aa95f0ce56ea
     container_name: keep-db
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${KEEP_DB_USER} -d ${KEEP_DB_NAME}"]
@@ -526,7 +526,7 @@ services:
   # Traefik (Reverse Proxy & Ingress)
   # ---------------------------------------------------------
   traefik:
-    image: docker.io/library/traefik:v3.6.13@sha256:5ae9c349154d5298a5d61a7b25e5f3a9f53314f1515e87632120b95051c7917c
+    image: docker.io/library/traefik:v3.6.13@sha256:34d5089d0b414945342848518b383f11f5b3a645504ed87b77ffeb9d683d0e48
     container_name: traefik
     healthcheck:
       test: ["CMD-SHELL", "http_proxy= HTTP_PROXY= wget -q --tries=1 --spider http://127.0.0.1:8082/ping || exit 1"]
