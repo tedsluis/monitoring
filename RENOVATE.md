@@ -186,20 +186,37 @@ The test log file created during the `poll-renovate-prs.sh` is stored in **./log
 ### 4.3 Running Tests Manually
 If you want to validate the stack without interacting with GitHub:
 ```bash
-$ ./run-tests.sh 
+./run-tests.sh 
 ========================================
 🚀 Starting Automated Validation Suite
 ========================================
+  ✔  Continue!          
 🔍 [CHECK] Smoketest: Are all defined containers running?
    [INFO] Expected container count from compose.yml: 19
    [INFO] Currently running containers: 19
 ✅ [SUCCESS] All required containers are running.
 ----------------------------------------
-⏳ [WAIT] Checking container health status (Minio, Loki, Tempo)...
-   [INFO] Waiting for minio to become healthy...
-   [SUCCESS] minio is healthy!
+⏳ [WAIT] Checking container health status (Alertmanager, Grafana, Keep-db, Keep-frontend, Minio, Nginx, Node-exporter, Podman-exporter, Prometheus, Traefik)...
+   [INFO] Waiting for alertmanager to become healthy...
+   [SUCCESS] alertmanager is healthy!
+   [INFO] Waiting for grafana to become healthy...
+   [SUCCESS] grafana is healthy!
    [INFO] Waiting for keep-db to become healthy...
    [SUCCESS] keep-db is healthy!
+   [INFO] Waiting for keep-frontend to become healthy...
+   [SUCCESS] keep-frontend is healthy!
+   [INFO] Waiting for minio to become healthy...
+   [SUCCESS] minio is healthy!
+   [INFO] Waiting for nginx to become healthy...
+   [SUCCESS] nginx is healthy!
+   [INFO] Waiting for node-exporter to become healthy...
+   [SUCCESS] node-exporter is healthy!
+   [INFO] Waiting for podman-exporter to become healthy...
+   [SUCCESS] podman-exporter is healthy!
+   [INFO] Waiting for prometheus to become healthy...
+   [SUCCESS] prometheus is healthy!
+   [INFO] Waiting for traefik to become healthy...
+   [SUCCESS] traefik is healthy!
 🔍 [CHECK] Identifying internal Podman network...
 🔌 [INFO] Using internal network: monitoring_monitoring-net
    [INFO] Using ephemeral curl container for internal API testing.
@@ -210,54 +227,150 @@ $ ./run-tests.sh
 🔍 [TEST] Prometheus Targets (Max 2 minutes wait)
    [INFO] Fetching Prometheus targets (Attempt 1/12)...
 ✅ [SUCCESS] All Prometheus targets are UP and successfully scraped.
+
+========================================
+🌐 Starting Podman monitoring-net network Tests (via HTTP)
+========================================
 ----------------------------------------
 🔍 [TEST] Grafana API
-✅ [SUCCESS] Grafana is reachable and healthy.
+✅ [SUCCESS] http://grafana:3000/api/health is reachable and healthy.
 ----------------------------------------
 🔍 [TEST] Alertmanager
-✅ [SUCCESS] Alertmanager is reachable and healthy.
+✅ [SUCCESS] http://alertmanager:9093/-/healthy is reachable and healthy.
 ----------------------------------------
 🔍 [TEST] Keep API
-✅ [SUCCESS] Keep API is reachable and healthy.
+✅ [SUCCESS] http://keep-backend:8080/ is reachable and healthy.
 ----------------------------------------
 🔍 [TEST] Traefik Routing (using Nginx)
-✅ [SUCCESS] Traefik is routing requests correctly.
+✅ [SUCCESS] http://traefik:80 is routing requests correctly.
 ----------------------------------------
 🔍 [TEST] Alloy
-✅ [SUCCESS] Alloy is reachable and healthy.
+✅ [SUCCESS] http://alloy:12345/-/healthy is reachable and healthy.
 ----------------------------------------
 🔍 [TEST] Blackbox Exporter
-✅ [SUCCESS] Blackbox Exporter is reachable and healthy.
+✅ [SUCCESS] http://blackbox-exporter:9115/-/healthy is reachable and healthy.
 ----------------------------------------
 🔍 [TEST] Karma Dashboard
-✅ [SUCCESS] Karma is reachable and healthy.
+✅ [SUCCESS] http://karma:8080/health is reachable and healthy.
 ----------------------------------------
 🔍 [TEST] Keep Frontend
-✅ [SUCCESS] Keep Frontend is reachable and healthy.
+✅ [SUCCESS] http://keep-frontend:3000/api/healthcheck is reachable and healthy.
 ----------------------------------------
 🔍 [TEST] Loki
-✅ [SUCCESS] Loki is reachable and healthy.
+✅ [SUCCESS] http://loki:3100/ready is reachable and healthy.
 ----------------------------------------
 🔍 [TEST] MinIO
-✅ [SUCCESS] MinIO is reachable and healthy.
+✅ [SUCCESS] http://minio:9000/minio/health/live is reachable and healthy.
 ----------------------------------------
 🔍 [TEST] Nginx
-✅ [SUCCESS] Nginx is reachable.
+✅ [SUCCESS] http://nginx:80 is reachable.
 ----------------------------------------
 🔍 [TEST] Node Exporter
-✅ [SUCCESS] Node Exporter is reachable.
+✅ [SUCCESS] http://host.containers.internal:9100 is reachable.
 ----------------------------------------
 🔍 [TEST] OpenTelemetry Collector
-✅ [SUCCESS] OTel Collector is reachable.
+✅ [SUCCESS] http://otel-collector:8888/metrics is reachable.
 ----------------------------------------
 🔍 [TEST] Podman Exporter
-✅ [SUCCESS] Podman Exporter is reachable.
+✅ [SUCCESS] http://podman-exporter:9882/metrics is reachable.
 ----------------------------------------
 🔍 [TEST] Tempo
-✅ [SUCCESS] Tempo is reachable and healthy.
+✅ [SUCCESS] http://tempo:3200/ready is reachable and healthy.
 ----------------------------------------
 🔍 [TEST] Webhook Tester
-✅ [SUCCESS] Webhook Tester is reachable.
+✅ [SUCCESS] http://webhook-tester:8080 is reachable.
+
+========================================
+🌐 Starting Reverse Proxy Tests (via HTTPS/443)
+========================================
+----------------------------------------
+🔍 [TEST] Proxy: Alloy
+✅ [SUCCESS] https://alloy.localhost/-/healthy is reachable.
+----------------------------------------
+🔍 [TEST] Proxy: Alertmanager
+✅ [SUCCESS] https://alertmanager.localhost/-/healthy is reachable.
+----------------------------------------
+🔍 [TEST] Proxy: Grafana
+✅ [SUCCESS] https://grafana.localhost/api/health is reachable.
+----------------------------------------
+🔍 [TEST] Proxy: Karma
+✅ [SUCCESS] https://karma.localhost/health is reachable.
+----------------------------------------
+🔍 [TEST] Proxy: KeepHQ (Frontend)
+✅ [SUCCESS] https://keep.localhost/api/healthcheck is reachable.
+----------------------------------------
+🔍 [TEST] Proxy: MinIO Console
+✅ [SUCCESS] https://minio.localhost/ is reachable.
+----------------------------------------
+🔍 [TEST] Proxy: Traefik Dashboard
+✅ [SUCCESS] https://traefik.localhost/dashboard/ is reachable.
+----------------------------------------
+🔍 [TEST] Proxy: Webhook Tester
+✅ [SUCCESS] https://webhook-tester.localhost/ is reachable.
+
+========================================
+🔗 Starting End-to-End Tracing Pipeline Test
+========================================
+🔍 [TEST] Flow: Traefik -> Grafana -> OTel -> Tempo -> Prometheus
+   [INFO] Injected Traceparent: 00-94a28f6924984c1693799c085095c6d8-4859a8e8b4274581-01
+   [INFO] Waiting for the tracing pipeline to buffer and flush (max 30s)...
+  ✔  Continue!          
+   ✅ [SUCCESS] Tempo successfully received and stored the exact Trace ID!
+   [INFO] Verifying tracing metrics flow in Prometheus...
+   ✅ [SUCCESS] Prometheus confirms that tracing metrics are actively flowing!
+
+========================================
+📜 Starting End-to-End Logging Pipeline Test
+========================================
+🔍 [TEST] Flow: Script -> Loki API (Push) -> MinIO (Storage) -> Loki API (Query)
+   [INFO] Injected Log Message: e2e-test-log-entry-cf34c556-9066-407d-9db8-caed8ec37687
+   [INFO] Successfully pushed log to Loki API.
+   [INFO] Waiting for Loki to index the log (max 50s)...
+  ✔  Continue!          
+   ✅ [SUCCESS] Loki successfully ingested, indexed, and returned the test log!
+
+========================================
+🪵 Starting Alloy Auto-Discovery Test
+========================================
+🔍 [TEST] Flow: Container Logs -> Alloy -> Loki
+   [INFO] Verifying if Alloy is actively scraping containers and sending them to Loki...
+   ✅ [SUCCESS] Alloy is actively scraping container logs and shipping them to Loki!
+
+========================================
+🚨 Starting End-to-End Alerting Pipeline Tests
+========================================
+🔍 [TEST] Flow: Prometheus (Rules Engine) -> Alertmanager
+   [INFO] Checking if Alertmanager is receiving the 'Watchdog' alert from Prometheus...
+   ✅ [SUCCESS] Alertmanager is receiving alerts from Prometheus!
+----------------------------------------
+🔍 [TEST] Flow: Loki (Ruler) -> Alertmanager
+   [INFO] Checking if Alertmanager is receiving the 'LokiWatchdog' alert from Loki...
+   ✅ [SUCCESS] Alertmanager is receiving alerts from Loki!
+----------------------------------------
+🔍 [TEST] Flow: Alertmanager -> Karma Dashboard
+   [INFO] Checking if Karma is actively parsing and visualizing alerts from Alertmanager...
+   ✅ [SUCCESS] Karma is successfully receiving and grouping alerts from Alertmanager (Total: 4)!
+
+========================================
+📊 Starting PromQL Data Integrity Test
+========================================
+🔍 [TEST] Flow: Exporters -> Prometheus TSDB -> PromQL Evaluation
+   [INFO] Evaluating PromQL: up{job="node-exporter"}
+   ✅ [SUCCESS] PromQL successfully evaluated the metric (value: 1).
+   [INFO] Verifying Blackbox Exporter End-to-End flow...
+   ✅ [SUCCESS] Prometheus confirms Blackbox Exporter is successfully executing HTTP probes!
+   [INFO] Verifying Podman Exporter End-to-End flow (Rootless Socket)...
+   ✅ [SUCCESS] Prometheus confirms Podman Exporter is actively reading container metrics from the rootless socket!
+   [INFO] Verifying Traefik Metrics End-to-End flow...
+   ✅ [SUCCESS] Prometheus confirms Traefik is actively exposing internal metrics!
+
+========================================
+🪣 Starting Storage Verification Test (MinIO)
+========================================
+🔍 [TEST] Flow: minio-init -> MinIO Buckets
+   [INFO] Checking if Loki and Tempo buckets exist in MinIO...
+   ✅ [SUCCESS] Bucket 'loki-data' exists.
+   ✅ [SUCCESS] Bucket 'tempo-data' exists.
 ========================================
 🎉 [COMPLETE] All tests completed successfully! Stack is stable.
 ```
