@@ -133,7 +133,6 @@ This stack is using `podman` and `podman compose` where you may be used to `dock
 *   **Drop-in Replacement:** The transition is practically seamless. Podman's CLI is intentionally designed to be identical to Docker's. You can simply add `alias docker=podman` to your shell profile, and all your familiar commands (`build`, `run`, `ps`, `pull`) will work exactly as expected.
 *   **Native Systemd Integration:** Podman integrates fully into Linux environments. It can easily generate and manage `systemd` unit files from running containers, allowing you to treat containers as native system services that start automatically on boot.
 *   **Kubernetes Readiness:** Podman introduces the concept of "pods" (groups of containers sharing the same network and namespaces) locally, mirroring how Kubernetes operates. It can even generate Kubernetes YAML from local containers or run existing Kubernetes YAML directly, making the transition from local development to production orchestration much smoother.
-*   
 
 #### Understanding `podman-compose` vs. `podman compose`
 
@@ -679,7 +678,7 @@ In a typical workflow, a collector like Grafana Alloy gathers logs from your con
 
 **How it works in this stack (loki-config.yaml):** The core behavior of Loki in this environment is defined in [./loki/loki-config.yaml](./loki/loki-config.yaml):
 
-* **S3 Storage Backend (MinIO):** Rather than saving heavy log files to local disk, Loki is configured to use the s3 storage type. It connects directly to the local MinIO instance (`http://minio:9000`) using the `minio` / `minio123` credentials and stores all log chunks in the loki-data bucket.
+* **S3 Storage Backend (MinIO):** Rather than saving heavy log files to local disk, Loki is configured to use the s3 storage type. It connects directly to the local MinIO instance (`http://minio:9000`) using the credentials defined in your `.env` file and stores all log chunks in the loki-data bucket.
 * **TSDB Indexing:** The `schema_config` defines that Loki uses tsdb (Time Series Database) for its index. This is the modern, highly optimized index format for Loki that drastically improves query performance and reduces storage costs compared to older formats.
 * **Data Retention & Compactor:** To prevent the disk/MinIO from filling up indefinitely, the limits_config enforces a strict retention period of `168h` (7 days). The compactor component runs periodically to scan the MinIO bucket and automatically delete log data that has exceeded this age limit.
 * **The Ruler (Alerting):** Loki isn't just for searching; it can proactively monitor your logs. The ruler block configures Loki to continuously evaluate LogQL alert rules stored in `/loki/rules` (e.g., triggering an alert if the word "ERROR" appears more than 10 times in a minute). If a rule threshold is met, Loki sends the alert directly to `http://alertmanager:9093`.

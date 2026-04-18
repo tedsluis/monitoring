@@ -63,12 +63,14 @@ mkdir -p traefik/dynamic traefik/certs landing-page
 echo "======================================================"
 echo "📝 Generating configuration from templates..."
 # Define wich environment variables we want to inject into the configuration files
-VARS='${DOMAIN} ${KEEP_API_KEY} ${WEBHOOK_TESTER_UUID}'
+VARS='${DOMAIN} ${KEEP_API_KEY} ${WEBHOOK_TESTER_UUID} ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}'
 
 envsubst "$VARS" < template/traefik.yaml > traefik/traefik.yaml
 envsubst "$VARS" < template/traefik-dynamic.yaml > traefik/dynamic/traefik-dynamic.yaml
 envsubst "$VARS" < template/index.html > landing-page/index.html
 envsubst "$VARS" < template/alertmanager.yml > alertmanager/alertmanager.yml
+envsubst "$VARS" < template/loki-config.yaml > loki/loki-config.yaml
+envsubst "$VARS" < template/tempo.yaml > tempo/tempo.yaml
 echo "✅ Templates successfully processed."
 echo "======================================================"
 echo ""

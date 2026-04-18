@@ -34,8 +34,8 @@ storage:
       # The S3 configuration for Tempo.
       bucket: tempo-data
       endpoint: minio:9000
-      access_key: minio
-      secret_key: minio123
+      access_key: ${MINIO_ROOT_USER}
+      secret_key: ${MINIO_ROOT_PASSWORD}
       insecure: true
     wal:
       # Define the traces WAL here, instead of via CLI

@@ -2,10 +2,14 @@
 /.env
 /alertmanager/alertmanager.yml
 !/alertmanager/.gitkeep
-/traefik/certs/*
 /landing-page/index.html 
+/logs/*
+/loki/loki-config.yaml
+!/loki/.gitkeep
+pr_state.json
+/tempo/tempo.yaml
+!/tempo/.gitkeep
+/traefik/certs/*
 /traefik/dynamic/traefik-dynamic.yaml 
 /traefik/traefik.yaml
 !/traefik/certs/.gitkeep
-pr_state.json
-/logs/*
