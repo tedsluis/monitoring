@@ -123,9 +123,9 @@ The installation script (`install.sh`) will automatically configure the followin
 - **TLS/SSL:** A self-signed wildcard certificate will be generated and added to the Fedora trust store.
 - **Domain:** The stack will be configured to run on your custom `DOMAIN` (defaults to `localhost`).
 
-### 5.2 Podman & podman-compose to run containers
+### 5.2 Podman & podman compose to run containers
 
-This stack is using `podman` and `podman-compose` where you may be used to `docker` and `docker-compose`. While Docker is commonly used, there are good reasons to use Podman due to several key architectural and security advantages:
+This stack is using `podman` and `podman compose` where you may be used to `docker` and `docker-compose`. While Docker is commonly used, there are good reasons to use Podman due to several key architectural and security advantages:
 
 *   **Daemonless Architecture:** Unlike Docker, which requires a heavy, central background daemon (`dockerd`) running as root to manage containers, Podman is daemonless. It interacts directly with the container registry and runtime. This means no single point of failure—if the Docker daemon crashes, container management halts. With Podman, each container runs as an independent process.
 *   **Rootless by Design (Enhanced Security):** Security is a primary focus for Podman. It allows you to run containers as a standard, non-root user out of the box. If a container is somehow compromised, the attacker is confined to the privileges of that standard user, preventing them from gaining root access to the host machine.
@@ -133,6 +133,21 @@ This stack is using `podman` and `podman-compose` where you may be used to `dock
 *   **Drop-in Replacement:** The transition is practically seamless. Podman's CLI is intentionally designed to be identical to Docker's. You can simply add `alias docker=podman` to your shell profile, and all your familiar commands (`build`, `run`, `ps`, `pull`) will work exactly as expected.
 *   **Native Systemd Integration:** Podman integrates fully into Linux environments. It can easily generate and manage `systemd` unit files from running containers, allowing you to treat containers as native system services that start automatically on boot.
 *   **Kubernetes Readiness:** Podman introduces the concept of "pods" (groups of containers sharing the same network and namespaces) locally, mirroring how Kubernetes operates. It can even generate Kubernetes YAML from local containers or run existing Kubernetes YAML directly, making the transition from local development to production orchestration much smoother.
+*   
+
+#### Understanding `podman-compose` vs. `podman compose`
+
+When working with this stack, you will notice we use the command `podman compose` (with a space) instead of `podman-compose` (with a hyphen). While they look almost identical, there is a crucial difference in how they operate:
+
+* **`podman-compose` (with a hyphen):** This is a community-driven Python script installed via the package manager. It acts as the actual "engine" or provider that parses the `compose.yml` file, translates it into Podman API calls, and starts the containers.
+* **`podman compose` (with a space):** This is a native sub-command built directly into the Podman CLI. It acts as a smart wrapper (a "conductor"). It doesn't process the YAML itself; instead, it prepares the environment and then delegates the actual work to an external provider (like the `podman-compose` Python script).
+
+**Why we use `podman compose`:**
+The primary reason is **environment variable handling**. In our `compose.yml`, we use dynamic variables like `${DOMAIN:-localhost}`. If you run the Python script directly using `podman-compose --env-file .env up -d`, it injects these variables *into* the containers, but struggles to substitute them within the YAML file itself. 
+
+However, by running the native wrapper using `podman compose --env-file .env up -d`, Podman correctly loads the `.env` variables into the host's system environment *before* passing execution to the Python script. This ensures perfect interpolation of all your variables across the configuration.
+
+*Note: Even though we type `podman compose`, you **must not uninstall** the `podman-compose` package. The native wrapper relies on it under the hood to function!*
 
 ### 5.3 Clone the repository
 
@@ -141,16 +156,56 @@ This stack is using `podman` and `podman-compose` where you may be used to `dock
    cd monitoring
 ```
 
-### 5.4 Install
+### 5.4 Configure your own environment variables
 
 ```bash
+   # 1.show default variables
+   cat .env.examples
+   # ==========================================
+   # Monitoring Stack Environment Variables
+   # Copy this file to '.env' and fill in our own values before running the stack.
+   # ==========================================
+
+   # Domain name (default: localhost)
+   DOMAIN=localhost
+
+   # Grafana
+   GRAFANA_ADMIN_USER=admin
+   GRAFANA_ADMIN_PASSWORD=admin
+
+   # MinIO Storage
+   MINIO_ROOT_USER=minio
+   MINIO_ROOT_PASSWORD=minio123
+
+   # Keep Database (PostgreSQL)
+   KEEP_DB_USER=keep
+   KEEP_DB_PASSWORD=keep
+   KEEP_DB_NAME=keep
+
+   # Keep API & Application
+   # Generate a secure string for the API key (e.g., via uuidgen)
+   KEEP_API_KEY=585af6cc-5c07-427f-966f-a263473ad402
+   # Generate a random string for NextAuth
+   NEXTAUTH_SECRET=change_me_to_a_secure_string
+
+   # External Integrations
+   OPENAI_API_KEY=dummy-key
+
+   # Webhook Tester (UUID for your specific test-endpoint)
+   WEBHOOK_TESTER_UUID=65ae26f0-131e-4390-8daa-bdaec17e77c2
+
    # 1. Copy the example environment file
    cp .env.example .env
 
-   # 2. Edit the .env file and fill in your secure passwords and custom DOMAIN (using an editor like vi, vim or nano).
+   # 2. Edit the .env file and fill in 
+   # your secure passwords and custom DOMAIN (using an editor like vi, vim or nano).
    vi .env
+```
 
-   # 3. Run the installation script
+### 5.5 Install
+
+```bash
+   # Run the installation script
    ./install.sh 
    ======================================================
    🚀 Starting installation
@@ -195,15 +250,15 @@ This stack is using `podman` and `podman-compose` where you may be used to `dock
 ```
 **note:** You can edit the `.env` file and rerun this `install.sh` every time you want to change the `DOMAIN` or update a secret in the templates.
 
-### 5.5 Start the stack
+### 5.6 Start the stack
 
 ```bash
    # Important: Only run this step after you have successfully executed the install.sh script!
-   podman-compose up -d
+   podman compose up -d
 ```
 The first time, the `minio-init` container will automatically create the required buckets (`loki-data` and `tempo-data`).
 
-### 5.6 Check the status
+### 5.7 Check the status
 
 ```bash
 podman ps -a
@@ -421,35 +476,35 @@ To ensure all components are successfully communicating with each other, you can
 🎉 [COMPLETE] All tests completed successfully! Stack is stable.
 ```
 
-### 5.7 Stop, start or restart with podman-compose
+### 5.8 Stop, start or restart with podman compose
 
-**podman-compose** is a utility designed to help you define and run multi-container applications seamlessly without relying on a central daemon.
+**podman compose** is a utility designed to help you define and run multi-container applications seamlessly without relying on a central daemon.
 
-*   **What it is:** `podman-compose` is a script that allows you to manage multi-container environments using Podman. It is fully compatible with the Compose specification, meaning you can often use your existing `docker-compose` projects without any modifications.
-*   **How it works:** Under the hood, `podman-compose` reads your configuration file and translates the instructions into native Podman commands. Because Podman is daemonless and rootless, `podman-compose` executes these commands in the context of the user running it. It automatically handles the creation of networks (or Pods, depending on the configuration) so your containers can securely discover and communicate with each other locally.
-*   **The Role of [./compose.yml](./compose.yml):** The [./compose.yml](./compose.yml) file serves as the definitive blueprint for your application stack. It is a declarative YAML file where you define your entire infrastructure as code: services, image versions, port mappings, persistent volumes, and environment variables. Instead of manually executing long strings of CLI commands, you simply run `podman-compose up -d`, and the tool reads this file to build, connect, and start your entire environment in a reproducible way.
+*   **What it is:** `podman compose` is a script that allows you to manage multi-container environments using Podman. It is fully compatible with the Compose specification, meaning you can often use your existing `docker-compose` projects without any modifications.
+*   **How it works:** Under the hood, `podman compose` reads your configuration file and translates the instructions into native Podman commands. Because Podman is daemonless and rootless, `podman compose` executes these commands in the context of the user running it. It automatically handles the creation of networks (or Pods, depending on the configuration) so your containers can securely discover and communicate with each other locally.
+*   **The Role of [./compose.yml](./compose.yml):** The [./compose.yml](./compose.yml) file serves as the definitive blueprint for your application stack. It is a declarative YAML file where you define your entire infrastructure as code: services, image versions, port mappings, persistent volumes, and environment variables. Instead of manually executing long strings of CLI commands, you simply run `podman compose up -d`, and the tool reads this file to build, connect, and start your entire environment in a reproducible way.
 
 ```bash
    # Podman Help
-   podman-compose --help
+   podman compose --help
 
    # stop all containers
-   podman-compose down
+   podman compose down
 
    # start all containers
-   podman-compose up -d
+   podman compose up -d
 
    # restart all containers
-   podman-compose down && podman-compose up -d
+   podman compose down && podman compose up -d
 
    # restart a specific container and include changes from compose.yaml
-   podman-compose down webhook-tester && podman-compose up -d --force-recreate webhook-tester
+   podman compose down webhook-tester && podman compose up -d --force-recreate webhook-tester
 
    # restart a specific container without applying compose.yaml changes
    podman restart webhook-tester
 ```
 
-### 5.8 Generic Podman commands
+### 5.9 Generic Podman commands
 
 ```bash
    # Podman Compose Help
@@ -1071,7 +1126,7 @@ This section explains how to remove everything.
 
 ```bash
    # stop all containers
-   podman-compose down
+   podman compose down
 
    # (optional) remove the compose network if it still exists
    # check the network name first; typically 'monitoring_monitoring-net'
@@ -1117,4 +1172,4 @@ This section explains how to remove everything.
 
 Notes:
 - If your browser trusted the local CA, restart the browser to ensure trust store changes take effect.
-- The compose network is usually removed by `podman-compose down`, but the explicit removal ensures a clean state.
+- The compose network is usually removed by `podman compose down`, but the explicit removal ensures a clean state.

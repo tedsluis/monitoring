@@ -170,7 +170,7 @@ echo "Restarting Traefik..."
 if command -v podman-compose &> /dev/null; then
     # If podman-compose is available, use it for cleaner recreate
     cd "$REPO_ROOT"
-    podman-compose up -d --force-recreate traefik
+    podman compose up -d --force-recreate traefik
 else
     # Fallback to regular podman restart
     podman restart traefik

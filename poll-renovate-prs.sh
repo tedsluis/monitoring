@@ -125,19 +125,19 @@ while read -r pr_number branch updated; do
     git pull origin "$branch"
 
     echo "🚀 Starting containers for PR #$pr_number..."
-    echo "[INFO] Running 'podman-compose pull' to ensure all images are up to date..."
-    retry podman-compose pull
+    echo "[INFO] Running 'podman compose pull' to ensure all images are up to date..."
+    retry podman compose pull
     echo "[INFO] Tearing down any existing stack (timeout 30s)..."
-    podman-compose down -t 30
+    podman compose down -t 30
     
     TEST_LOG="$LOG_DIR/pr-${pr_number}-$(date +%s).log"
     stack_started=true
 
     ./install.sh
-    # Check podman-compose up -d exit-code
+    # Check podman compose up -d exit-code
     echo "[INFO] Bringing up the new stack with '--force-recreate'..."
-    if ! podman-compose up -d --force-recreate; then
-        echo "❌ podman-compose up -d failed! Check for port conflicts or invalid configs." | tee "$TEST_LOG"
+    if ! podman compose up -d --force-recreate; then
+        echo "❌ podman compose up -d failed! Check for port conflicts or invalid configs." | tee "$TEST_LOG"
         stack_started=false
     fi
 
@@ -188,7 +188,7 @@ $LOG_CONTENT
             MERGED_PRS+=("$pr_number")
             
             echo "[INFO] Bringing down the test stack..."
-            podman-compose down -t 30
+            podman compose down -t 30
             
             # Update base branch after merge to prevent stale base for the next iteration
             echo "[INFO] Syncing local base branch ($base_branch) with origin..."
@@ -202,9 +202,9 @@ $LOG_CONTENT
             retry git fetch origin
             git reset --hard origin/"$base_branch"
             
-            podman-compose down -t 30
+            podman compose down -t 30
             ./install.sh
-            podman-compose up -d --force-recreate
+            podman compose up -d --force-recreate
         fi
 
     else
@@ -265,10 +265,10 @@ $FAIL_LOG
         git reset --hard origin/"$base_branch"
         
         echo "[INFO] Destroying failed test stack..."
-        podman-compose down -t 30
+        podman compose down -t 30
         echo "[INFO] Starting stable stack..."
         ./install.sh
-        podman-compose up -d --force-recreate
+        podman compose up -d --force-recreate
     fi
 
 done <<< "$PRS"
@@ -287,12 +287,12 @@ if [ "$MAIN_NEEDS_UPDATE" = true ]; then
     git reset --hard origin/main
     
     echo "⬇️ Pulling new images on main..."
-    retry podman-compose pull
+    retry podman compose pull
     
     echo "🔄 Restarting stack with latest main branch..."
-    podman-compose down -t 30
+    podman compose down -t 30
     ./install.sh
-    podman-compose up -d --force-recreate
+    podman compose up -d --force-recreate
     
     echo "🎉 Main stack successfully updated and running on the latest versions!"
 

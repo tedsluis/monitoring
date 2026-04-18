@@ -112,6 +112,6 @@ echo ""
 
 echo "======================================================"
 echo "✅ Installation preparation complete!"
-echo "You can now start the stack with: podman-compose up -d"
+echo "You can now start the stack with: podman compose up -d"
 echo "It will be accessible at: https://${DOMAIN}"
 echo "======================================================"
