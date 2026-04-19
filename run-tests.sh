@@ -497,8 +497,8 @@ echo ""
 echo "========================================"
 echo "📊 Starting PromQL Data Integrity Test"
 echo "========================================"
-echo "🔍 [TEST] Flow: Exporters -> Prometheus TSDB -> PromQL Evaluation"
 
+echo "🔍 [TEST] Flow: Exporters -> Prometheus TSDB -> PromQL Evaluation"
 # Execute a PromQL query to ensure the database is actually receiving and parsing data (Node Exporter)
 PROMQL_TEST_QUERY='up{job="node-exporter"}'
 echo "   [INFO] Evaluating PromQL: $PROMQL_TEST_QUERY"
@@ -513,7 +513,28 @@ else
     exit 1
 fi
 
+echo "----------------------------------------"
+echo "🔍 [TEST] Flow: Verify all Prometheus targets are UP (via PromQL)"
+echo "   [INFO] Evaluating PromQL: up == 0"
+
+# Ask Prometheus specifically for targets that are DOWN (value == 0)
+DOWN_RESP=$($CURL_CMD -sG --data-urlencode "query=up == 0" http://prometheus:9090/api/v1/query || echo '{"data":{"result":[]}}')
+
+# Count how many results we get back
+DOWN_COUNT=$(echo "$DOWN_RESP" | jq -r '.data.result | length' 2>/dev/null || echo "1")
+
+if [ "$DOWN_COUNT" == "0" ]; then
+    echo "   ✅ [SUCCESS] No targets are reporting '0'. All targets are UP in the TSDB!"
+else
+    echo "   ❌ [ERROR] There are $DOWN_COUNT target(s) DOWN ('0') in the TSDB!"
+    echo "   [DEBUG] Failing targets:"
+    # Print a clean list of the specific jobs and instances that are failing
+    echo "$DOWN_RESP" | jq -r '.data.result[] | "   - \(.metric.job) (\(.metric.instance))"'
+    exit 1
+fi
+
 # Blackbox E2E validation: Verify Blackbox successfully probed an external target
+echo "----------------------------------------"
 echo "   [INFO] Verifying Blackbox Exporter End-to-End flow..."
 BLACKBOX_QUERY='probe_success{job="blackbox-http"} == 1'
 BLACKBOX_RESP=$($CURL_CMD -sG --data-urlencode "query=${BLACKBOX_QUERY}" http://prometheus:9090/api/v1/query || echo '{"data":{"result":[]}}')
@@ -526,6 +547,7 @@ else
 fi
 
 # Podman E2E validation: Verify Podman Exporter is successfully reading the rootless socket
+echo "----------------------------------------"
 echo "   [INFO] Verifying Podman Exporter End-to-End flow (Rootless Socket)..."
 PODMAN_QUERY='podman_container_info{name="grafana"}'
 PODMAN_RESP=$($CURL_CMD -sG --data-urlencode "query=${PODMAN_QUERY}" http://prometheus:9090/api/v1/query || echo '{"data":{"result":[]}}')
@@ -539,6 +561,7 @@ else
 fi
 
 # Traefik Metrics validation
+echo "----------------------------------------"
 echo "   [INFO] Verifying Traefik Metrics End-to-End flow..."
 TRAEFIK_QUERY='traefik_entrypoint_request_duration_seconds_count > 0'
 TRAEFIK_RESP=$($CURL_CMD -sG --data-urlencode "query=${TRAEFIK_QUERY}" http://prometheus:9090/api/v1/query || echo '{"data":{"result":[]}}')
