@@ -1,5 +1,3 @@
-version: '3.8'
-
 networks:
   monitoring-net:
     driver: bridge
@@ -58,7 +56,7 @@ services:
       - /var/log/journal:/var/log/journal:ro
       - /run/log/journal:/run/log/journal:ro
       - /etc/machine-id:/etc/machine-id:ro
-      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
+      - /run/user/${UID:-1000}/podman/podman.sock:/var/run/docker.sock:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.alloy.rule=Host(`alloy.${DOMAIN:-localhost}`)"
