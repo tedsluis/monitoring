@@ -69,7 +69,7 @@ You can run these scripts manually for debugging or immediate updates.
 
 To manually trigger the Renovate bot to scan for updates and create PRs:
 ```bash
-$ ./renovate.sh 
+./renovate.sh 
 🚀 Starting Mend Renovate via Podman...
  INFO: Renovate started
        "renovateVersion": "43.77.7"
@@ -115,7 +115,7 @@ The log file created during the run of `renovate.sh` is stored in **./logs/pr-*.
 
 To manually trigger the poller to process any open Renovate PRs:
 ```bash
-$ ./poll-renovate-prs.sh
+./poll-renovate-prs.sh
 [INFO] Verifying required directories and state files...
 🔄 Starting Renovate PR Poller at Mon Mar 23 07:05:12 AM CET 2026
 [INFO] Fetching open Pull Requests with the label 'renovate' from tedsluis/monitoring...
@@ -285,34 +285,34 @@ If you want to validate the stack without interacting with GitHub:
 ========================================
 ----------------------------------------
 🔍 [TEST] Proxy: Alloy
-✅ [SUCCESS] https://alloy.localhost/-/healthy is reachable.
+✅ [SUCCESS] https://alloy.ted.home/-/healthy is reachable.
 ----------------------------------------
 🔍 [TEST] Proxy: Alertmanager
-✅ [SUCCESS] https://alertmanager.localhost/-/healthy is reachable.
+✅ [SUCCESS] https://alertmanager.ted.home/-/healthy is reachable.
 ----------------------------------------
 🔍 [TEST] Proxy: Grafana
-✅ [SUCCESS] https://grafana.localhost/api/health is reachable.
+✅ [SUCCESS] https://grafana.ted.home/api/health is reachable.
 ----------------------------------------
 🔍 [TEST] Proxy: Karma
-✅ [SUCCESS] https://karma.localhost/health is reachable.
+✅ [SUCCESS] https://karma.ted.home/health is reachable.
 ----------------------------------------
 🔍 [TEST] Proxy: KeepHQ (Frontend)
-✅ [SUCCESS] https://keep.localhost/api/healthcheck is reachable.
+✅ [SUCCESS] https://keep.ted.home/api/healthcheck is reachable.
 ----------------------------------------
 🔍 [TEST] Proxy: MinIO Console
-✅ [SUCCESS] https://minio.localhost/ is reachable.
+✅ [SUCCESS] https://minio.ted.home/ is reachable.
 ----------------------------------------
 🔍 [TEST] Proxy: Traefik Dashboard
-✅ [SUCCESS] https://traefik.localhost/dashboard/ is reachable.
+✅ [SUCCESS] https://traefik.ted.home/dashboard/ is reachable.
 ----------------------------------------
 🔍 [TEST] Proxy: Webhook Tester
-✅ [SUCCESS] https://webhook-tester.localhost/ is reachable.
+✅ [SUCCESS] https://webhook-tester.ted.home/ is reachable.
 
 ========================================
 🔗 Starting End-to-End Tracing Pipeline Test
 ========================================
 🔍 [TEST] Flow: Traefik -> Grafana -> OTel -> Tempo -> Prometheus
-   [INFO] Injected Traceparent: 00-94a28f6924984c1693799c085095c6d8-4859a8e8b4274581-01
+   [INFO] Injected Traceparent: 00-569e0c28eb99477197f39b009168b76b-c48e6ad44ae84b22-01
    [INFO] Waiting for the tracing pipeline to buffer and flush (max 30s)...
   ✔  Continue!          
    ✅ [SUCCESS] Tempo successfully received and stored the exact Trace ID!
@@ -323,7 +323,7 @@ If you want to validate the stack without interacting with GitHub:
 📜 Starting End-to-End Logging Pipeline Test
 ========================================
 🔍 [TEST] Flow: Script -> Loki API (Push) -> MinIO (Storage) -> Loki API (Query)
-   [INFO] Injected Log Message: e2e-test-log-entry-cf34c556-9066-407d-9db8-caed8ec37687
+   [INFO] Injected Log Message: e2e-test-log-entry-48a76b36-c1b2-474b-804c-cb6bbbba48df
    [INFO] Successfully pushed log to Loki API.
    [INFO] Waiting for Loki to index the log (max 50s)...
   ✔  Continue!          
@@ -357,10 +357,17 @@ If you want to validate the stack without interacting with GitHub:
 🔍 [TEST] Flow: Exporters -> Prometheus TSDB -> PromQL Evaluation
    [INFO] Evaluating PromQL: up{job="node-exporter"}
    ✅ [SUCCESS] PromQL successfully evaluated the metric (value: 1).
+----------------------------------------
+🔍 [TEST] Flow: Verify all Prometheus targets are UP (via PromQL)
+   [INFO] Evaluating PromQL: up == 0
+   ✅ [SUCCESS] No targets are reporting '0'. All targets are UP in the TSDB!
+----------------------------------------
    [INFO] Verifying Blackbox Exporter End-to-End flow...
    ✅ [SUCCESS] Prometheus confirms Blackbox Exporter is successfully executing HTTP probes!
+----------------------------------------
    [INFO] Verifying Podman Exporter End-to-End flow (Rootless Socket)...
    ✅ [SUCCESS] Prometheus confirms Podman Exporter is actively reading container metrics from the rootless socket!
+----------------------------------------
    [INFO] Verifying Traefik Metrics End-to-End flow...
    ✅ [SUCCESS] Prometheus confirms Traefik is actively exposing internal metrics!
 
@@ -388,8 +395,8 @@ GITHUB_COM_TOKEN="your_personal_access_token"
 RENOVATE_GIT_AUTHOR="Your Name <your.email@example.com>"
 REPO="tedsluis/monitoring" # Adjust to your repository format: owner/repo
 # Run the renovate and poller every 8 hours (adjust the paths below to your choice)
-0 0,8,16 * * * cd /${HOME}/git/monitoring && ./renovate.sh >> /${HOME}/git/monitoring/logs/renovate-cron.log 2>&1
-0 1,7,17 * * * cd /${HOME}/git/monitoring && ./poll-renovate-prs.sh >> /${HOME}/git/monitoring/logs/poll-renovate-prs-cron.log 2>&1
+0 0,8,16 * * * cd /home/tedsluis/git/monitoring && git checkout main && git branch | grep 'renovate/' | xargs git branch -D && ./renovate.sh >> /home/tedsluis/git/monitoring/logs/renovate-cron-$(date +\%Y\%m\%d-\%H\%M\%S).log 2>&1
+0 1,7,17 * * * cd /home/tedsluis/git/monitoring && ./poll-renovate-prs.sh >> /home/tedsluis/git/monitoring/logs/poll-renovate-prs-cron-$(date +\%Y\%m\%d-\%H\%M\%S).log 2>&1
 
 # Clean up old downloaded Podman images weekly on Sunday night at 03:00
 0 3 * * 0 podman image prune -a -f
