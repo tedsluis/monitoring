@@ -13,7 +13,8 @@ workflow:
         type: grafana_loki
         config: "{{ providers.loki-local }}"
         with:
-          query: '{container_name="{{ alert.labels.container }}"}'
+          queryType: query_range
+          query: '{container_name="{{ alert.labels.name }}"}'
           since: "15m"
           limit: 20
           direction: backward
