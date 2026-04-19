@@ -121,6 +121,7 @@ The installation script (`install.sh`) will automatically configure the followin
 - **Podman Socket:** The rootless user socket will be enabled for the Podman Exporter, Grafana Alloy and Traefik.
 - **Networking:** Unprivileged ports will be enabled, and `/etc/hosts` will be updated dynamically with your chosen domain.
 - **TLS/SSL:** A self-signed wildcard certificate will be generated and added to the Fedora trust store.
+- **Secrets:** Create configuration files from `./template` directory for alertmanager, index.html, loki, tempo en traefik and `substitute sercrets`.
 - **Domain:** The stack will be configured to run on your custom `DOMAIN` (defaults to `localhost`).
 
 ### 5.2 Podman & podman compose to run containers
