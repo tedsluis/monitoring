@@ -395,7 +395,7 @@ GITHUB_COM_TOKEN="your_personal_access_token"
 RENOVATE_GIT_AUTHOR="Your Name <your.email@example.com>"
 REPO="tedsluis/monitoring" # Adjust to your repository format: owner/repo
 # Run the renovate and poller every 8 hours (adjust the paths below to your choice)
-0 0,8,16 * * * cd /home/tedsluis/git/monitoring && git checkout main && git branch | grep 'renovate/' | xargs git branch -D && ./renovate.sh >> /home/tedsluis/git/monitoring/logs/renovate-cron-$(date +\%Y\%m\%d-\%H\%M\%S).log 2>&1
+0 0,8,16 * * * cd /home/tedsluis/git/monitoring && (git checkout main || true) && git branch | grep 'renovate/' | xargs --no-run-if-empty git branch -D && ./renovate.sh >> /home/tedsluis/git/monitoring/logs/renovate-cron-$(date +\%Y\%m\%d-\%H\%M\%S).log 2>&1
 0 1,7,17 * * * cd /home/tedsluis/git/monitoring && ./poll-renovate-prs.sh >> /home/tedsluis/git/monitoring/logs/poll-renovate-prs-cron-$(date +\%Y\%m\%d-\%H\%M\%S).log 2>&1
 
 # Clean up old downloaded Podman images weekly on Sunday night at 03:00
