@@ -205,6 +205,11 @@ $CURL_CMD -sSf -o /dev/null http://podman-exporter:9882/metrics || { echo "❌ [
 echo "✅ [SUCCESS] http://podman-exporter:9882/metrics is reachable."
 
 echo "----------------------------------------"
+echo "🔍 [TEST] Pyroscope"
+$CURL_CMD -sSf -o /dev/null http://pyroscope:4040/ready || { echo "❌ [ERROR] http://pyroscope:4040/ready is not healthy"; exit 1; }
+echo "✅ [SUCCESS] http://pyroscope:4040/ready is reachable and healthy."
+
+echo "----------------------------------------"
 echo "🔍 [TEST] Tempo"
 $CURL_CMD -sSf -o /dev/null http://tempo:3200/ready || { echo "❌ [ERROR] http://tempo:3200/ready is not healthy"; exit 1; }
 echo "✅ [SUCCESS] http://tempo:3200/ready is reachable and healthy."
@@ -427,12 +432,24 @@ echo "========================================"
 echo "🔍 [TEST] Flow: Prometheus (Rules Engine) -> Alertmanager"
 echo "   [INFO] Checking if Alertmanager is receiving the 'Watchdog' alert from Prometheus..."
 # Prometheus should be constantly firing the 'Watchdog' alert
-PROM_WATCHDOG=$($CURL_CMD -sG --data-urlencode "filter=alertname=\"Watchdog\"" http://alertmanager:9093/api/v2/alerts || echo "[]")
-HAS_PROM_WATCHDOG=$(echo "$PROM_WATCHDOG" | jq -r 'length' 2>/dev/null || echo "0")
 
-if [ "$HAS_PROM_WATCHDOG" -gt 0 ]; then
-    echo "   ✅ [SUCCESS] Alertmanager is receiving alerts from Prometheus!"
-else
+PROM_WATCHDOG_FOUND=false
+for i in {1..6}; do
+    PROM_WATCHDOG=$($CURL_CMD -sG --data-urlencode "filter=alertname=\"Watchdog\"" http://alertmanager:9093/api/v2/alerts || echo "[]")
+    HAS_PROM_WATCHDOG=$(echo "$PROM_WATCHDOG" | jq -r 'length' 2>/dev/null || echo "0")
+
+    if [ "$HAS_PROM_WATCHDOG" -gt 0 ]; then
+        PROM_WATCHDOG_FOUND=true
+        echo "   ✅ [SUCCESS] Alertmanager is receiving alerts from Prometheus!"
+        break
+    fi
+    echo "   [INFO] 'Watchdog' alert not yet in Alertmanager. Waiting for Prometheus to evaluate rules (retrying)..."
+    sleep 10 &
+    BG_PID=$!
+    spinner "$BG_PID"
+    wait "$BG_PID"
+done
+if [ "$PROM_WATCHDOG_FOUND" = false ]; then
     echo "   ❌ [ERROR] The 'Watchdog' alert was not found in Alertmanager. Prometheus -> Alertmanager link is broken."
     exit 1
 fi
@@ -593,6 +610,14 @@ if echo "$MINIO_BUCKET_METRICS" | grep -q 'bucket="tempo-data"'; then
     echo "   ✅ [SUCCESS] Bucket 'tempo-data' exists."
 else
     echo "   ❌ [ERROR] Bucket 'tempo-data' is missing!"
+    exit 1
+fi
+
+
+if echo "$MINIO_BUCKET_METRICS" | grep -q 'bucket="pyroscope-data"'; then
+    echo "   ✅ [SUCCESS] Bucket 'pyroscope-data' exists."
+else
+    echo "   ❌ [ERROR] Bucket 'pyroscope-data' is missing!"
     exit 1
 fi
 

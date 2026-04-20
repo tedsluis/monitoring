@@ -1,7 +1,7 @@
 # Full Stack Observability & Monitoring Platform
 ## An Educational Lab for Prometheus, Loki, Tempo, Grafana, and Alerting
 
-This repository contains a complete, production-like observability stack optimized for Fedora Workstation with rootless Podman. It is designed as an educational environment to help Developers and DevOps Engineers understand how modern monitoring tools interlock to provide comprehensive metrics, logging, tracing, and alerting capabilities. The entire stack is automatically configured upon startup, including pre-provisioned Grafana dashboards, datasources, and alerting rules.
+This repository contains a complete, production-like observability stack optimized for Fedora Workstation with rootless Podman. It is designed as an educational environment to help Developers and DevOps Engineers understand how modern monitoring tools interlock to provide comprehensive metrics, logging, tracing, profiling and alerting capabilities. The entire stack is automatically configured upon startup, including pre-provisioned Grafana dashboards, datasources, and alerting rules.
 
 Diagram
 ![diagram](./images/overview-diagram.svg)
@@ -21,8 +21,8 @@ Diagram
 
 Why use this stack? This environment is built to teach you:
 
-- **The Three Pillars of Observability**: How to seamlessly connect Metrics (Prometheus), Logs (Loki), and Traces (Tempo).
-- **Contextual Drill-down**: How to configure Grafana datasources so you can jump directly from a spike in a metric to the specific log line, and then to the exact application trace.
+- **The four Pillars of Observability**: How to seamlessly connect Metrics (Prometheus), Logs (Loki), Traces (Tempo) and Profiles (Pyroscope).
+- **Contextual Drill-down**: How to configure Grafana datasources so you can jump directly from a spike in a metric to the specific log line, then to the exact application trace and finally to the specific line of code causing the bottleneck via a Flame Graph.
 - **Modern Collection**: Using Grafana Alloy and OpenTelemetry Collector as modern, vendor-neutral data pipelines.
 - **S3-Compatible Storage**: How Loki and Tempo use MinIO object storage for scalable, long-term data retention instead of local disks.
 - **Advanced Alerting Routing**: The flow of an alert from Prometheus -> Alertmanager -> KeepHQ / Karma / Webhook-tester.
@@ -55,6 +55,10 @@ Prometheus evaluates alert.rules.yml -> Fires to Alertmanager -> Alertmanager ro
 
 ![alerting](./images/alerting-diagram.svg)
 
+### 2.5 Profiling Flow
+
+Monitoring tools (like Prometheus, Loki, Alloy) expose pprof endpoints -> Grafana Alloy scrapes these CPU and Memory profiles -> Pushed to Pyroscope -> Stored in MinIO -> Visualized as Flame Graphs in Grafana.
+
 ## 3. Service Port Map
 
 | Service         | Internal Port | Public URL                          | Description                              |
@@ -65,6 +69,7 @@ Prometheus evaluates alert.rules.yml -> Fires to Alertmanager -> Alertmanager ro
 | Prometheus      | 9090          | https://prometheus.localhost        | Time-series database                     |
 | Loki            | 3100          | https://loki.localhost              | Log aggregation engine                   |
 | Tempo           | 3200          | https://tempo.localhost             | Distributed Tracing backend              |
+| Pyroscope       | 4040          | https://pyroscope.localhost         | Continuous Profiling backend (flamegraph)|
 | MinIO           | 9000 / 9001   | https://minio.localhost             | S3 Object Storage for Loki & Tempo       |
 | Alloy           | 12345         | https://alloy.localhost             | Log collection pipeline                  |
 | OTel Collector  | 4317 / 8888   | https://otel-collector.localhost    | Trace collection pipeline                |
@@ -99,8 +104,12 @@ Prometheus evaluates alert.rules.yml -> Fires to Alertmanager -> Alertmanager ro
    * Grafana Tempo: High-scale distributed tracing backend. Uses MinIO for storage.
    * OpenTelemetry (OTel) Collector: Receives OTLP traces and forwards them to Tempo.
 
+**5. Profiling (The "Why is the code consuming resources?")**
+   * Grafana Pyroscope: Continuous profiling backend. Analyzes performance profiles to identify CPU and memory bottlenecks. Uses MinIO for storage.
+   * Grafana Alloy: Scrapes pprof endpoints from running containers and sends them to Pyroscope.
+
 **5. Storage & Infrastructure**
-   * MinIO: S3-compatible storage providing scalable object storage for Tempo and Loki data.
+   * MinIO: S3-compatible storage providing scalable object storage for Tempo, Loki and Pyroscope data.
    * PostgreSQL: Relational database backend for KeepHQ.
    * Traefik: Reverse proxy that acts as the entry point, handling routing and TLS termination for all `*.${DOMAIN}` domains.
 
@@ -121,7 +130,7 @@ The installation script (`install.sh`) will automatically configure the followin
 - **Podman Socket:** The rootless user socket will be enabled for the Podman Exporter, Grafana Alloy and Traefik.
 - **Networking:** Unprivileged ports will be enabled, and `/etc/hosts` will be updated dynamically with your chosen domain.
 - **TLS/SSL:** A self-signed wildcard certificate will be generated and added to the Fedora trust store.
-- **Secrets:** Create configuration files from `./template` directory for alertmanager, index.html, loki, tempo en traefik and `substitute sercrets`.
+- **Secrets:** Create configuration files from `./template` directory (for alertmanager, index.html, loki, tempo, traefik and pyroscope) and `substitute sercrets`.
 - **Domain:** The stack will be configured to run on your custom `DOMAIN` (defaults to `localhost`).
 
 ### 5.2 Podman & podman compose to run containers
@@ -200,6 +209,9 @@ However, by running the native wrapper using `podman compose --env-file .env up 
    # 2. Edit the .env file and fill in 
    # your secure passwords and custom DOMAIN (using an editor like vi, vim or nano).
    vi .env
+
+   # 3. load environemt variables from .env file
+   export $(grep -v '^#' .env | xargs)
 ```
 
 ### 5.5 Install
@@ -842,9 +854,14 @@ If propagation works, you'll see a beautiful trace tree with the Traefik span at
 *See the screenshot below for an impression of the Explore traces - service graph:*
 ![traces-explore](./images/explore-traces-service-graph.png)
 
+**Pyroscope profiling explore**
+
+The Pyroscope datasource allows you to query continuous profiling data. Using Flame Graphs, you can visually analyze exactly which functions or lines of code are consuming the most CPU time or Memory allocations over a selected period. You can also use the "Diff" view to compare a profile from a healthy period against a profile from an incident period.
+See the screenshot below for an impression of the Explore profiles:
+
 #### 7.7.3 Drilldown
 
-The drill-down functionality within Grafana offers the ability to connect in-depth error analysis through metrics, logs and traces contextually with each other. From an anomaly in a metrics dashboard, you can directly navigate to the correlated log lines in Loki, and then use automatically detected trace IDs to switch to detailed request spans in Tempo. This integration eliminates the need to manually synchronize timestamps and identifiers between different datasources, significantly increasing the efficiency of root cause analysis and performance optimization.
+The drill-down functionality within Grafana offers the ability to connect in-depth error analysis through metrics, logs, traces and profiles contextually with each other. From an anomaly in a metrics dashboard, you can directly navigate to the correlated log lines in Loki, and then use automatically detected trace IDs to switch to detailed request spans in Tempo. Finally, you can click on a specific Tempo span to open the exact Pyroscope Flame Graph for that exact millisecond in time. This integration eliminates the need to manually synchronize timestamps and identifiers between different datasources, significantly increasing the efficiency of root cause analysis and performance optimization.
 
 *See the screenshot below for an impression of the Metrics drilldown:*
 ![Metrics-drilldown](./images/drilldown-metrics-dashboard.png)
@@ -1126,6 +1143,30 @@ Go to: https://traefik.localhost
 
 * https://doc.traefik.io/traefik/getting-started/
 * https://github.com/traefik/traefik
+
+### 7.18 Pyroscope 
+
+Grafana Pyroscope is a continuous profiling tool. While metrics tell you what is happening (e.g., CPU is at 100%), and traces tell you where it is happening (e.g., a specific API endpoint is slow), profiling tells you exactly why it is happening by showing you the exact function or line of code responsible for the resource consumption.
+
+Go to https://pyroscope.localhost
+
+**How it works in this stack:**
+
+* **Scraping via Alloy:** Instead of pushing profiles directly from applications, Grafana Alloy is configured to actively scrape standard pprof endpoints. In this educational stack, Alloy scrapes the CPU and Memory profiles of your monitoring tools themselves (Prometheus, Loki, and Alloy).
+* **S3 Storage Backend (MinIO):** Pyroscope connects to the local MinIO instance (http://minio:9000) and stores all profiling data in the pyroscope-data bucket.* **Data Retention:** Profiling data can grow quickly. Pyroscope's built-in compactor is configured to aggregate this data and enforce a strict 14-day retention policy (block_retention: 336h), automatically cleaning up old profiles from MinIO.
+* **Trace-to-Profile Integration:** In Grafana, the Tempo datasource is explicitly linked to the Pyroscope datasource using the service.name tag. This creates a seamless UI experience where you can jump from a trace span directly into a Flame Graph.
+
+| configuration       | configuration file         |
+|---------------------|----------------------------|
+| Pyroscope config    | ./pyroscope/pyroscope.yaml |
+| Alloy Scrape config | ./alloy/config.alloy       |
+
+*See the screenshot below for an impression of the Pyroscope metrics dashboard:*
+
+**Docs:**
+
+* https://grafana.com/docs/pyroscope/latest/
+* https://github.com/grafana/pyroscope
 
 ## 8. Teardown & Cleanup
 

@@ -345,6 +345,7 @@ services:
       until mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}; do echo '...waiting for minio...'; sleep 1; done;
       mc mb myminio/loki-data --ignore-existing;
       mc mb myminio/tempo-data --ignore-existing;
+      mc mb myminio/pyroscope-data --ignore-existing;
       echo 'Buckets created';
       exit 0;
       "
@@ -486,6 +487,35 @@ services:
       - "traefik.http.routers.prometheus.rule=Host(`prometheus.${DOMAIN:-localhost}`)"
       - "traefik.http.routers.prometheus.tls=true"
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+
+  # ---------------------------------------------------------
+  # Pyroscope
+  # ---------------------------------------------------------
+  pyroscope:
+    image: docker.io/grafana/pyroscope:1.13.0
+    container_name: pyroscope
+    command:
+      - "-config.file=/etc/pyroscope/pyroscope.yaml"
+    environment:
+      - http_proxy=
+      - https_proxy=
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+    networks:
+      - monitoring-net
+    restart: unless-stopped
+    depends_on:
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    volumes:
+      - ./pyroscope/pyroscope.yaml:/etc/pyroscope/pyroscope.yaml:Z
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pyroscope.rule=Host(`pyroscope.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.pyroscope.tls=true"
+      - "traefik.http.services.pyroscope.loadbalancer.server.port=4040"
 
   # ---------------------------------------------------------
   # Tempo

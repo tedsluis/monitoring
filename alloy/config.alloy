@@ -121,3 +121,33 @@ loki.source.journal "read_host_journal" {
 
   forward_to = [loki.relabel.journal_relabel.receiver]
 }
+
+// ==============================================================================
+// STREAM 3: CONTINUOUS PROFILING (PYROSCOPE)
+// Scrapes pprof endpoints from monitoring tools and sends them to Pyroscope
+// ==============================================================================
+
+// 1. Output: Define the destination of profiles
+pyroscope.write "backend" {
+  endpoint {
+    url = "http://pyroscope:4040"
+  }
+}
+
+// 2. Source: Define which containers need to be scraped.
+pyroscope.scrape "monitoring_tools" {
+  targets = [
+    {"__address__" = "prometheus:9090", "service_name" = "prometheus"},
+    {"__address__" = "loki:3100", "service_name" = "loki"},
+    {"__address__" = "alloy:12345", "service_name" = "alloy"},
+  ]
+  
+  // Send collected data to the backend defined in step 1
+  forward_to = [pyroscope.write.backend.receiver]
+  
+  // Specific profiles
+  profiling_config {
+    profile.process_cpu { enabled = true }
+    profile.godeltaprof_memory { enabled = true }
+  }
+}

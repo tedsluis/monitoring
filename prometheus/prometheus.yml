@@ -70,20 +70,22 @@ scrape_configs:
         - http://minio:9000/minio/health/ready
         # Note: runs on host network!
         - http://host.containers.internal:9100
+        # NGINX
+        - http://nginx:80/
         # OTel Collector
         - http://otel-collector:8888/metrics
         # Podman Exporter
         - http://podman-exporter:9882
         # Prometheus
         - http://prometheus:9090/-/healthy
+        # Pyroscope
+        - http://pyroscope:4040/ready
         # tempo
         - http://tempo:3200/ready
         # Traefik
         - http://traefik:8082/ping
         # webhook-tester
         - http://webhook-tester:8080/
-        # NGINX
-        - http://nginx:80/
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -183,3 +185,7 @@ scrape_configs:
       x-api-key:
         values:
           - "585af6cc-5c07-427f-966f-a263473ad402"
+
+  - job_name: 'pyroscope'
+    static_configs:
+      - targets: ['pyroscope:4040']

@@ -24,6 +24,8 @@ fi
 
 # Load environment variables from the .env file
 export $(grep -v '^#' .env | xargs)
+echo "✅ environment variables loaded from .env"
+echo ""
 
 # Fallback DOMAIN to localhost if not set in .env
 export DOMAIN="${DOMAIN:-localhost}"
@@ -57,12 +59,12 @@ if [ ! -S "/run/user/$(id -u)/podman/podman.sock" ]; then
 fi
 
 # 3. Create necessary directories
-mkdir -p traefik/dynamic traefik/certs landing-page
-
-# 4. Generate configuration from templates
-echo "======================================================"
-echo "📝 Generating configuration from templates..."
-# Define wich environment variables we want to inject into the configuration files
+mkdir -p traefik/dynamic traefik/certs landing-page alertmanager loki tempo pyroscope
+ 
+# 4. Generate configuration from templates 
+echo "======================================================" 
+echo "📝 Generating configuration from templates..." 
+# Define wich environment variables we want to inj ect into the configuration files
 VARS='${DOMAIN} ${KEEP_API_KEY} ${WEBHOOK_TESTER_UUID} ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}'
 
 envsubst "$VARS" < template/traefik.yaml > traefik/traefik.yaml
@@ -71,6 +73,16 @@ envsubst "$VARS" < template/index.html > landing-page/index.html
 envsubst "$VARS" < template/alertmanager.yml > alertmanager/alertmanager.yml
 envsubst "$VARS" < template/loki-config.yaml > loki/loki-config.yaml
 envsubst "$VARS" < template/tempo.yaml > tempo/tempo.yaml
+envsubst "$VARS" < template/pyroscope.yaml > pyroscope/pyroscope.yaml
+
+echo "copy template/traefik.yaml > traefik/traefik.yaml"
+echo "copy template/traefik-dynamic.yaml > traefik/dynamic/traefik-dynamic.yaml"
+echo "copy template/index.html > landing-page/index.html"
+echo "copy template/alertmanager.yml > alertmanager/alertmanager.yml"
+echo "copy template/loki-config.yaml > loki/loki-config.yaml"
+echo "copy template/tempo.yaml > tempo/tempo.yaml"
+echo "copy template/pyroscope.yaml > pyroscope/pyroscope.yaml"
+
 echo "✅ Templates successfully processed."
 echo "======================================================"
 echo ""
@@ -83,7 +95,7 @@ if [ "$DOMAIN" != "localhost" ]; then
     echo "======================================================"
     echo "🌐 Updating /etc/hosts..."
     # List of all subdomains we use
-    SUBDOMAINS="grafana prometheus loki tempo minio s3 alloy otel-collector alertmanager karma keep keep-api node-exporter podman-exporter blackbox traefik traefik-metrics webhook-tester"
+    SUBDOMAINS="grafana prometheus loki tempo minio s3 alloy otel-collector alertmanager karma keep keep-api node-exporter podman-exporter blackbox traefik traefik-metrics pyroscope webhook-tester"
     
     HOSTS_ENTRY="127.0.0.1 ${DOMAIN}"
     for SUB in $SUBDOMAINS; do
