@@ -120,10 +120,12 @@ services:
       - loki
       - tempo
     environment:
-      - HTTP_PROXY=
-      - HTTPS_PROXY=
-      - http_proxy=
-      - https_proxy=
+      - HTTP_PROXY=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - NO_PROXY=${NO_PROXY}
+      - http_proxy=${http_proxy}
+      - https_proxy=${https_proxy}
+      - no_proxy=${no_proxy}
       - GF_SERVER_ROOT_URL=https://grafana.${DOMAIN:-localhost}
       - GF_SERVER_DOMAIN=grafana.${DOMAIN:-localhost}
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
@@ -216,10 +218,12 @@ services:
     depends_on:
       - keep-db
     environment:
-      - HTTP_PROXY=
-      - HTTPS_PROXY=
-      - http_proxy=
-      - https_proxy=
+      - HTTP_PROXY=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - NO_PROXY=${NO_PROXY}
+      - http_proxy=${http_proxy}
+      - https_proxy=${https_proxy}
+      - no_proxy=${no_proxy}
       # Database connectie
       - DATABASE_CONNECTION_STRING=postgresql://${KEEP_DB_USER}:${KEEP_DB_PASSWORD}@keep-db:5432/${KEEP_DB_NAME}
       - DISABLE_POSTHOG=true
