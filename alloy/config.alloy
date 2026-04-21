@@ -137,9 +137,16 @@ pyroscope.write "backend" {
 // 2. Source: Define which containers need to be scraped.
 pyroscope.scrape "monitoring_tools" {
   targets = [
-    {"__address__" = "prometheus:9090", "service_name" = "prometheus"},
-    {"__address__" = "loki:3100", "service_name" = "loki"},
+    {"__address__" = "alertmanager:9093", "service_name" = "alertmanager"},
     {"__address__" = "alloy:12345", "service_name" = "alloy"},
+    {"__address__" = "blackbox-exporter:9115", "service_name" = "blackbox-exporter"},
+    {"__address__" = "grafana:6060", "service_name" = "grafana"},
+    {"__address__" = "host.containers.internal:9100", "service_name" = "node-exporter"},
+    {"__address__" = "loki:3100", "service_name" = "loki"},
+    {"__address__" = "otel-collector:1777", "service_name" = "otel-collector"},
+    {"__address__" = "prometheus:9090", "service_name" = "prometheus"},
+    {"__address__" = "tempo:3200", "service_name" = "tempo"},
+    {"__address__" = "traefik:8083", "service_name" = "traefik"},
   ]
   
   // Send collected data to the backend defined in step 1
@@ -148,6 +155,24 @@ pyroscope.scrape "monitoring_tools" {
   // Specific profiles
   profiling_config {
     profile.process_cpu { enabled = true }
-    profile.godeltaprof_memory { enabled = true }
+    profile.memory { enabled = true }
+    profile.mutex { enabled = true }
+    profile.block { enabled = true }
+    profile.goroutine { enabled = true }
+  }
+}
+
+pyroscope.scrape "pyroscope_self" {
+  targets = [
+    {"__address__" = "pyroscope:4040", "service_name" = "pyroscope"},
+  ]
+  forward_to = [pyroscope.write.backend.receiver]
+
+  profiling_config {
+    profile.process_cpu { enabled = false }  // conflicteert met interne profiler
+    profile.memory      { enabled = true }
+    profile.mutex       { enabled = true }
+    profile.block       { enabled = true }
+    profile.goroutine   { enabled = true }
   }
 }

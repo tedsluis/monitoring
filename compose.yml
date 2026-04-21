@@ -135,6 +135,9 @@ services:
       - GF_TRACING_OPENTELEMETRY_OTLP_PROTOCOL=grpc
       - GF_TRACING_OPENTELEMETRY_PROPAGATION=w3c
       - GF_TRACING_OPENTELEMETRY_ENABLED=true
+      - GF_DIAGNOSTICS_PROFILING_ENABLED=true
+      - GF_DIAGNOSTICS_PROFILING_PORT=6060
+      - GF_DIAGNOSTICS_PROFILING_ADDR=0.0.0.0
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN:-localhost}`)"

@@ -4,6 +4,7 @@ global:
 
 api:
   dashboard: true
+  debug: true
 
 log:
   level: INFO
@@ -36,6 +37,11 @@ entryPoints:
           - main: "${DOMAIN}"
             sans:
               - "*.${DOMAIN}"
+
+  # internal API-poort with pprof
+  traefik-internal:
+    address: ":8083"
+
   otlp:
     # The otlp entry point is used for receiving traces from the OpenTelemetry Collector. The address is set to ":4317" to listen on all interfaces on port 4317, which is the standard port for OTLP gRPC traffic.
     address: ":4317"
