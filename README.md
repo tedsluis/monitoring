@@ -857,7 +857,9 @@ If propagation works, you'll see a beautiful trace tree with the Traefik span at
 **Pyroscope profiling explore**
 
 The Pyroscope datasource allows you to query continuous profiling data. Using Flame Graphs, you can visually analyze exactly which functions or lines of code are consuming the most CPU time or Memory allocations over a selected period. You can also use the "Diff" view to compare a profile from a healthy period against a profile from an incident period.
-See the screenshot below for an impression of the Explore profiles:
+
+*See the screenshot below for an impression of the Explore profiles:*
+![pyroscope-explore](./images/pyroscope-explore.png)
 
 #### 7.7.3 Drilldown
 
@@ -871,6 +873,9 @@ The drill-down functionality within Grafana offers the ability to connect in-dep
 
 *See the screenshot below for an impression of the Traces drilldown:*
 ![traces-drilldown](./images/drilldown-breakdown.png)
+
+*See the screenshot below for an impression of the Profiling drilldown:*
+![profiling-drilldown](./images/pyroscope-profiling-drilldown.png)
 
 #### 7.7.4 Grafana alerts
 
@@ -1162,6 +1167,7 @@ Go to https://pyroscope.localhost
 | Alloy Scrape config | ./alloy/config.alloy       |
 
 *See the screenshot below for an impression of the Pyroscope metrics dashboard:*
+![pyroscope-metrics](./images/pyroscope-metrics-dashboard.png)
 
 **Docs:**
 
