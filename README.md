@@ -212,15 +212,18 @@ However, by running the native wrapper using `podman compose --env-file .env up 
    # your secure passwords and custom DOMAIN (using an editor like vi, vim or nano).
    vi .env
 
-   # 3. load environment variables from .env file
+   # 3. load environment variables from `.env` file
    export $(grep -v '^#' .env | xargs)
 ```
 
 ### 5.5 Install
 
 ```bash
-   # Source installation script
-   source ./install.sh 
+   # export the `.env` environment variables
+   export $(grep -v '^#' .env | xargs)
+
+   # Execute the installation script
+   ./install.sh 
    ======================================================
    🚀 Starting installation
    ======================================================
@@ -286,8 +289,8 @@ However, by running the native wrapper using `podman compose --env-file .env up 
 ### 5.6 Start the stack
 
 ```bash
-   # Important: 
-   # - Only run this step after you have successfully executed the install script: 'source ./install.sh'
+   # Important: Only run this step after you have exported the `.env` environment variables
+   # and successfully executed the install script: './install.sh'
   
    podman compose up -d
 ```
@@ -664,8 +667,8 @@ In case you navigate to Grafana or MinIO, you need to log in with the user accou
 
 | Service | Username       | Password                            | Note                        |
 |---------|----------------|-------------------------------------|-----------------------------|
-| Grafana | admin          | *<value of GRAFANA_ADMIN_PASSWORD>* | Configured via `.env` file. |
-| MinIO   | minio123       | *<value of MINIO_ROOT_PASSWORD>*    | Configured via `.env` file. |
+| Grafana | admin          | *value of GRAFANA_ADMIN_PASSWORD*   | Configured via `.env` file. |
+| MinIO   | minio123       | *value of MINIO_ROOT_PASSWORD*      | Configured via `.env` file. |
 
 ### 7.3 Prometheus Metrics
 
@@ -793,10 +796,10 @@ Go to https://pyroscope.localhost
 * **S3 Storage Backend (MinIO):** Pyroscope connects to the local MinIO instance (http://minio:9000) and stores all profiling data in the pyroscope-data bucket.* **Data Retention:** Profiling data can grow quickly. Pyroscope's built-in compactor is configured to aggregate this data and enforce a strict 14-day retention policy (block_retention: 336h), automatically cleaning up old profiles from MinIO.
 * **Trace-to-Profile Integration:** In Grafana, the Tempo datasource is explicitly linked to the Pyroscope datasource using the service.name tag. This creates a seamless UI experience where you can jump from a trace span directly into a Flame Graph.
 
-| configuration       | configuration file         |
-|---------------------|----------------------------|
-| Pyroscope config    | ./pyroscope/pyroscope.yaml |
-| Alloy Scrape config | ./alloy/config.alloy       |
+| configuration         | configuration file                                       |
+|-----------------------|----------------------------------------------------------|
+| `Pyroscope config`    | [./pyroscope/pyroscope.yaml](./pyroscope/pyroscope.yaml) |
+| `Alloy Scrape config` | [./alloy/config.alloy](./alloy/config.alloy)             |
 
 *See the screenshot below for an impression of the Pyroscope metrics dashboard:*
 ![pyroscope-metrics](./images/pyroscope-metrics-dashboard.png)
