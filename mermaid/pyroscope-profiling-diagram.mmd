@@ -1,0 +1,21 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'lineColor': '#9e9e9e' }}}%%
+flowchart LR
+  %% Native Mermaid Styling (No HTML) - Node Classes
+  classDef uiNode fill:#bbdefb,stroke:#1565c0,stroke-width:2px,color:#000000;
+  classDef obsNode fill:#81d4fa,stroke:#01579b,stroke-width:2px,color:#000000;
+  classDef dbNode fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000000;
+  classDef collectNode fill:#e1bee7,stroke:#6a1b9a,stroke-width:2px,color:#000000;
+  classDef extNode fill:#cfd8dc,stroke:#37474f,stroke-width:2px,color:#000000;
+
+grafana[grafana]:::uiNode
+pyroscope[pyroscope]:::obsNode
+alloy[alloy]:::collectNode
+minio[(minio)]:::dbNode
+
+
+%% Profiling Data Flows
+grafana -->|Port 4040/HTTP Profile Queries| pyroscope
+alloy -->|Port 4040/HTTP Push Profiles| pyroscope
+pyroscope -->|Port 9000/HTTP S3 Storage| minio
+
+ 

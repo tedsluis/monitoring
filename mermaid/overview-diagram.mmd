@@ -44,6 +44,7 @@ flowchart LR
         prometheus[prometheus]:::obsNode
         loki[loki]:::obsNode
         tempo[tempo]:::obsNode
+        pyroscope[pyroscope]:::obsNode
         minio[(minio)]:::dbNode
       end
 
@@ -77,6 +78,7 @@ flowchart LR
   traefik -->|9090/HTTP| prometheus
   traefik -->|3100/HTTP| loki
   traefik -->|3200/HTTP| tempo
+  traefik -->|4040/HTTP| pyroscope
   traefik -->|9000-9001/HTTP| minio
   traefik -->|9093/HTTP| alertmanager
   traefik -->|8080/HTTP| karma
@@ -90,16 +92,19 @@ flowchart LR
   grafana -->|9090/HTTP Queries| prometheus
   grafana -->|3100/HTTP Queries| loki
   grafana -->|3200-9095 Queries| tempo
+  grafana -->|4040/HTTP Queries| pyroscope
   keep_frontend -->|8080/HTTP API| keep_backend
   keep_frontend -.->|8111/HTTP AI API| host_ai
 
   %% Core Telemetry & Storage Pipelines
   alloy -->|3100/HTTP Push| loki
+  alloy -->|4040/HTTP Push Profiles| pyroscope
   traefik -->|4317/gRPC Traces| otel_collector
   grafana -->|4317/gRPC Traces| otel_collector
   otel_collector -->|4317/gRPC Traces| tempo
   loki -->|9000/HTTP S3 Storage| minio
   tempo -->|9000/HTTP S3 Storage| minio
+  pyroscope -->|9000/HTTP S3 Storage| minio
 
   %% Tempo Metrics Generator (Remote Write)
   tempo -->|9090/HTTP Push Metrics| prometheus
@@ -121,6 +126,7 @@ flowchart LR
   prometheus -->|8080/HTTP Scrape| keep_backend
   prometheus -->|3200/HTTP Scrape| tempo
   prometheus -->|3100/HTTP Scrape| loki
+  prometheus -->|4040/HTTP Scrape| pyroscope
   prometheus -->|9000/HTTP Scrape| minio
   prometheus -->|8080/HTTP Scrape| karma
   prometheus -->|9093/HTTP Scrape| alertmanager

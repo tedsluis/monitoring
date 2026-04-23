@@ -30,6 +30,7 @@ flowchart LR
     alloy[alloy]:::collectNode
     otel_collector[otel-collector]:::collectNode
     loki[loki]:::obsNode
+    pyroscope[pyroscope]:::obsNode
     minio[(minio)]:::dbNode
   end
 
@@ -54,6 +55,7 @@ flowchart LR
   prometheus -->|Port 12345/HTTP Scrape| alloy
   prometheus -->|Port 8888/HTTP Scrape| otel_collector
   prometheus -->|Port 3100/HTTP Scrape| loki
+  prometheus -->|Port 4040/HTTP Scrape| pyroscope
   prometheus -->|Port 9000/HTTP Scrape| minio
 
   prometheus -->|Port 8082/HTTP Scrape| traefik

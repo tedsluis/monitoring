@@ -57,7 +57,9 @@ Prometheus evaluates alert.rules.yml -> Fires to Alertmanager -> Alertmanager ro
 
 ### 2.5 Profiling Flow
 
-Monitoring tools (like Prometheus, Loki, Alloy) expose pprof endpoints -> Grafana Alloy scrapes these CPU and Memory profiles -> Pushed to Pyroscope -> Stored in MinIO -> Visualized as Flame Graphs in Grafana.
+Applications can expose pprof endpoints -> Grafana Alloy scrapes these CPU and Memory profiles -> Pushed to Pyroscope -> Stored in MinIO -> Visualized as Flame Graphs in Grafana.
+
+![profiling](./images/pyroscope-profiling.svg)
 
 ## 3. Service Port Map
 
@@ -210,24 +212,38 @@ However, by running the native wrapper using `podman compose --env-file .env up 
    # your secure passwords and custom DOMAIN (using an editor like vi, vim or nano).
    vi .env
 
-   # 3. load environemt variables from .env file
+   # 3. load environment variables from .env file
    export $(grep -v '^#' .env | xargs)
 ```
 
 ### 5.5 Install
 
 ```bash
-   # Run the installation script
-   ./install.sh 
+   # Source installation script
+   source ./install.sh 
    ======================================================
    🚀 Starting installation
    ======================================================
+   ✅ environment variables loaded from .env
+
    ✅ Installation is running for domain: localhost
 
    📦 Checking prerequisites...
    ======================================================
    📝 Generating configuration from templates...
+   copy template/traefik.yaml > traefik/traefik.yaml
+   copy template/traefik-dynamic.yaml > traefik/dynamic/traefik-dynamic.yaml
+   copy template/index.html > landing-page/index.html
+   copy template/alertmanager.yml > alertmanager/alertmanager.yml
+   copy template/loki-config.yaml > loki/loki-config.yaml
+   copy template/tempo.yaml > tempo/tempo.yaml
+   copy template/pyroscope.yaml > pyroscope/pyroscope.yaml
    ✅ Templates successfully processed.
+   ======================================================
+
+   ======================================================
+   🌐 Updating /etc/hosts...
+   ✅ /etc/hosts updated.
    ======================================================
 
    ======================================================
@@ -236,8 +252,8 @@ However, by running the native wrapper using `podman compose --env-file .env up 
    Cleaning up old files...
    Generating SAN configuration...
    Generating Root CA...
-   ...+......+.+...+.....+................+...+++++++++++++++++++++++++++++++++++++++*.......+...+..+.........+.......+...+..+.......+...+..+.+.....+......+++++++++++++++++++++++++++++++++++++++*.....+.+............+...+...+.....+......+...+...+.........+......+..........+..+.......+......+..+.+.....+......+.............+...+.....+...+.+.....+......+..........+..............+...................+..+....+...+...+..+.....................+....+..+.+........+....+..++++++
-   ...+........+.+......+..+.......+.....+.+.....+.......+...............+...+.....+.........+.+..+.......+.....+....+............+++++++++++++++++++++++++++++++++++++++*....+...+....+...+.....+++++++++++++++++++++++++++++++++++++++*.+.............+...+..+...+.+.....+.+...............+.....+...+....+.....+.......+...+...........+......+....+..+.........++++++
+   ...+..+...+++++++++++++++++++++++++++++++++++++++*........+...+...+..........+............+...+.....+++++++++++++++++++++++++++++++++++++++*...+.....+.+.....+...+...+...+............+...+............+.......+...+...+......+.....+...+.+..+.......+......+...........+...+.............+.................+......+.......+.....+..........+..+...+....+.....+...+..........+......+..+.......+...+..+......+.......+.........+...+..+...+..........+......+........................+......+......+.........+..............+............+...+..........+...........+......+......+.........+.+.................+...+...+.+......+..+.+..+...+.+...+..+.........+.+........+......+.......+..+......+......+.+.....+.........+.+...+..............+.......+........+...+....+........+.............++++++
+   .+...+............+..+...+...+....+........+...+....+......+..+.+...............+++++++++++++++++++++++++++++++++++++++*....+.+.....+.......+..+...+.......+............+....................+.+..+...+....+.....+.+...............+............+..+......+...+.+......+...+.....+......+++++++++++++++++++++++++++++++++++++++*.+........+.......+...+...........+................+..+.............+...+.....+......+....+......+..............+.+...+.....+...+....+..............+.......+..+.........................+..................+............+.....+.......+...........+.......+..+...+............+..........+...+..+......+...+......+................+..+.+.........+...........+....+...+.....+.......+.....+.................................+....+.....+....+.........+.....+...+.......+..+......+.......+.....+.+..+...+......+.........+.+.........+..+...+.......+..+..........+...+..............+...+............+...+.+......+...+.....+...............+.+..............+............+...+......+.+.....+...............+..................+.+.........+...+..+.+.........+......+...........+....+.....+....+...+..++++++
    -----
    Generating Server Certificate...
    Certificate request self-signature ok
@@ -247,8 +263,12 @@ However, by running the native wrapper using `podman compose --env-file .env up 
    Checking if System Bundle trusts the certificate...
    ✓ SUCCESS: System bundle now trusts your certificate!
    Restarting Traefik...
-   babb3439e401e4547964fc3fd4ba8f44bfa9340758ba2ff59819e4660f0f4f49
-   a67a1bfb5808194eb99314bb47b54e5bc451d1b7bb8a754bb05fc3afacf73b18
+   >>>> Executing external compose provider "/usr/bin/podman-compose". Please see podman-compose(1) for how to disable this message. <<<<
+
+   WARN[0010] StopSignal SIGTERM failed to stop container traefik in 10 seconds, resorting to SIGKILL 
+   traefik
+   traefik
+   1c00aa3f62ae7371769086b1b1394db2fd1842517023d731e148aae678d6e578
    traefik
    === Done! ===
    Test now with: curl -v https://grafana.localhost
@@ -259,41 +279,45 @@ However, by running the native wrapper using `podman compose --env-file .env up 
    You are not using a HTTP proxy.
    Neither http_proxy, https_proxy, HTTP_PROXY nor HTTPS_PROXY is set. The no_proxy variable will not have any effect.
    Please set http_proxy, https_proxy, HTTP_PROXY and HTTPS_PROXY environment variables if you intend to use a proxy.
+
 ```
-**note:** You can edit the `.env` file and rerun this `install.sh` every time you want to change the `DOMAIN` or update a secret in the templates.
+**note:** You can edit the `.env` file and rerun this `source ./install.sh` every time you want to change the `DOMAIN` or update a secret in the templates.
 
 ### 5.6 Start the stack
 
 ```bash
-   # Important: Only run this step after you have successfully executed the install.sh script!
+   # Important: 
+   # - Only run this step after you have successfully executed the install script: 'source ./install.sh'
+  
    podman compose up -d
 ```
-The first time, the `minio-init` container will automatically create the required buckets (`loki-data` and `tempo-data`).
+The first time, the `minio-init` container will automatically create the required buckets (`loki-data`, `tempo-data` an `pyroscope-data`).
 
 ### 5.7 Check the status
 
 ```bash
 podman ps -a
-CONTAINER ID  IMAGE                                                                                                                    COMMAND               CREATED       STATUS                   PORTS                                                             NAMES
-b8db045c2924  quay.io/prometheus/alertmanager@sha256:88b605de9aba0410775c1eb3438f951115054e0d307f23f274a4c705f51630c1                  --config.file=/et...  13 hours ago  Up 13 hours (healthy)    9093/tcp                                                          alertmanager
-99746eba94b1  docker.io/grafana/alloy@sha256:8f5666aebb871ba43ee2d65159c5d1c26c903720efafaf2d9ed4e237afc3bc88                          run --server.http...  13 hours ago  Up 13 hours                                                                                alloy
-2bbaf8abf010  quay.io/prometheus/blackbox-exporter@sha256:e753ff9f3fc458d02cca5eddab5a77e1c175eee484a8925ac7d524f04366c2fc             --config.file=/co...  13 hours ago  Up 13 hours              9115/tcp                                                          blackbox-exporter
-a56668a969be  docker.io/library/postgres@sha256:4da1a4828be12604092fa55311276f08f9224a74a62dcb4708bd7439e2a03911                       postgres              13 hours ago  Up 13 hours (healthy)    5432/tcp                                                          keep-db
-d3ef02cfc919  docker.io/minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e                            server /data --co...  13 hours ago  Up 13 hours (healthy)    9000/tcp                                                          minio
-5c7253e032a8  docker.io/library/nginx@sha256:e7257f1ef28ba17cf7c248cb8ccf6f0c6e0228ab9c315c152f9c203cd34cf6d1                          nginx -g daemon o...  13 hours ago  Up 13 hours (healthy)    80/tcp                                                            nginx
-9faae1ccbe5e  quay.io/prometheus/node-exporter@sha256:337ff1d356b68d39cef853e8c6345de11ce7556bb34cda8bd205bcf2ed30b565                 --path.rootfs=/ho...  13 hours ago  Up 13 hours (healthy)    9100/tcp                                                          node-exporter
-19627b6c8326  quay.io/navidys/prometheus-podman-exporter@sha256:2ebb9e09101d8cc1e28e3f306b56a722450918e628208435201ed39bd62403cb                             13 hours ago  Up 13 hours (healthy)    9882/tcp                                                          podman-exporter
-f08df82fcea2  quay.io/prometheus/prometheus@sha256:7571a304e67fbd794be02422b13627dc7de822152f74e99e2bef95d29eceecde                    --config.file=/et...  13 hours ago  Up 13 hours (healthy)    9090/tcp                                                          prometheus
-ca01ef826b99  docker.io/library/traefik@sha256:acfc80650104f0194a15f73dc1648f517561bc1645391a15705332a064cfc33c                        traefik               13 hours ago  Up 13 hours (healthy)    0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:4317->4317/tcp  traefik
-e6cd2cf7e97a  docker.io/tarampampam/webhook-tester@sha256:7df929897b150aec5b60d77529ae863f69238cf74f0e47c161258fcc185f3e0c             start                 13 hours ago  Up 13 hours                                                                                webhook-tester
-fe1fe0aafcec  ghcr.io/prymitive/karma@sha256:cae0afb8d083756a7a44413480847fa59c072659d909734924a10640e1de600d                                                13 hours ago  Up 13 hours              8080/tcp                                                          karma
-4a832c4f2cdb  us-central1-docker.pkg.dev/keephq/keep/keep-api@sha256:0e95b90210f2caeaf6a654daec274cfe43101cf1c4cdbc9cd1fec1a99e791af6  gunicorn keep.api...  13 hours ago  Up 13 hours (healthy)                                                                      keep-backend
-aa0d66edfc89  docker.io/minio/mc@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727                                                     13 hours ago  Exited (0) 13 hours ago                                                                    minio-init
-736a0b57ef1f  us-central1-docker.pkg.dev/keephq/keep/keep-ui@sha256:2041f65c7bbd64c2a800a4d11eedf0e99b89debfd6b88f0bbb109443eb6bcc23                         13 hours ago  Up 13 hours (healthy)    3000/tcp                                                          keep-frontend
-af2575426baf  docker.io/grafana/loki@sha256:3c8fd3570dd9219951a60d3f919c7f31923d10baee578b77bc26c4a0b32d092d                           -config.file=/etc...  13 hours ago  Up 13 hours              3100/tcp                                                          loki
-6f71a3bcc52d  docker.io/grafana/tempo@sha256:cac9de2ac9f6da8efca5b64b690a7cb8c786a0c49cac7b4517dd1b0089a6c703                          -config.file=/etc...  13 hours ago  Up 13 hours                                                                                tempo
-ce958ef62c3e  docker.io/otel/opentelemetry-collector-contrib@sha256:8164eab2e6bca9c9b0837a8d2f118a6618489008a839db7f9d6510e66be3923c   --config=/etc/ote...  13 hours ago  Up 13 hours              4317-4318/tcp, 55679/tcp                                          otel-collector
-66c8b0604c18  docker.io/grafana/grafana@sha256:e932bd6ed0e026595b08483cd0141e5103e1ab7ff8604839ff899b8dc54cabcb                                              13 hours ago  Up 13 hours (healthy)    3000/tcp                                                          grafana
+CONTAINER ID  IMAGE                                                                                                                    COMMAND               CREATED         STATUS                   PORTS                                                             NAMES
+9a7d19394fea  quay.io/prometheus/alertmanager@sha256:88b605de9aba0410775c1eb3438f951115054e0d307f23f274a4c705f51630c1                  --config.file=/et...  24 hours ago    Up 24 hours (healthy)    9093/tcp                                                          alertmanager
+4385be7aa616  docker.io/grafana/alloy@sha256:1f40cf52adda8fab3e058f9347a5d165624ecb9fbc1527769cb744748961940d                          run --server.http...  24 hours ago    Up 24 hours                                                                                alloy
+e39d9970fdc9  quay.io/prometheus/blackbox-exporter@sha256:e753ff9f3fc458d02cca5eddab5a77e1c175eee484a8925ac7d524f04366c2fc             --config.file=/co...  24 hours ago    Up 24 hours              9115/tcp                                                          blackbox-exporter
+479da2e5f9fa  docker.io/library/postgres@sha256:52098013b4b64a746626437d38afc03cabff6cdeb4d3d92e2342aa95f0ce56ea                       postgres              24 hours ago    Up 24 hours (healthy)    5432/tcp                                                          keep-db
+f19ac9b0fc24  docker.io/minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e                            server /data --co...  24 hours ago    Up 24 hours (healthy)    9000/tcp                                                          minio
+acafb4c0f6ca  docker.io/library/nginx@sha256:5616878291a2eed594aee8db4dade5878cf7edcb475e59193904b198d9b830de                          nginx -g daemon o...  24 hours ago    Up 24 hours (healthy)    80/tcp                                                            nginx
+545194db4adb  quay.io/prometheus/node-exporter@sha256:337ff1d356b68d39cef853e8c6345de11ce7556bb34cda8bd205bcf2ed30b565                 --path.rootfs=/ho...  24 hours ago    Up 24 hours (healthy)    9100/tcp                                                          node-exporter
+d475858f4b28  quay.io/navidys/prometheus-podman-exporter@sha256:2ebb9e09101d8cc1e28e3f306b56a722450918e628208435201ed39bd62403cb                             24 hours ago    Up 24 hours (healthy)    9882/tcp                                                          podman-exporter
+579a72c7b7e3  quay.io/prometheus/prometheus@sha256:7571a304e67fbd794be02422b13627dc7de822152f74e99e2bef95d29eceecde                    --config.file=/et...  24 hours ago    Up 24 hours (healthy)    9090/tcp                                                          prometheus
+bf15c54adfd7  docker.io/tarampampam/webhook-tester@sha256:85818267b450d3d386cad6510c561e09b974183ed2832c373bc83b125fc1b221             start                 24 hours ago    Up 24 hours                                                                                webhook-tester
+1a80fa997e58  ghcr.io/prymitive/karma@sha256:cae0afb8d083756a7a44413480847fa59c072659d909734924a10640e1de600d                                                24 hours ago    Up 24 hours              8080/tcp                                                          karma
+e56abf8f23b1  us-central1-docker.pkg.dev/keephq/keep/keep-api@sha256:0e95b90210f2caeaf6a654daec274cfe43101cf1c4cdbc9cd1fec1a99e791af6  gunicorn keep.api...  24 hours ago    Up 24 hours (healthy)                                                                      keep-backend
+226eb18ecf08  docker.io/minio/mc@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727                                                     24 hours ago    Exited (0) 24 hours ago                                                                    minio-init
+1c1061ab48b2  us-central1-docker.pkg.dev/keephq/keep/keep-ui@sha256:2041f65c7bbd64c2a800a4d11eedf0e99b89debfd6b88f0bbb109443eb6bcc23                         24 hours ago    Up 24 hours (healthy)    3000/tcp                                                          keep-frontend
+9d15366f4ab2  docker.io/grafana/loki@sha256:73e905b51a7f917f7a1075e4be68759df30226e03dcb3cd2213b989cc0dc8eb4                           -config.file=/etc...  24 hours ago    Up 24 hours              3100/tcp                                                          loki
+bae17c2ad577  docker.io/grafana/pyroscope:1.13.0                                                                                       -config.file=/etc...  24 hours ago    Up 24 hours              4040/tcp                                                          pyroscope
+92ec7ed8987b  docker.io/grafana/tempo@sha256:a6616c9d224770c883a67b50e4941e99c5df81b076ef05f516bb7cce5a96cec0                          -config.file=/etc...  24 hours ago    Up 24 hours                                                                                tempo
+c6150f320361  docker.io/otel/opentelemetry-collector-contrib@sha256:a516c26968aa1feb5e5fc0562e3338ea13755cb4f373603226bcc4e276374ad0   --config=/etc/ote...  24 hours ago    Up 24 hours              4317-4318/tcp, 55679/tcp                                          otel-collector
+820acb069f16  docker.io/grafana/grafana@sha256:2e986801428cd689c2358605289c90ab37d2b39e24808874971f54c99bcdc412                                              24 hours ago    Up 24 hours (healthy)    3000/tcp                                                          grafana
+1c00aa3f62ae  docker.io/library/traefik@sha256:34d5089d0b414945342848518b383f11f5b3a645504ed87b77ffeb9d683d0e48                        traefik               22 minutes ago  Up 22 minutes (healthy)  0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:4317->4317/tcp  traefik
 ```
 **note**: The `minio-init` container only runs briefly when starting MinIo and will have an Exited (0) status.
 
@@ -398,28 +422,28 @@ To ensure all components are successfully communicating with each other, you can
 ========================================
 ----------------------------------------
 🔍 [TEST] Proxy: Alloy
-✅ [SUCCESS] https://alloy.ted.home/-/healthy is reachable.
+✅ [SUCCESS] https://alloy.localhost/-/healthy is reachable.
 ----------------------------------------
 🔍 [TEST] Proxy: Alertmanager
-✅ [SUCCESS] https://alertmanager.ted.home/-/healthy is reachable.
+✅ [SUCCESS] https://alertmanager.localhost/-/healthy is reachable.
 ----------------------------------------
 🔍 [TEST] Proxy: Grafana
-✅ [SUCCESS] https://grafana.ted.home/api/health is reachable.
+✅ [SUCCESS] https://grafana.localhost/api/health is reachable.
 ----------------------------------------
 🔍 [TEST] Proxy: Karma
-✅ [SUCCESS] https://karma.ted.home/health is reachable.
+✅ [SUCCESS] https://karma.localhost/health is reachable.
 ----------------------------------------
 🔍 [TEST] Proxy: KeepHQ (Frontend)
-✅ [SUCCESS] https://keep.ted.home/api/healthcheck is reachable.
+✅ [SUCCESS] https://keep.localhost/api/healthcheck is reachable.
 ----------------------------------------
 🔍 [TEST] Proxy: MinIO Console
-✅ [SUCCESS] https://minio.ted.home/ is reachable.
+✅ [SUCCESS] https://minio.localhost/ is reachable.
 ----------------------------------------
 🔍 [TEST] Proxy: Traefik Dashboard
-✅ [SUCCESS] https://traefik.ted.home/dashboard/ is reachable.
+✅ [SUCCESS] https://traefik.localhost/dashboard/ is reachable.
 ----------------------------------------
 🔍 [TEST] Proxy: Webhook Tester
-✅ [SUCCESS] https://webhook-tester.ted.home/ is reachable.
+✅ [SUCCESS] https://webhook-tester.localhost/ is reachable.
 
 ========================================
 🔗 Starting End-to-End Tracing Pipeline Test
@@ -755,7 +779,34 @@ Tempo does not include a built-in user interface. Instead, it relies entirely on
 * https://grafana.com/docs/tempo/latest/
 * https://github.com/grafana/tempo
 
-### 7.6 Alertmanager
+### 7.6 Pyroscope 
+
+Grafana Pyroscope is a continuous profiling tool. While metrics tell you what is happening (e.g., CPU is at 100%), and traces tell you where it is happening (e.g., a specific API endpoint is slow), profiling tells you exactly why it is happening by showing you the exact function or line of code responsible for the resource consumption.
+
+Go to https://pyroscope.localhost
+
+![pyroscope](./images/pyroscope-detailed-diagram.svg)
+
+**How it works in this stack:**
+
+* **Scraping via Alloy:** Instead of pushing profiles directly from applications, Grafana Alloy is configured to actively scrape standard pprof endpoints. Alloy scrapes the CPU and Memory profiles from containers, in this monitoring stack from the monitoring tools themselves.
+* **S3 Storage Backend (MinIO):** Pyroscope connects to the local MinIO instance (http://minio:9000) and stores all profiling data in the pyroscope-data bucket.* **Data Retention:** Profiling data can grow quickly. Pyroscope's built-in compactor is configured to aggregate this data and enforce a strict 14-day retention policy (block_retention: 336h), automatically cleaning up old profiles from MinIO.
+* **Trace-to-Profile Integration:** In Grafana, the Tempo datasource is explicitly linked to the Pyroscope datasource using the service.name tag. This creates a seamless UI experience where you can jump from a trace span directly into a Flame Graph.
+
+| configuration       | configuration file         |
+|---------------------|----------------------------|
+| Pyroscope config    | ./pyroscope/pyroscope.yaml |
+| Alloy Scrape config | ./alloy/config.alloy       |
+
+*See the screenshot below for an impression of the Pyroscope metrics dashboard:*
+![pyroscope-metrics](./images/pyroscope-metrics-dashboard.png)
+
+**Docs:**
+
+* https://grafana.com/docs/pyroscope/latest/
+* https://github.com/grafana/pyroscope
+
+### 7.7 Alertmanager
 
 Alertmanager handles alerts sent by client applications such as the Prometheus server and Loki's Ruler. While Prometheus and Loki evaluate data and fire alerts based on predefined thresholds, Alertmanager takes over the complex logistics of notification management.
 
@@ -796,7 +847,7 @@ Alertmanager exposes prometheus metrics too, which are used to monitor Alertmana
 * https://github.com/prometheus/alertmanager
 
 
-### 7.7 Grafana
+### 7.8 Grafana
 
 Go to https://grafana.localhost
 
@@ -811,14 +862,14 @@ A major highlight of this environment is that Grafana is fully pre-provisioned v
 * https://grafana.com/docs/grafana/latest/
 * https://github.com/grafana/grafana
 
-#### 7.7.1 Dashboards
+#### 7.8.1 Dashboards
 
 **Automated dashboard provisioning:** [./grafana-provisioning/dashboards/dashboard.yaml](./grafana-provisioning/dashboards/dashboard.yaml) acts as a dashboard provider configuration. It tells Grafana to recursively scan the local directory `./grafana-provisioning/dashboards/json/` for any .json files and automatically load them into the UI. Because of this, all the specialized dashboards (for Node Exporter, Podman, Alloy, Blackbox, MinIO, etc.) are instantly available for use without requiring manual import steps.
 
 *See the screenshot below for an overview of the Grafana Dashboards:*
 ![grafana-dashboarden](./images/grafana-dashboards.png)
 
-#### 7.7.2 Explore
+#### 7.8.2 Explore
 
 The Explore mode provides an advanced interface for ad-hoc analysis and troubleshooting, where users can execute queries directly. Explore thus facilitates rapid incident diagnosis and root-cause analysis, without the need to configure predefined dashboards in advance.
 
@@ -861,7 +912,7 @@ The Pyroscope datasource allows you to query continuous profiling data. Using Fl
 *See the screenshot below for an impression of the Explore profiles:*
 ![pyroscope-explore](./images/pyroscope-explore.png)
 
-#### 7.7.3 Drilldown
+#### 7.8.3 Drilldown
 
 The drill-down functionality within Grafana offers the ability to connect in-depth error analysis through metrics, logs, traces and profiles contextually with each other. From an anomaly in a metrics dashboard, you can directly navigate to the correlated log lines in Loki, and then use automatically detected trace IDs to switch to detailed request spans in Tempo. Finally, you can click on a specific Tempo span to open the exact Pyroscope Flame Graph for that exact millisecond in time. This integration eliminates the need to manually synchronize timestamps and identifiers between different datasources, significantly increasing the efficiency of root cause analysis and performance optimization.
 
@@ -877,14 +928,14 @@ The drill-down functionality within Grafana offers the ability to connect in-dep
 *See the screenshot below for an impression of the Profiling drilldown:*
 ![profiling-drilldown](./images/pyroscope-profiling-drilldown.png)
 
-#### 7.7.4 Grafana alerts
+#### 7.8.4 Grafana alerts
 
 Grafana Alerting provides a central interface for monitoring alerts. This module aggregates alert rules from both Prometheus (for metrics) and Loki (for log data), creating an overview of the operational status. Through this dashboard you can analyze the real-time status of alerts (‘Pending’ or ‘Firing’), examine the underlying query definitions, and gain insight into the evaluation criteria that safeguard the platform’s stability and availability.
 
 *See the screenshot below for an impression of the Grafana Alerting:*
 ![grafana-alerting](./images/grafana-alerts.png)
 
-#### 7.7.5 Grafana datasources
+#### 7.8.5 Grafana datasources
 
 Datasources in Grafana serve as the technical interface to the underlying data storage systems, allowing the application to retrieve data without persisting it itself. In this configuration, Prometheus, Loki and Tempo are defined as the primary sources for exposing metrics, log files and distributed traces, respectively.
 
@@ -895,7 +946,7 @@ Datasources in Grafana serve as the technical interface to the underlying data s
 
 The datasources for Prometheus, Loki and Tempo are configured in [./grafana-provisioning/datasources/datasources.yaml](./grafana-provisioning/datasources/datasources.yaml).
 
-### 7.8 Karma Alert Dashboard
+### 7.9 Karma Alert Dashboard
 
 Karma is a specialized, highly visual dashboard designed specifically for Alertmanager. While Alertmanager excels at routing and grouping alerts, its default UI is quite basic. Karma fills this gap by providing an intuitive, color-coded, and auto-refreshing interface that gives Operations and DevOps teams a consolidated overview of the platform's health at a glance.
 
@@ -926,7 +977,7 @@ An overview of all active warnings (e.g., "Disk almost full", "Container down" o
 
 * https://github.com/prymitive/karma
 
-### 7.9 webhook-tester
+### 7.10 webhook-tester
 
 Webhook-tester is a lightweight and incredibly useful utility for debugging and inspecting incoming HTTP requests. In this observability stack, it acts as a "dummy" or "catch-all" receiver for Alertmanager.
 
@@ -947,7 +998,7 @@ Go to https://webhook-tester.localhost
 
 * https://github.com/tarampampam/webhook-tester
 
-### 7.10 KeepHQ
+### 7.11 KeepHQ
 
 KeepHQ is an open-source AIOps and alert management platform. While Alertmanager handles the initial routing and deduplication of alerts, KeepHQ takes alert management a step further by providing advanced correlation, noise reduction, and automated workflow execution (auto-remediation). It acts as a single pane of glass for all your alerts, enriching them with context from various tools.
 
@@ -980,7 +1031,7 @@ By injecting these configurations via Infrastructure as Code, KeepHQ is instantl
 * https://docs.keephq.dev/overview/introduction
 * https://github.com/keephq/keep
 
-### 7.11 Storage (MinIO)
+### 7.12 Storage (MinIO)
 
 MinIO is a high-performance, S3-compatible object storage server. In this observability stack, it serves as the persistent, long-term storage backend for both Grafana Loki (logs) and Grafana Tempo (traces).
 
@@ -1014,19 +1065,20 @@ Go to https://minio.localhost
 * https://github.com/minio/minio
 * https://docs.min.io/enterprise/aistor-object-store/
 
-### 7.12 Alloy
+### 7.13 Alloy
 
-Grafana Alloy is a highly configurable, vendor-neutral observability data pipeline. In this monitoring stack, Alloy acts as the primary log collector and processor, bridging the gap between your raw logs (both container and host-level) and Grafana Loki.
+Grafana Alloy is a highly configurable, vendor-neutral observability data pipeline. In this monitoring stack, Alloy acts as the primary log collector, processor and profiling agent, bridging the gap between your raw logs (both container and host-level) and Grafana Loki, as well as collecting continuous profiling data for Pyroscope.
 
 Go to https://alloy.localhost
 
 ![alloy](./images/alloy-detailed-diagram.svg)
 
-**How it works in this stack (config.alloy):** The configuration file located at [./alloy/config.alloy](./alloy/config.alloy) defines two main data streams that converge into a single output pushed to Loki:
+**How it works in this stack (config.alloy):** The configuration file located at [./alloy/config.alloy](./alloy/config.alloy) defines three main data streams that converge into a single output pushed to Loki and Pyroscope:
 
 * **Stream 1:** Container Logs (`Podman Socket`): Alloy discovers all running containers via the local Podman socket (`/var/run/docker.sock`). Instead of just grabbing raw logs, it enriches them with highly useful metadata. It extracts the container_name, shortens the container_id to 12 characters for precision, and tags the image, pod_name, and compose project. This enrichment is what allows you to effortlessly filter logs in Grafana based on specific containers or pods.
 * **Stream 2:** Host System Logs (`Journald`): Alloy also reads the host machine's system logs directly from `/var/log/journal`. It extracts the systemd unit (e.g., sshd.service), syslog_identifier, and the log level (e.g., info, warning, err) so you can quickly filter for host-level errors.
 * **Smart Deduplication:** Because rootless Podman automatically writes container logs to the host's system journal as well, simply collecting both streams would result in duplicate logs in Loki. The config.alloy explicitly prevents this by applying a loki.relabel rule that drops any journald log containing a container ID. This ensures your logs remain clean and accurate.
+* **Stream 3: Continuous Profiling (pprof Scraping):** Alloy is configured to actively scrape standard Go `pprof` endpoints from the monitoring tools in the stack (such as Prometheus, Loki, Tempo, Traefik, Node Exporter, and Alloy itself). It routinely collects CPU, memory, goroutine, block, and mutex profiles, and forwards this data to the Pyroscope backend. This agent-based pull model eliminates the need for each application to explicitly push its own profiles.
 
 Through the Alloy web UI, you can view the health of these components and visually inspect the data flow pipeline using the Graph tab.
 
@@ -1044,7 +1096,7 @@ Through the Alloy web UI, you can view the health of these components and visual
 * https://grafana.com/docs/alloy/latest
 * https://github.com/grafana/alloy
 
-### 7.13 Blackbox exporter
+### 7.14 Blackbox exporter
 
 The Prometheus Blackbox Exporter is a probing tool that allows you to monitor the external health, availability, and response times of your endpoints. Instead of relying on internal application metrics (white-box monitoring), the Blackbox Exporter performs active "black-box" testing by making HTTP requests, TCP connections, or ICMP pings over the network just like a real user or client would.
 
@@ -1072,7 +1124,7 @@ https://blackbox.localhost
 
 * https://github.com/prometheus/blackbox_exporter
 
-### 7.14 node-exporter
+### 7.15 node-exporter
 
 The Prometheus Node Exporter is a fundamental component for infrastructure monitoring. While other exporters focus on specific applications, databases, or container engines, the Node Exporter focuses entirely on the host machine itself (in this case, your underlying Fedora Workstation).
 
@@ -1088,7 +1140,7 @@ The Prometheus Node Exporter is a fundamental component for infrastructure monit
 * https://prometheus.io/docs/guides/node-exporter/
 * https://github.com/prometheus/node_exporter
 
-### 7.15 podman-exporter
+### 7.16 podman-exporter
 
 The Prometheus Podman Exporter is designed to extract metrics specifically from a Podman environment. Since this observability stack intentionally uses daemonless, rootless Podman instead of Docker, traditional Docker exporters will not work. This exporter bridges that gap by providing deep visibility into your container runtime.
 
@@ -1103,7 +1155,7 @@ The Prometheus Podman Exporter is designed to extract metrics specifically from 
 
 * https://github.com/containers/prometheus-podman-exporter
 
-### 7.16 OpenTelemetry-collector
+### 7.17 OpenTelemetry-collector
 
 The OpenTelemetry (OTel) Collector is a vendor-agnostic proxy, router, and processor for telemetry data. While it has the capability to handle metrics and logs, in this observability stack it is primarily dedicated to handling distributed traces.
 
@@ -1123,7 +1175,7 @@ The OpenTelemetry (OTel) Collector is a vendor-agnostic proxy, router, and proce
 * https://opentelemetry.io/docs/collector/
 * https://github.com/open-telemetry/opentelemetry-collector
 
-### 7.17 Traefik
+### 7.18 Traefik
 
 Traefik acts as the Edge Router and Reverse Proxy for this entire observability stack. It is the single entry point that intercepts all incoming requests (like when you visit `https://grafana.localhost`) and dynamically routes them to the correct backend container. Furthermore, it handles all TLS/SSL termination, ensuring your local connections are secure and free of browser warnings.
 
@@ -1148,31 +1200,6 @@ Go to: https://traefik.localhost
 
 * https://doc.traefik.io/traefik/getting-started/
 * https://github.com/traefik/traefik
-
-### 7.18 Pyroscope 
-
-Grafana Pyroscope is a continuous profiling tool. While metrics tell you what is happening (e.g., CPU is at 100%), and traces tell you where it is happening (e.g., a specific API endpoint is slow), profiling tells you exactly why it is happening by showing you the exact function or line of code responsible for the resource consumption.
-
-Go to https://pyroscope.localhost
-
-**How it works in this stack:**
-
-* **Scraping via Alloy:** Instead of pushing profiles directly from applications, Grafana Alloy is configured to actively scrape standard pprof endpoints. In this educational stack, Alloy scrapes the CPU and Memory profiles of your monitoring tools themselves (Prometheus, Loki, and Alloy).
-* **S3 Storage Backend (MinIO):** Pyroscope connects to the local MinIO instance (http://minio:9000) and stores all profiling data in the pyroscope-data bucket.* **Data Retention:** Profiling data can grow quickly. Pyroscope's built-in compactor is configured to aggregate this data and enforce a strict 14-day retention policy (block_retention: 336h), automatically cleaning up old profiles from MinIO.
-* **Trace-to-Profile Integration:** In Grafana, the Tempo datasource is explicitly linked to the Pyroscope datasource using the service.name tag. This creates a seamless UI experience where you can jump from a trace span directly into a Flame Graph.
-
-| configuration       | configuration file         |
-|---------------------|----------------------------|
-| Pyroscope config    | ./pyroscope/pyroscope.yaml |
-| Alloy Scrape config | ./alloy/config.alloy       |
-
-*See the screenshot below for an impression of the Pyroscope metrics dashboard:*
-![pyroscope-metrics](./images/pyroscope-metrics-dashboard.png)
-
-**Docs:**
-
-* https://grafana.com/docs/pyroscope/latest/
-* https://github.com/grafana/pyroscope
 
 ## 8. Teardown & Cleanup
 
@@ -1201,8 +1228,7 @@ This section explains how to remove everything.
    podman volume rm $(podman volume ls -q | grep '^monitoring_') 2>/dev/null || true
 
    # remove certificates
-   sudo rm /etc/pki/ca-trust/source/anchors/my-local-ca.pem
-   sudo rm /etc/pki/ca-trust/source/anchors/my-local-ca.crt
+   sudo rm /etc/pki/ca-trust/source/anchors/my-local-ca.*
    sudo update-ca-trust extract
 
    # disable podman socket
