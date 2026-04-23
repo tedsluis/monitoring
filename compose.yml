@@ -558,7 +558,7 @@ services:
   # Pyroscope
   # ---------------------------------------------------------
   pyroscope:
-    image: docker.io/grafana/pyroscope:1.13.0
+    image: docker.io/grafana/pyroscope:1.21.0@sha256:751794786ee566c6b6200272546ba0200221c6c5660a03ca3b3b3d64d6b3d557
     container_name: pyroscope
     command:
       - "-config.file=/etc/pyroscope/pyroscope.yaml"
