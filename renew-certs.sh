@@ -72,11 +72,12 @@ DNS.12 = node-exporter.${DOMAIN}
 DNS.13 = otel-collector.${DOMAIN}
 DNS.14 = podman-exporter.${DOMAIN}
 DNS.15 = prometheus.${DOMAIN}
-DNS.16 = s3.${DOMAIN}
-DNS.17 = tempo.${DOMAIN}
-DNS.18 = traefik.${DOMAIN}
-DNS.19 = traefik-metrics.${DOMAIN}
-DNS.20 = webhook-tester.${DOMAIN}
+DNS.16 = pyroscope.${DOMAIN}
+DNS.17 = s3.${DOMAIN}
+DNS.18 = tempo.${DOMAIN}
+DNS.19 = traefik.${DOMAIN}
+DNS.20 = traefik-metrics.${DOMAIN}
+DNS.21 = webhook-tester.${DOMAIN}
 IP.1 = 127.0.0.1
 EOF
 

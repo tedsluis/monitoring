@@ -842,7 +842,7 @@ groups:
           summary: "Service {{ $labels.service }} is slow."
           description: "The 95th percentile latency of traces is higher than 2s."
 
-# ---------------------------------------------------------
+  # ---------------------------------------------------------
   # Traefik Alerts
   # ---------------------------------------------------------
   - name: traefik_alerts
@@ -865,3 +865,72 @@ groups:
         annotations:
           summary: "Many 5xx errors in Traefik"
           description: "More than 5% of all incoming requests via Traefik result in a 5xx server error. Check the backend containers!"
+
+  # ---------------------------------------------------------
+  # Traefik Alerts
+  # ---------------------------------------------------------
+  - name: pyroscope_alerts
+    rules:
+      # 1. Container Health: High CPU
+      - alert: PyroscopeHighCpuUsage
+        expr: rate(process_cpu_seconds_total{job=~".*pyroscope.*"}[2m]) > 2.0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU load on Pyroscope"
+          description: "Pyroscope (instance {{ $labels.instance }}) has been using more than 2 CPU cores for 5 minutes."
+
+      # 2. Container Health: High Memory Usage (OOM risk)
+      - alert: PyroscopeHighMemoryUsage
+        # Alerts if RSS memory exceeds 2 GB
+        expr: process_resident_memory_bytes{job=~".*pyroscope.*"} > 2147483648
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Pyroscope memory usage is critically high"
+          description: "Pyroscope (instance {{ $labels.instance }}) is using over 2GB of memory. Risk of an Out-Of-Memory (OOM) kill."
+
+      # 3. Container Health: Possible Memory Leak or Goroutine Leak
+      - alert: PyroscopeHighGoroutineCount
+        expr: go_goroutines{job=~".*pyroscope.*"} > 10000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Pyroscope has an unusually high number of goroutines"
+          description: "Pyroscope (instance {{ $labels.instance }}) has more than 10,000 active goroutines, which may indicate a leak."
+
+      # 4. Container Health: Frequent Restarts
+      - alert: PyroscopeFrequentRestarts
+        # Alerts if uptime is less than 5 minutes
+        expr: (time() - process_start_time_seconds{job=~".*pyroscope.*"}) < 300
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Pyroscope has recently restarted"
+          description: "The Pyroscope container on {{ $labels.instance }} has just started (uptime < 5m)."
+
+      # 5. Database Performance: Slow S3/MinIO connection
+      - alert: PyroscopeSlowBlockOpening
+        # Alerts if opening a block of data takes longer than 1 second on average
+        expr: (sum by (instance) (rate(pyroscopedb_block_opening_duration_sum{job=~".*pyroscope.*"}[5m])) / sum by (instance) (rate(pyroscopedb_block_opening_duration_count{job=~".*pyroscope.*"}[5m]))) > 1.0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow loading of Pyroscope storage blocks"
+          description: "Opening profile blocks in the backend storage (MinIO) takes longer than 1 second on average on {{ $labels.instance }}. This will make the Explore view slow."
+
+      # 6. Cluster Performance: Gossip network slow
+      - alert: PyroscopeHighGossipLatency
+        # Alerts if internal cluster communication takes longer than 500ms
+        expr: timer_memberlist_gossip{job=~".*pyroscope.*", quantile="0.5"} > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High network latency in Pyroscope cluster"
+          description: "The median memberlist gossip latency on {{ $labels.instance }} is greater than 0.5 seconds."

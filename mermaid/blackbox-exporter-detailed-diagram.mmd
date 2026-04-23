@@ -41,6 +41,7 @@ grafana[grafana]:::uiNode
 prometheus_out[prometheus]:::obsNode
 loki[loki]:::obsNode
 tempo[tempo]:::obsNode
+pyroscope[pyroscope]:::obsNode
 minio[(minio)]:::dbNode
 alloy[alloy]:::collectNode
 otel_collector[otel-collector]:::collectNode
@@ -74,6 +75,7 @@ blackbox_exporter -.->|Port 3000/HTTP Probe| grafana
 blackbox_exporter -.->|Port 9090/HTTP Probe| prometheus_out
 blackbox_exporter -.->|Port 3100/HTTP Probe| loki
 blackbox_exporter -.->|Port 3200/HTTP Probe| tempo
+blackbox_exporter -.->|Port 4040/HTTP Probe| pyroscope
 blackbox_exporter -.->|Port 9000/HTTP Probe| minio
 blackbox_exporter -.->|Port 12345/HTTP Probe| alloy
 blackbox_exporter -.->|Port 8888/HTTP Probe| otel_collector

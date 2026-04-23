@@ -18,6 +18,7 @@ flowchart LR
     prometheus[prometheus]:::obsNode
     loki[loki]:::obsNode
     tempo[tempo]:::obsNode
+    pyroscope[pyroscope]:::obsNode
   end
 
   subgraph Pipelines [Trace Pipelines]
@@ -32,6 +33,7 @@ flowchart LR
   grafana -->|Port 3100/HTTP LogQL Queries| loki
   grafana -->|Port 3200/HTTP TraceQL Queries| tempo
   grafana -->|Port 9095/gRPC TraceQL Queries| tempo
+  grafana -->|Port 4040/HTTP Profile Queries| pyroscope
 
   %% Grafana Internal Traces & Metrics
   grafana -->|Port 4317/gRPC Internal Traces| otel_collector

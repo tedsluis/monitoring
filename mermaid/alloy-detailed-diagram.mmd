@@ -21,6 +21,7 @@ end
 
 subgraph Observability [Observability Backend]
 loki[loki]:::obsNode
+pyroscope[pyroscope]:::obsNode
 end
 
 subgraph Monitoring [Monitoring & Probes]
@@ -28,12 +29,14 @@ prometheus[prometheus]:::obsNode
 blackbox_exporter[blackbox-exporter]:::collectNode
 end
 
-%% Log Collection (Inputs)
+%% Data Collection (Inputs)
 podman_socket -.->|Socket/TCP Read Container Logs| alloy
 journald -.->|Host FS Read System Logs| alloy
+prometheus -.->|Port 9090/HTTP Pull pprof Profiles| alloy
 
-%% Log Export (Outputs)
+%% Data Export (Outputs)
 alloy -->|Port 3100/HTTP Push Logs| loki
+alloy -->|Port 4040/HTTP Push Profiles| pyroscope
 
 %% Ingress Routing
 traefik -->|Port 12345/HTTP Route| alloy

@@ -3,7 +3,7 @@ networks:
     driver: bridge
 
 services:
- 
+
   # ---------------------------------------------------------
   # Alertmanager
   # ---------------------------------------------------------
@@ -16,6 +16,11 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+    environment:
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
     # Alertmanager runs as non-root user by default (uid 65534), but we set it explicitly here for clarity. Running as non-root is a good security practice to minimize the potential impact of a compromise.
     user: "65534:65534"
     networks:
@@ -40,10 +45,15 @@ services:
     container_name: alloy
     # Alloy needs to run as root to be able to read the journal logs from the host. In a production environment, you should use a more secure way to grant these permissions, such as using capabilities or a custom security profile.
     user: "0:0"
+    environment:
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
     networks:
       - monitoring-net
-    command: 
-      - run 
+    command:
+      - run
       - --server.http.listen-addr=0.0.0.0:12345 
       - --storage.path=/var/lib/alloy/data
       - /etc/alloy/config.alloy
@@ -71,6 +81,11 @@ services:
     container_name: blackbox-exporter
     networks:
       - monitoring-net
+    environment:
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
     restart: unless-stopped
     volumes:
       - ./blackbox/blackbox.yml:/config/blackbox.yml:Z
@@ -105,6 +120,12 @@ services:
       - loki
       - tempo
     environment:
+      - HTTP_PROXY=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - NO_PROXY=${NO_PROXY}
+      - http_proxy=${http_proxy}
+      - https_proxy=${https_proxy}
+      - no_proxy=${no_proxy}
       - GF_SERVER_ROOT_URL=https://grafana.${DOMAIN:-localhost}
       - GF_SERVER_DOMAIN=grafana.${DOMAIN:-localhost}
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
@@ -116,6 +137,9 @@ services:
       - GF_TRACING_OPENTELEMETRY_OTLP_PROTOCOL=grpc
       - GF_TRACING_OPENTELEMETRY_PROPAGATION=w3c
       - GF_TRACING_OPENTELEMETRY_ENABLED=true
+      - GF_DIAGNOSTICS_PROFILING_ENABLED=true
+      - GF_DIAGNOSTICS_PROFILING_PORT=6060
+      - GF_DIAGNOSTICS_PROFILING_ADDR=0.0.0.0
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN:-localhost}`)"
@@ -136,6 +160,10 @@ services:
     networks:
       - monitoring-net
     environment:
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
       - CONFIG_FILE=/etc/karma.yaml
     volumes:
       - ./karma/karma.yaml:/etc/karma.yaml:ro,Z
@@ -162,6 +190,10 @@ services:
     networks:
       - monitoring-net
     environment:
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
       - POSTGRES_USER=${KEEP_DB_USER}
       - POSTGRES_PASSWORD=${KEEP_DB_PASSWORD}
       - POSTGRES_DB=${KEEP_DB_NAME}
@@ -186,6 +218,12 @@ services:
     depends_on:
       - keep-db
     environment:
+      - HTTP_PROXY=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - NO_PROXY=${NO_PROXY}
+      - http_proxy=${http_proxy}
+      - https_proxy=${https_proxy}
+      - no_proxy=${no_proxy}
       # Database connectie
       - DATABASE_CONNECTION_STRING=postgresql://${KEEP_DB_USER}:${KEEP_DB_PASSWORD}@keep-db:5432/${KEEP_DB_NAME}
       - DISABLE_POSTHOG=true
@@ -234,6 +272,10 @@ services:
     depends_on:
       - keep-backend
     environment:
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
       - API_URL=http://keep-backend:8080
       - ENABLE_AI=true
       - KEEP_ENABLE_AI=true
@@ -256,13 +298,13 @@ services:
     image: docker.io/grafana/loki:3.7.1@sha256:73e905b51a7f917f7a1075e4be68759df30226e03dcb3cd2213b989cc0dc8eb4
     container_name: loki
     environment:
-      - http_proxy=
-      - https_proxy=
       - HTTP_PROXY=
       - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
     networks:
       - monitoring-net
-    command: 
+    command:
       - "-config.file=/etc/loki/loki-config.yaml"
     restart: unless-stopped
     depends_on:
@@ -290,10 +332,10 @@ services:
     networks:
       - monitoring-net
     environment:
-      - http_proxy=
-      - https_proxy=
       - HTTP_PROXY=
       - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - MINIO_PROMETHEUS_AUTH_TYPE=public
@@ -330,10 +372,10 @@ services:
     image: docker.io/minio/mc@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727
     container_name: minio-init
     environment:
-      - http_proxy=
-      - https_proxy=
       - HTTP_PROXY=
       - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
     networks:
       - monitoring-net
     # This container is used to initialize the MinIO buckets for Loki and Tempo. It runs a simple script that waits for MinIO to be healthy, then creates the necessary buckets. After the script completes successfully, the container will exit. The loki and tempo services depend on this container with a condition of service_completed_successfully to ensure that Loki only starts after the buckets have been created.
@@ -345,6 +387,7 @@ services:
       until mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}; do echo '...waiting for minio...'; sleep 1; done;
       mc mb myminio/loki-data --ignore-existing;
       mc mb myminio/tempo-data --ignore-existing;
+      mc mb myminio/pyroscope-data --ignore-existing;
       echo 'Buckets created';
       exit 0;
       "
@@ -360,6 +403,11 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+    environment:
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
     networks:
       - monitoring-net
     volumes:
@@ -387,6 +435,11 @@ services:
     command:
       - '--path.rootfs=/host'
       - '--collector.systemd'
+    environment:
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
     # MUST STAY ON HOST NETWORK TO ACCESS HOST METRICS!
     pid: host
     network_mode: host
@@ -406,6 +459,11 @@ services:
     command: ["--config=/etc/otel-config.yaml"]
     networks:
       - monitoring-net
+    environment:
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
     volumes:
       - ./otel/otel-config.yaml:/etc/otel-config.yaml:Z
     restart: unless-stopped
@@ -440,6 +498,10 @@ services:
     networks:
       - monitoring-net
     environment:
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
       - CONTAINER_HOST=unix:///run/podman/podman.sock
     restart: unless-stopped
     # The label=disable security option is used to disable SELinux labeling for the container, which can be necessary when the container needs to access files on the host that have different SELinux contexts. In this case, since the Podman Exporter needs to access the Podman socket on the host, which may have a different SELinux context, we disable labeling to avoid permission issues.
@@ -468,6 +530,11 @@ services:
       start_period: 15s
     networks:
       - monitoring-net
+    environment:
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -488,6 +555,35 @@ services:
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
 
   # ---------------------------------------------------------
+  # Pyroscope
+  # ---------------------------------------------------------
+  pyroscope:
+    image: docker.io/grafana/pyroscope:1.13.0
+    container_name: pyroscope
+    command:
+      - "-config.file=/etc/pyroscope/pyroscope.yaml"
+    environment:
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
+    networks:
+      - monitoring-net
+    restart: unless-stopped
+    depends_on:
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    volumes:
+      - ./pyroscope/pyroscope.yaml:/etc/pyroscope/pyroscope.yaml:Z
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pyroscope.rule=Host(`pyroscope.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.pyroscope.tls=true"
+      - "traefik.http.services.pyroscope.loadbalancer.server.port=4040"
+
+  # ---------------------------------------------------------
   # Tempo
   # ---------------------------------------------------------
   tempo:
@@ -497,10 +593,10 @@ services:
       - "-config.file=/etc/tempo.yaml"
     user: "0:0"
     environment:
-      - http_proxy=
-      - https_proxy=
       - HTTP_PROXY=
       - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
     networks:
       - monitoring-net
     # OTel gaat via Collector of Traefik
@@ -546,6 +642,11 @@ services:
       - ./traefik/certs:/etc/traefik/certs:ro,Z
     networks:
       - monitoring-net
+    environment:
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
     # Ensure that Traefik can resolve 'host.containers.internal' to the host IP
     # This is needed for the node-exporter proxy
     extra_hosts:
@@ -572,6 +673,10 @@ services:
       - monitoring-net
     restart: unless-stopped
     environment:
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - http_proxy=
+      - https_proxy=
       - AUTO_CREATE_SESSIONS=true
     labels:
       - "traefik.enable=true"

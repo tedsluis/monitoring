@@ -17,7 +17,7 @@ subgraph Ingress [Ingress / Reverse Proxy]
 traefik[traefik]:::proxyNode
 end
 
-%% Routed Groups
+%% Target Groups
 subgraph UIs [Frontends & Portals]
 nginx[nginx]:::uiNode
 grafana[grafana]:::uiNode
@@ -28,20 +28,21 @@ subgraph AppBackends [Application Backends]
 keep_backend[keep-backend]:::appNode
 end
 
-subgraph Observability [Observability Storage]
+subgraph Observability [Observability Backends]
 prometheus[prometheus]:::obsNode
 loki[loki]:::obsNode
 tempo[tempo]:::obsNode
+pyroscope[pyroscope]:::obsNode
 minio[(minio)]:::dbNode
 end
 
-subgraph Alerts [Alerting]
+subgraph Alerts [Alerting & Management]
 alertmanager[alertmanager]:::alertNode
 karma[karma]:::alertNode
 webhook_tester[webhook-tester]:::alertNode
 end
 
-subgraph Pipelines [Pipelines & Probes]
+subgraph Probes [Pipelines & Metrics]
 alloy[alloy]:::collectNode
 otel_collector[otel-collector]:::collectNode
 blackbox_exporter[blackbox-exporter]:::collectNode
@@ -60,6 +61,7 @@ traefik -->|8080/HTTP| keep_backend
 traefik -->|9090/HTTP| prometheus
 traefik -->|3100/HTTP| loki
 traefik -->|3200/HTTP| tempo
+traefik -->|4040/HTTP| pyroscope
 traefik -->|9000-9001/HTTP| minio
 traefik -->|9093/HTTP| alertmanager
 traefik -->|8080/HTTP| karma
@@ -74,7 +76,7 @@ traefik -->|Port 4317/gRPC Internal Traces| otel_collector
 
 %% Prometheus Metrics & Health Probes
 prometheus -->|Port 8082/HTTP Scrape Metrics| traefik
-blackbox_exporter -.->|Port 8082/HTTP Health Ping| traefik
+blackbox_exporter -.->|Port 8082/HTTP Health Probe| traefik
 
 %% Subgraph Styling (Background blocks)
 style Ingress fill:#fff8e1,stroke:#ffe082,stroke-width:2px,rx:10,ry:10
@@ -82,4 +84,4 @@ style UIs fill:#e3f2fd,stroke:#90caf9,stroke-width:2px,rx:10,ry:10
 style AppBackends fill:#e8f5e9,stroke:#a5d6a7,stroke-width:2px,rx:10,ry:10
 style Observability fill:#e0f7fa,stroke:#80deea,stroke-width:2px,rx:10,ry:10
 style Alerts fill:#ffebee,stroke:#ef9a9a,stroke-width:2px,rx:10,ry:10
-style Pipelines fill:#f3e5f5,stroke:#ce93d8,stroke-width:2px,rx:10,ry:10
+style Probes fill:#eceff1,stroke:#b0bec5,stroke-width:2px,rx:10,ry:10

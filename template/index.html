@@ -109,7 +109,7 @@
 
         /* Specifieke layout Explore tab: max 3 per row */
         #tab-explore .grid {
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         }
 
         .card {
@@ -408,6 +408,15 @@
                 <p>Traefik metrics.</p>
                 <div class="port-badge">traefik-metrics.${DOMAIN}</div>
             </a>
+            <a href="https://pyroscope.${DOMAIN}/metrics" class="card exporter" target="_blank" rel="noopener noreferrer">
+                <div class="card-header">
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+                    <h2>Pyroscope exporter</h2>
+                </div>
+                <p>Pyroscope metrics.</p>
+                <div class="port-badge">pyroscope.${DOMAIN}/metrics</div>
+            </a>
         </div>
     </div>
 
@@ -527,6 +536,16 @@
                 <p>Detailed information about Prometheus statistics.</p>
                 <div class="port-badge">grafana.${DOMAIN}/d/prometheus-stats...</div>
             </a>
+            <a href="https://grafana.${DOMAIN}/d/pyroscope-self-monitoring-v3/pyroscope-performance-overview" class="card dashboard" target="_blank" rel="noopener noreferrer">
+                <div class="card-header">
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+                    </svg>
+                    <h2>Pyroscope dashboard</h2>
+                </div>
+                <p>Detailed information about Pyroscope performance.</p>
+                <div class="port-badge">grafana.${DOMAIN}/d/pyroscope...</div>
+            </a>
             <a href="https://grafana.${DOMAIN}/d/traefik-dashboard/traefik-dashboard" class="card dashboard" target="_blank" rel="noopener noreferrer">
                 <div class="card-header">
                     <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg>
@@ -565,6 +584,16 @@
                 <p>Direct access to the Grafana Explore view for analyzing traces.</p>
                 <div class="port-badge">grafana.${DOMAIN}/explore (traces)</div>
             </a>
+            <a href="https://grafana.${DOMAIN}/explore?schemaVersion=1&panes=%7B%22ho6%22:%7B%22datasource%22:%22pyroscope%22,%22queries%22:%5B%7B%22groupBy%22:%5B%5D,%22includeExemplars%22:false,%22labelSelector%22:%22%7B%7D%22,%22spanSelector%22:%5B%5D,%22queryType%22:%22both%22,%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22grafana-pyroscope-datasource%22,%22uid%22:%22pyroscope%22%7D,%22profileTypeId%22:%22process_cpu:cpu:nanoseconds:cpu:nanoseconds%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D,%22compact%22:false%7D%7D&orgId=1" class="card explore" target="_blank">
+                <div class="card-header">
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+                    </svg>
+                    <h2>Explore: Pyroscope Profiles</h2>
+                </div>
+                <p>Analyze Continuous Profiling & Flame Graphs</p>
+                <div class="port-badge">grafana.${DOMAIN}/explore (profiles)</div>
+            </a>
             <a href="https://grafana.${DOMAIN}/a/grafana-metricsdrilldown-app/drilldown?from=now-1h&to=now&timezone=browser&var-metrics_filters=&var-filters=&var-labelsWingman=%28none%29&layout=grid&filters-rule=&filters-prefix=&filters-suffix=&search_txt=&var-metrics-reducer-sort-by=default&filters-recent=&var-ds=prometheus&var-other_metric_filters=" class="card explore" target="_blank" rel="noopener noreferrer">
                 <div class="card-header">
                     <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
@@ -588,6 +617,18 @@
                 </div>
                 <p>Grafana application for in-depth trace and performance analysis with Tempo.</p>
                 <div class="port-badge">grafana.${DOMAIN}/a/exploretraces</div>
+            </a>
+            <a href="https://grafana.${DOMAIN}/a/grafana-pyroscope-app/explore" class="card explore" target="_blank">
+                <div class="card-header">
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                    <h2>Drilldown: Drilldown Profiling</h2>
+                </div>
+                <p>Deep dive and compare performance profiles</p>
+                <div class="port-badge">grafana.${DOMAIN}/a/grafana-pyroscope-app/explore</div>
             </a>
         </div>
     </div>

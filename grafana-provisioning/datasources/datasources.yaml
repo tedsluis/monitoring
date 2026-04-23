@@ -39,6 +39,11 @@ datasources:
       tracesToLogsV2:
         datasourceUid: loki
         tags: ['job', 'instance', 'pod', 'container']
+
+      # Link from Tempo traces to Pyroscope Profiles! (NIEUW)
+      tracesToProfiles:
+        datasourceUid: pyroscope
+        tags: ['service.name', 'service_name']
       
       # Link the Service Graphs to Prometheus
       serviceMap:
@@ -52,11 +57,17 @@ datasources:
             value: 'service'
           - key: 'job'
             value: 'job'
-            
+
       # Enable TraceQL Metrics via Prometheus! 
       # This stops the 500 errors in Grafana Drilldown.
       traceqlMetrics:
-        datasourceUid: prometheus
-            
+        datasourceUid: prometheus      
       lokiSearch:
         datasourceUid: loki
+        
+    # Pyroscope Datasource
+  - name: Pyroscope
+    type: grafana-pyroscope-datasource
+    access: proxy
+    url: http://pyroscope:4040
+    uid: pyroscope

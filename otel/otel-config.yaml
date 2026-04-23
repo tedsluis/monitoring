@@ -22,6 +22,7 @@ exporters:
     verbosity: detailed
 
 service:
+  extensions: [health_check, pprof] 
   # Monitor the collector itself (metrics op poort 8888
   telemetry:
     metrics:
@@ -37,3 +38,8 @@ service:
       receivers: [otlp]
       processors: [batch]
       exporters: [otlp_grpc/tempo]
+
+extensions:
+  health_check:
+  pprof:
+    endpoint: 0.0.0.0:1777 

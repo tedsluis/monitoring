@@ -7,6 +7,8 @@
 /loki/loki-config.yaml
 !/loki/.gitkeep
 pr_state.json
+/pyroscope/pyroscope.yaml
+!/pyroscope/.gitkeep
 /tempo/tempo.yaml
 !/tempo/.gitkeep
 /traefik/certs/*

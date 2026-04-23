@@ -7,6 +7,12 @@ http:
       entryPoints:
         - "websecure"
       tls: {}
+    # Route for Traefik's internal API and pprof
+    traefik-pprof:
+      rule: "PathPrefix(`/`)"
+      service: "api@internal"
+      entryPoints:
+        - "traefik-internal"
 
   services:
     node-exporter-service:
