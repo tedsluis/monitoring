@@ -170,7 +170,7 @@ Overview of the installation and deployment:
   - **Domain:** The stack will be configured to run on your custom `DOMAIN` (defaults to `localhost`).
 * Start the stack using podman compose.
 
-### 5.4 Clone the repository
+### 5.4 Deployment
 
 ```bash
    # 1. clone the repository
