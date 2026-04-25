@@ -285,8 +285,9 @@ Overview of the installation and deployment:
 * The first time, the `minio-init` container will automatically create the required buckets (`loki-data`, `tempo-data` an `pyroscope-data`).
 * You can edit the `.env` file, rerun the `./install.sh` script and `podman compose down && podman compose up -d` every time you want to change the `DOMAIN` or update secrets in the templates.
 
-Before you got to `https://localhost` (or your custom domain) restart your browser!
-If you are using a HTTP internet proxy, make sure you add `*.your-domain` and `your-domain` to your browser `no proxy`.
+**Important:** 
+* Before you go to `https://localhost` (or your custom domain), restart your browser!
+* If you are using a HTTP internet proxy, make sure you add `*.your-domain` and `your-domain` to your browser `no proxy`.
 
 
 ### 5.5 Check the status
