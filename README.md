@@ -27,6 +27,7 @@ Why use this stack? This environment is built to teach you:
 - **S3-Compatible Storage**: How Loki and Tempo use MinIO object storage for scalable, long-term data retention instead of local disks.
 - **Advanced Alerting Routing**: The flow of an alert from Prometheus -> Alertmanager -> KeepHQ / Karma / Webhook-tester.
 - **Secure Local Networking**: Running a complex stack via Traefik Reverse Proxy with TLS/SSL on your own custom domain using rootless Podman.
+- **Automated Validation**: How to programmatically verify the health of all individual components and validate the end-to-end data flows across the entire observability pipeline.
 
 ## 2. Architecture & Data Flow
 
@@ -123,19 +124,7 @@ Applications can expose pprof endpoints -> Grafana Alloy scrapes these CPU and M
 
 ## 5. Installation & startup
 
-### 5.1 Overview
-
-This monitoring stack has been tested on Fedora Linux (tested on Fedora 43 and 44).
-
-The installation script (`install.sh`) will automatically configure the following:
-- **Tools:** `podman`, `podman-compose` and `gettext` will be installed if missing.
-- **Podman Socket:** The rootless user socket will be enabled for the Podman Exporter, Grafana Alloy and Traefik.
-- **Networking:** Unprivileged ports will be enabled, and `/etc/hosts` will be updated dynamically with your chosen domain.
-- **TLS/SSL:** A self-signed wildcard certificate will be generated and added to the Fedora trust store.
-- **Secrets:** Create configuration files from `./template` directory (for alertmanager, index.html, loki, tempo, traefik and pyroscope) and `substitute sercrets`.
-- **Domain:** The stack will be configured to run on your custom `DOMAIN` (defaults to `localhost`).
-
-### 5.2 Podman & podman compose to run containers
+### 5.1 Podman & podman compose to run containers
 
 This stack is using `podman` and `podman compose` where you may be used to `docker` and `docker-compose`. While Docker is commonly used, there are good reasons to use Podman due to several key architectural and security advantages:
 
@@ -146,7 +135,7 @@ This stack is using `podman` and `podman compose` where you may be used to `dock
 *   **Native Systemd Integration:** Podman integrates fully into Linux environments. It can easily generate and manage `systemd` unit files from running containers, allowing you to treat containers as native system services that start automatically on boot.
 *   **Kubernetes Readiness:** Podman introduces the concept of "pods" (groups of containers sharing the same network and namespaces) locally, mirroring how Kubernetes operates. It can even generate Kubernetes YAML from local containers or run existing Kubernetes YAML directly, making the transition from local development to production orchestration much smoother.
 
-#### Understanding `podman-compose` vs. `podman compose`
+### 5.2 Understanding `podman-compose` vs. `podman compose`
 
 When working with this stack, you will notice we use the command `podman compose` (with a space) instead of `podman-compose` (with a hyphen). While they look almost identical, there is a crucial difference in how they operate:
 
@@ -154,23 +143,38 @@ When working with this stack, you will notice we use the command `podman compose
 * **`podman compose` (with a space):** This is a native sub-command built directly into the Podman CLI. It acts as a smart wrapper (a "conductor"). It doesn't process the YAML itself; instead, it prepares the environment and then delegates the actual work to an external provider (like the `podman-compose` Python script).
 
 **Why we use `podman compose`:**
-The primary reason is **environment variable handling**. In our `compose.yml`, we use dynamic variables like `${DOMAIN:-localhost}`. If you run the Python script directly using `podman-compose --env-file .env up -d`, it injects these variables *into* the containers, but struggles to substitute them within the YAML file itself. 
+The primary reason is **environment variable handling**. In our `compose.yml`, we use dynamic variables like `${DOMAIN:-localhost}`. If you run the Python script directly using `podman-compose --env-file .env up -d`, it injects these variables *into* the containers, but struggles to substitute them within the YAML file itself.
 
 However, by running the native wrapper using `podman compose --env-file .env up -d`, Podman correctly loads the `.env` variables into the host's system environment *before* passing execution to the Python script. This ensures perfect interpolation of all your variables across the configuration.
 
 *Note: Even though we type `podman compose`, you **must not uninstall** the `podman-compose` package. The native wrapper relies on it under the hood to function!*
 
-### 5.3 Clone the repository
+### 5.3 Overview installation and deployment
+
+This monitoring stack has been tested on Fedora Linux (tested on Fedora 43 and 44).
+
+Overview of the installation and deployment:
+* Clone this repo.
+* Configure your `DOMAIN` and passwords in a `.env` file.
+* Export the environment variables from the `.env` file.
+* In case you use a HTTP internet proxy, run `source ./prepare_no_proxy.sh` to add your custom domain to the no_proxy.
+* Run the installation script `install.sh`, it will automatically configure the following:
+  - **Tools:** `podman`, `podman-compose` and `gettext` will be installed if missing.
+  - **Podman Socket:** The rootless user socket will be enabled for the Podman Exporter, Grafana Alloy and Traefik.
+  - **Networking:** Unprivileged ports will be enabled, and `/etc/hosts` will be updated dynamically with your chosen domain.
+  - **TLS/SSL:** A self-signed wildcard certificate will be generated and added to the Fedora trust store.
+  - **Secrets:** Create configuration files from `./template` directory (for alertmanager, index.html, loki, tempo, traefik and pyroscope) and `substitute sercrets`.
+  - **Domain:** The stack will be configured to run on your custom `DOMAIN` (defaults to `localhost`).
+* Start the stack using podman compose.
+
+### 5.4 Clone the repository
 
 ```bash
+   # 1. clone the repository
    git clone https://github.com/tedsluis/monitoring.git
    cd monitoring
-```
 
-### 5.4 Configure your own environment variables
-
-```bash
-   # 1.show default variables
+   # 2.show default variables
    cat .env.examples
    # ==========================================
    # Monitoring Stack Environment Variables
@@ -205,25 +209,22 @@ However, by running the native wrapper using `podman compose --env-file .env up 
    # Webhook Tester (UUID for your specific test-endpoint)
    WEBHOOK_TESTER_UUID=65ae26f0-131e-4390-8daa-bdaec17e77c2
 
-   # 1. Copy the example environment file
+   # 3. Copy the example environment file
    cp .env.example .env
 
-   # 2. Edit the .env file and fill in 
-   # your secure passwords and custom DOMAIN (using an editor like vi, vim or nano).
+   # 4. Edit the .env file and
+   # fill in your secure passwords and custom DOMAIN (using an editor like vi, vim, code or nano).
    vi .env
 
-   # 3. load environment variables from `.env` file
-   export $(grep -v '^#' .env | xargs)
-```
-
-### 5.5 Install
-
-```bash
-   # export the `.env` environment variables
+   # 5. load environment variables from `.env` file
    export $(grep -v '^#' .env | xargs)
 
-   # Execute the installation script
-   ./install.sh 
+   # 6. Are you using an HTTP internet proxy? Add the necessary hostnames and IP addresses
+   # to your no_proxy/NO_PROXY environment variables:
+   source ./prepare_no_proxy.sh
+
+   # 7. Execute the installation script
+   ./install.sh
    ======================================================
    🚀 Starting installation
    ======================================================
@@ -268,7 +269,7 @@ However, by running the native wrapper using `podman compose --env-file .env up 
    Restarting Traefik...
    >>>> Executing external compose provider "/usr/bin/podman-compose". Please see podman-compose(1) for how to disable this message. <<<<
 
-   WARN[0010] StopSignal SIGTERM failed to stop container traefik in 10 seconds, resorting to SIGKILL 
+   WARN[0010] StopSignal SIGTERM failed to stop container traefik in 10 seconds, resorting to SIGKILL
    traefik
    traefik
    1c00aa3f62ae7371769086b1b1394db2fd1842517023d731e148aae678d6e578
@@ -283,20 +284,14 @@ However, by running the native wrapper using `podman compose --env-file .env up 
    Neither http_proxy, https_proxy, HTTP_PROXY nor HTTPS_PROXY is set. The no_proxy variable will not have any effect.
    Please set http_proxy, https_proxy, HTTP_PROXY and HTTPS_PROXY environment variables if you intend to use a proxy.
 
-```
-**note:** You can edit the `.env` file and rerun this `source ./install.sh` every time you want to change the `DOMAIN` or update a secret in the templates.
-
-### 5.6 Start the stack
-
-```bash
-   # Important: Only run this step after you have exported the `.env` environment variables
-   # and successfully executed the install script: './install.sh'
-  
+   # 8. Start the monitoring stack
    podman compose up -d
 ```
-The first time, the `minio-init` container will automatically create the required buckets (`loki-data`, `tempo-data` an `pyroscope-data`).
+**notes:**
+* The first time, the `minio-init` container will automatically create the required buckets (`loki-data`, `tempo-data` an `pyroscope-data`).
+* You can edit the `.env` file, rerun the `./install.sh` script and `podman compose down && podman compose up -d` every time you want to change the `DOMAIN` or update secrets in the templates.
 
-### 5.7 Check the status
+### 5.5 Check the status
 
 ```bash
 podman ps -a
@@ -324,13 +319,15 @@ c6150f320361  docker.io/otel/opentelemetry-collector-contrib@sha256:a516c26968aa
 ```
 **note**: The `minio-init` container only runs briefly when starting MinIo and will have an Exited (0) status.
 
-To ensure all components are successfully communicating with each other, you can run `run-tests.sh`, the automated test suite:
+### 5.6 Automated validation script
+
+To ensure all components are successfully communicating with each other, you can run `run-tests.sh`, the automated test suite. It includes health verification of all individual components and validate the end-to-end data flows across the entire observability pipeline.
 ```bash
-./run-tests.sh 
+./run-tests.sh
 ========================================
 🚀 Starting Automated Validation Suite
 ========================================
-  ✔  Continue!          
+  ✔  Continue!
 🔍 [CHECK] Smoketest: Are all defined containers running?
    [INFO] Expected container count from compose.yml: 19
    [INFO] Currently running containers: 19
@@ -454,7 +451,7 @@ To ensure all components are successfully communicating with each other, you can
 🔍 [TEST] Flow: Traefik -> Grafana -> OTel -> Tempo -> Prometheus
    [INFO] Injected Traceparent: 00-569e0c28eb99477197f39b009168b76b-c48e6ad44ae84b22-01
    [INFO] Waiting for the tracing pipeline to buffer and flush (max 30s)...
-  ✔  Continue!          
+  ✔  Continue!
    ✅ [SUCCESS] Tempo successfully received and stored the exact Trace ID!
    [INFO] Verifying tracing metrics flow in Prometheus...
    ✅ [SUCCESS] Prometheus confirms that tracing metrics are actively flowing!
@@ -466,7 +463,7 @@ To ensure all components are successfully communicating with each other, you can
    [INFO] Injected Log Message: e2e-test-log-entry-48a76b36-c1b2-474b-804c-cb6bbbba48df
    [INFO] Successfully pushed log to Loki API.
    [INFO] Waiting for Loki to index the log (max 50s)...
-  ✔  Continue!          
+  ✔  Continue!
    ✅ [SUCCESS] Loki successfully ingested, indexed, and returned the test log!
 
 ========================================
@@ -512,6 +509,13 @@ To ensure all components are successfully communicating with each other, you can
    ✅ [SUCCESS] Prometheus confirms Traefik is actively exposing internal metrics!
 
 ========================================
+🔥 Starting End-to-End Profiling Pipeline Test
+========================================
+🔍 [TEST] Flow: Alloy (Scraper) -> Pyroscope
+   [INFO] Verifying profiling metrics flow in Prometheus...
+   ✅ [SUCCESS] Prometheus confirms that Alloy is actively scraping and sending profiles to Pyroscope!
+
+========================================
 🪣 Starting Storage Verification Test (MinIO)
 ========================================
 🔍 [TEST] Flow: minio-init -> MinIO Buckets
@@ -522,7 +526,7 @@ To ensure all components are successfully communicating with each other, you can
 🎉 [COMPLETE] All tests completed successfully! Stack is stable.
 ```
 
-### 5.8 Stop, start or restart with podman compose
+### 5.7 Stop, start or restart with podman compose
 
 **podman compose** is a utility designed to help you define and run multi-container applications seamlessly without relying on a central daemon.
 
@@ -550,7 +554,7 @@ To ensure all components are successfully communicating with each other, you can
    podman restart webhook-tester
 ```
 
-### 5.9 Generic Podman commands
+### 5.8 Generic Podman commands
 
 ```bash
    # Podman Compose Help
@@ -595,6 +599,8 @@ Source the script below to add the necessary hostnames and IP addresses:
 ```bash
   source ./prepare_no_proxy.sh
 ```
+
+**Important:** You also need to add your custom domain to the HTTP proxy settings of your browser: `no proxy = YOURDOMAIN, *.YOURDOMAIN`
 
 ### 6.4 Generate Local TLS Certificates
 
@@ -782,7 +788,7 @@ Tempo does not include a built-in user interface. Instead, it relies entirely on
 * https://grafana.com/docs/tempo/latest/
 * https://github.com/grafana/tempo
 
-### 7.6 Pyroscope 
+### 7.6 Pyroscope
 
 Grafana Pyroscope is a continuous profiling tool. While metrics tell you what is happening (e.g., CPU is at 100%), and traces tell you where it is happening (e.g., a specific API endpoint is slow), profiling tells you exactly why it is happening by showing you the exact function or line of code responsible for the resource consumption.
 
