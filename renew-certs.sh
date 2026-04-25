@@ -178,4 +178,4 @@ else
 fi
 
 echo -e "${GREEN}=== Done! ===${NC}"
-echo "Test now with: curl -v https://grafana.${DOMAIN}"
+echo "Test now with: curl -v https://traefik.${DOMAIN}"
