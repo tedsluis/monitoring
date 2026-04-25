@@ -33,33 +33,32 @@ Before running the automation, ensure your environnment is properly configured.
 ### 3.1 Required Packages
 Ensure you have the GitHub CLI (`gh`) and `jq` installed:
 ```bash
-sudo dnf install jq gh -y
+   sudo dnf install jq gh -y
 ```
 
 ### 3.2 Set required enviroment variables
 
 Create a Personal Access Token (classic) with repo scope and export it:
 ```bash
-export GITHUB_COM_TOKEN="your_personal_access_token"
-export RENOVATE_GIT_AUTHOR="Your Name <your.email@example.com>"
-export REPO="tedsluis/monitoring" # Adjust to your repository format: owner/repo
+   export GITHUB_COM_TOKEN="your_personal_access_token"
+   export RENOVATE_GIT_AUTHOR="Your Name <your.email@example.com>"
+   export REPO="tedsluis/monitoring" # Adjust to your repository format: owner/repo
 ```
 
 ### 3.3 GitHub Authentication
 The GitHub CLI must be authenticated to interact with repositories, PRs, and Issues.
 ```bash
-echo "$GITHUB_COM_TOKEN" | gh auth login --with-token
+   echo "$GITHUB_COM_TOKEN" | gh auth login --with-token
 ```
 
 ### 3.4 Add Github labels
 
 The scripts use specific labels to track status. Create them once in your repository:
 ```bash
-gh label create "test-passed" --color "0E8A16" --description "Automated smoke test passed"
-gh label create "test-failed" --color "D93F0B" --description "Automated smoke test failed"
-✓ Label "test-passed" created in tedsluis/monitoring
-✓ Label "test-failed" created in tedsluis/monitoring
-
+   gh label create "test-passed" --color "0E8A16" --description "Automated smoke test passed"
+   gh label create "test-failed" --color "D93F0B" --description "Automated smoke test failed"
+   ✓ Label "test-passed" created in tedsluis/monitoring
+   ✓ Label "test-failed" created in tedsluis/monitoring
 ```
 
 ## 4. Execution Examples
@@ -69,44 +68,44 @@ You can run these scripts manually for debugging or immediate updates.
 
 To manually trigger the Renovate bot to scan for updates and create PRs:
 ```bash
-./renovate.sh 
-🚀 Starting Mend Renovate via Podman...
- INFO: Renovate started
-       "renovateVersion": "43.77.7"
- INFO: Repository started (repository=tedsluis/monitoring)
-       "renovateVersion": "43.77.7"
- INFO: Dependency extraction complete (repository=tedsluis/monitoring, baseBranch=main)
-       "stats": {
-         "managers": {"docker-compose": {"fileCount": 1, "depCount": 19}},
-         "total": {"fileCount": 1, "depCount": 19}
-       }
-(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
-(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
-(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
-(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
-(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
-(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
-(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
-(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
-(node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
- INFO: Branch created (repository=tedsluis/monitoring, branch=renovate/observability-extras)
-       "commitSha": "4f91d4452a4dedd2b53a374838356c4e4c171017"
- INFO: PR created (repository=tedsluis/monitoring, branch=renovate/observability-extras)
-       "pr": 16,
-       "prTitle": "chore(deps): update observability tools to v0.148.0",
-       "labels": []
- INFO: Deleting orphan branch (repository=tedsluis/monitoring, branch=renovate/minor-patch)
- INFO: Repository finished (repository=tedsluis/monitoring)
-       "cloned": true,
-       "durationMs": 61442,
-       "result": "done",
-       "status": "activated",
-       "enabled": true,
-       "onboarded": true
- INFO: Renovate was run at log level "info". Set LOG_LEVEL=debug in environment variables to see extended debug logs.
-✅ Renovate run is complete. Check your GitHub repository for possible Pull Requests!
+   ./renovate.sh 
+   🚀 Starting Mend Renovate via Podman...
+   INFO: Renovate started
+         "renovateVersion": "43.77.7"
+   INFO: Repository started (repository=tedsluis/monitoring)
+         "renovateVersion": "43.77.7"
+   INFO: Dependency extraction complete (repository=tedsluis/monitoring, baseBranch=main)
+         "stats": {
+            "managers": {"docker-compose": {"fileCount": 1, "depCount": 19}},
+            "total": {"fileCount": 1, "depCount": 19}
+         }
+   (node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+   (Use `node --trace-warnings ...` to show where the warning was created)
+   (node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+   (node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+   (node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+   (node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+   (node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+   (node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+   (node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+   (node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+   (node:4) MetadataLookupWarning: received unexpected error = All promises were rejected code = UNKNOWN
+   INFO: Branch created (repository=tedsluis/monitoring, branch=renovate/observability-extras)
+         "commitSha": "4f91d4452a4dedd2b53a374838356c4e4c171017"
+   INFO: PR created (repository=tedsluis/monitoring, branch=renovate/observability-extras)
+         "pr": 16,
+         "prTitle": "chore(deps): update observability tools to v0.148.0",
+         "labels": []
+   INFO: Deleting orphan branch (repository=tedsluis/monitoring, branch=renovate/minor-patch)
+   INFO: Repository finished (repository=tedsluis/monitoring)
+         "cloned": true,
+         "durationMs": 61442,
+         "result": "done",
+         "status": "activated",
+         "enabled": true,
+         "onboarded": true
+   INFO: Renovate was run at log level "info". Set LOG_LEVEL=debug in environment variables to see extended debug logs.
+   ✅ Renovate run is complete. Check your GitHub repository for possible Pull Requests!
 ```
 
 The log file created during the run of `renovate.sh` is stored in **./logs/pr-*.log**
@@ -115,70 +114,70 @@ The log file created during the run of `renovate.sh` is stored in **./logs/pr-*.
 
 To manually trigger the poller to process any open Renovate PRs:
 ```bash
-./poll-renovate-prs.sh
-[INFO] Verifying required directories and state files...
-🔄 Starting Renovate PR Poller at Mon Mar 23 07:05:12 AM CET 2026
-[INFO] Fetching open Pull Requests with the label 'renovate' from tedsluis/monitoring...
-----------------------------------------
-📌 Inspecting PR #16 (Branch: renovate/observability-extras)
-[INFO] Fetching the latest commit SHA for PR #16...
-[DEBUG] Current PR SHA: 4f91d4452a4dedd2b53a374838356c4e4c171017
-[DEBUG] Last tested SHA: None
-[DEBUG] Current status in state file: None
-⚙️ New or updated PR found. Starting test cycle...
-[INFO] Base branch identified as: main (SHA: cdfd04b67e96370410aafd7496e22b4f4253997a)
-[INFO] Executing git operations: fetching and checking out branch 'renovate/observability-extras'...
-remote: Enumerating objects: 5, done.
-remote: Counting objects: 100% (5/5), done.
-remote: Compressing objects: 100% (1/1), done.
-remote: Total 3 (delta 2), reused 3 (delta 2), pack-reused 0 (from 0)
-Unpacking objects: 100% (3/3), 384 bytes | 384.00 KiB/s, done.
-From github.com:tedsluis/monitoring
- * branch            renovate/observability-extras -> FETCH_HEAD
- * [new branch]      renovate/observability-extras -> origin/renovate/observability-extras
-branch 'renovate/observability-extras' set up to track 'origin/renovate/observability-extras'.
-Switched to a new branch 'renovate/observability-extras'
-From github.com:tedsluis/monitoring
- * branch            renovate/observability-extras -> FETCH_HEAD
-Already up to date.
-🚀 Starting containers for PR #16...
-[INFO] Running 'podman compose pull' to ensure all images are up to date...
-[INFO] Tearing down any existing stack (timeout 30s)...  
-[INFO] Bringing up the new stack with '--force-recreate'...
-🔬 Running tests... (Output will be heavily logged in /home/tedsluis/monitoring/logs/pr-16-1774245969.log)
-✅ Test passed for PR #16!
-https://github.com/tedsluis/monitoring/pull/16
-https://github.com/tedsluis/monitoring/pull/16#issuecomment-4108234413
-🔀 Merging PR #16 into main...
-✓ Merged pull request tedsluis/monitoring#16 (chore(deps): update observability tools to v0.148.0)
-✓ Deleted remote branch renovate/observability-extras
-✅ PR successfully merged!
-[INFO] Bringing down the test stack...
-[INFO] Syncing local base branch (main) with origin...
-Switched to branch 'main'
-Your branch is up to date with 'origin/main'.
-remote: Enumerating objects: 1, done.
-remote: Counting objects: 100% (1/1), done.
-remote: Total 1 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
-Unpacking objects: 100% (1/1), 932 bytes | 466.00 KiB/s, done.
-From github.com:tedsluis/monitoring
-   cdfd04b..9ef55c7  main       -> origin/main
-HEAD is now at 9ef55c7 Merge pull request #16 from tedsluis/renovate/observability-extras
-========================================
-🚀 PRs have been successfully merged!
-The production (main) stack is now being permanently updated...
-[INFO] Checking out main branch and fetching latest changes...
-Already on 'main'
-Your branch is up to date with 'origin/main'.
-From github.com:tedsluis/monitoring
- * branch            main       -> FETCH_HEAD
-HEAD is now at 9ef55c7 Merge pull request #16 from tedsluis/renovate/observability-extras
-⬇️ Pulling new images on main...
-🔄 Restarting stack with latest main branch...
-🎉 Main stack successfully updated and running on the latest versions!
-https://github.com/tedsluis/monitoring/pull/16#issuecomment-4108240074
-[INFO] Performing safe image cleanup (removing untagged images older than 7 days)...
-✅ Poller run completed at Mon Mar 23 07:08:21 AM CET 2026.
+   ./poll-renovate-prs.sh
+   [INFO] Verifying required directories and state files...
+   🔄 Starting Renovate PR Poller at Mon Mar 23 07:05:12 AM CET 2026
+   [INFO] Fetching open Pull Requests with the label 'renovate' from tedsluis/monitoring...
+   ----------------------------------------
+   📌 Inspecting PR #16 (Branch: renovate/observability-extras)
+   [INFO] Fetching the latest commit SHA for PR #16...
+   [DEBUG] Current PR SHA: 4f91d4452a4dedd2b53a374838356c4e4c171017
+   [DEBUG] Last tested SHA: None
+   [DEBUG] Current status in state file: None
+   ⚙️ New or updated PR found. Starting test cycle...
+   [INFO] Base branch identified as: main (SHA: cdfd04b67e96370410aafd7496e22b4f4253997a)
+   [INFO] Executing git operations: fetching and checking out branch 'renovate/observability-extras'...
+   remote: Enumerating objects: 5, done.
+   remote: Counting objects: 100% (5/5), done.
+   remote: Compressing objects: 100% (1/1), done.
+   remote: Total 3 (delta 2), reused 3 (delta 2), pack-reused 0 (from 0)
+   Unpacking objects: 100% (3/3), 384 bytes | 384.00 KiB/s, done.
+   From github.com:tedsluis/monitoring
+   * branch            renovate/observability-extras -> FETCH_HEAD
+   * [new branch]      renovate/observability-extras -> origin/renovate/observability-extras
+   branch 'renovate/observability-extras' set up to track 'origin/renovate/observability-extras'.
+   Switched to a new branch 'renovate/observability-extras'
+   From github.com:tedsluis/monitoring
+   * branch            renovate/observability-extras -> FETCH_HEAD
+   Already up to date.
+   🚀 Starting containers for PR #16...
+   [INFO] Running 'podman compose pull' to ensure all images are up to date...
+   [INFO] Tearing down any existing stack (timeout 30s)...  
+   [INFO] Bringing up the new stack with '--force-recreate'...
+   🔬 Running tests... (Output will be heavily logged in /home/tedsluis/monitoring/logs/pr-16-1774245969.log)
+   ✅ Test passed for PR #16!
+   https://github.com/tedsluis/monitoring/pull/16
+   https://github.com/tedsluis/monitoring/pull/16#issuecomment-4108234413
+   🔀 Merging PR #16 into main...
+   ✓ Merged pull request tedsluis/monitoring#16 (chore(deps): update observability tools to v0.148.0)
+   ✓ Deleted remote branch renovate/observability-extras
+   ✅ PR successfully merged!
+   [INFO] Bringing down the test stack...
+   [INFO] Syncing local base branch (main) with origin...
+   Switched to branch 'main'
+   Your branch is up to date with 'origin/main'.
+   remote: Enumerating objects: 1, done.
+   remote: Counting objects: 100% (1/1), done.
+   remote: Total 1 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+   Unpacking objects: 100% (1/1), 932 bytes | 466.00 KiB/s, done.
+   From github.com:tedsluis/monitoring
+      cdfd04b..9ef55c7  main       -> origin/main
+   HEAD is now at 9ef55c7 Merge pull request #16 from tedsluis/renovate/observability-extras
+   ========================================
+   🚀 PRs have been successfully merged!
+   The production (main) stack is now being permanently updated...
+   [INFO] Checking out main branch and fetching latest changes...
+   Already on 'main'
+   Your branch is up to date with 'origin/main'.
+   From github.com:tedsluis/monitoring
+   * branch            main       -> FETCH_HEAD
+   HEAD is now at 9ef55c7 Merge pull request #16 from tedsluis/renovate/observability-extras
+   ⬇️ Pulling new images on main...
+   🔄 Restarting stack with latest main branch...
+   🎉 Main stack successfully updated and running on the latest versions!
+   https://github.com/tedsluis/monitoring/pull/16#issuecomment-4108240074
+   [INFO] Performing safe image cleanup (removing untagged images older than 7 days)...
+   ✅ Poller run completed at Mon Mar 23 07:08:21 AM CET 2026.
 ```
 
 The test log file created during the `poll-renovate-prs.sh` is stored in **./logs/pr-*.log**
@@ -186,200 +185,211 @@ The test log file created during the `poll-renovate-prs.sh` is stored in **./log
 ### 4.3 Running Tests Manually
 If you want to validate the stack without interacting with GitHub:
 ```bash
-./run-tests.sh 
-========================================
-🚀 Starting Automated Validation Suite
-========================================
-  ✔  Continue!          
-🔍 [CHECK] Smoketest: Are all defined containers running?
-   [INFO] Expected container count from compose.yml: 19
-   [INFO] Currently running containers: 19
-✅ [SUCCESS] All required containers are running.
-----------------------------------------
-⏳ [WAIT] Checking container health status (Alertmanager, Grafana, Keep-db, Keep-frontend, Minio, Nginx, Node-exporter, Podman-exporter, Prometheus, Traefik)...
-   [INFO] Waiting for alertmanager to become healthy...
-   [SUCCESS] alertmanager is healthy!
-   [INFO] Waiting for grafana to become healthy...
-   [SUCCESS] grafana is healthy!
-   [INFO] Waiting for keep-db to become healthy...
-   [SUCCESS] keep-db is healthy!
-   [INFO] Waiting for keep-frontend to become healthy...
-   [SUCCESS] keep-frontend is healthy!
-   [INFO] Waiting for minio to become healthy...
-   [SUCCESS] minio is healthy!
-   [INFO] Waiting for nginx to become healthy...
-   [SUCCESS] nginx is healthy!
-   [INFO] Waiting for node-exporter to become healthy...
-   [SUCCESS] node-exporter is healthy!
-   [INFO] Waiting for podman-exporter to become healthy...
-   [SUCCESS] podman-exporter is healthy!
-   [INFO] Waiting for prometheus to become healthy...
-   [SUCCESS] prometheus is healthy!
-   [INFO] Waiting for traefik to become healthy...
-   [SUCCESS] traefik is healthy!
-🔍 [CHECK] Identifying internal Podman network...
-🔌 [INFO] Using internal network: monitoring_monitoring-net
-   [INFO] Using ephemeral curl container for internal API testing.
-----------------------------------------
-🔍 [TEST] Prometheus API & Base Health
-✅ [SUCCESS] Prometheus API is reachable and reports healthy.
-----------------------------------------
-🔍 [TEST] Prometheus Targets (Max 2 minutes wait)
-   [INFO] Fetching Prometheus targets (Attempt 1/12)...
-✅ [SUCCESS] All Prometheus targets are UP and successfully scraped.
+   ./run-tests.sh 
+   ========================================
+   🚀 Starting Automated Validation Suite
+   ========================================
+   ✔  Continue!          
+   🔍 [CHECK] Smoketest: Are all defined containers running?
+      [INFO] Expected container count from compose.yml: 20
+      [INFO] Currently running containers: 20
+   ✅ [SUCCESS] All required containers are running.
+   ----------------------------------------
+   ⏳ [WAIT] Checking container health status (Alertmanager, Grafana, Keep-db, Keep-frontend, Minio, Nginx, Node-exporter, Podman-exporter, Prometheus, Traefik)...
+      [INFO] Waiting for alertmanager to become healthy...
+      [SUCCESS] alertmanager is healthy!
+      [INFO] Waiting for grafana to become healthy...
+      [SUCCESS] grafana is healthy!
+      [INFO] Waiting for keep-db to become healthy...
+      [SUCCESS] keep-db is healthy!
+      [INFO] Waiting for keep-frontend to become healthy...
+      [SUCCESS] keep-frontend is healthy!
+      [INFO] Waiting for minio to become healthy...
+      [SUCCESS] minio is healthy!
+      [INFO] Waiting for nginx to become healthy...
+      [SUCCESS] nginx is healthy!
+      [INFO] Waiting for node-exporter to become healthy...
+      [SUCCESS] node-exporter is healthy!
+      [INFO] Waiting for podman-exporter to become healthy...
+      [SUCCESS] podman-exporter is healthy!
+      [INFO] Waiting for prometheus to become healthy...
+      [SUCCESS] prometheus is healthy!
+      [INFO] Waiting for traefik to become healthy...
+      [SUCCESS] traefik is healthy!
+   🔍 [CHECK] Identifying internal Podman network...
+   🔌 [INFO] Using internal network: monitoring_monitoring-net
+      [INFO] Using ephemeral curl container for internal API testing.
+   ----------------------------------------
+   🔍 [TEST] Prometheus API & Base Health
+   ✅ [SUCCESS] Prometheus API is reachable and reports healthy.
+   ----------------------------------------
+   🔍 [TEST] Prometheus Targets (Max 2 minutes wait)
+      [INFO] Fetching Prometheus targets (Attempt 1/12)...
+   ✅ [SUCCESS] All Prometheus targets are UP and successfully scraped.
 
-========================================
-🌐 Starting Podman monitoring-net network Tests (via HTTP)
-========================================
-----------------------------------------
-🔍 [TEST] Grafana API
-✅ [SUCCESS] http://grafana:3000/api/health is reachable and healthy.
-----------------------------------------
-🔍 [TEST] Alertmanager
-✅ [SUCCESS] http://alertmanager:9093/-/healthy is reachable and healthy.
-----------------------------------------
-🔍 [TEST] Keep API
-✅ [SUCCESS] http://keep-backend:8080/ is reachable and healthy.
-----------------------------------------
-🔍 [TEST] Traefik Routing (using Nginx)
-✅ [SUCCESS] http://traefik:80 is routing requests correctly.
-----------------------------------------
-🔍 [TEST] Alloy
-✅ [SUCCESS] http://alloy:12345/-/healthy is reachable and healthy.
-----------------------------------------
-🔍 [TEST] Blackbox Exporter
-✅ [SUCCESS] http://blackbox-exporter:9115/-/healthy is reachable and healthy.
-----------------------------------------
-🔍 [TEST] Karma Dashboard
-✅ [SUCCESS] http://karma:8080/health is reachable and healthy.
-----------------------------------------
-🔍 [TEST] Keep Frontend
-✅ [SUCCESS] http://keep-frontend:3000/api/healthcheck is reachable and healthy.
-----------------------------------------
-🔍 [TEST] Loki
-✅ [SUCCESS] http://loki:3100/ready is reachable and healthy.
-----------------------------------------
-🔍 [TEST] MinIO
-✅ [SUCCESS] http://minio:9000/minio/health/live is reachable and healthy.
-----------------------------------------
-🔍 [TEST] Nginx
-✅ [SUCCESS] http://nginx:80 is reachable.
-----------------------------------------
-🔍 [TEST] Node Exporter
-✅ [SUCCESS] http://host.containers.internal:9100 is reachable.
-----------------------------------------
-🔍 [TEST] OpenTelemetry Collector
-✅ [SUCCESS] http://otel-collector:8888/metrics is reachable.
-----------------------------------------
-🔍 [TEST] Podman Exporter
-✅ [SUCCESS] http://podman-exporter:9882/metrics is reachable.
-----------------------------------------
-🔍 [TEST] Tempo
-✅ [SUCCESS] http://tempo:3200/ready is reachable and healthy.
-----------------------------------------
-🔍 [TEST] Webhook Tester
-✅ [SUCCESS] http://webhook-tester:8080 is reachable.
+   ========================================
+   🌐 Starting Podman monitoring-net network Tests (via HTTP)
+   ========================================
+   ----------------------------------------
+   🔍 [TEST] Grafana API
+   ✅ [SUCCESS] http://grafana:3000/api/health is reachable and healthy.
+   ----------------------------------------
+   🔍 [TEST] Alertmanager
+   ✅ [SUCCESS] http://alertmanager:9093/-/healthy is reachable and healthy.
+   ----------------------------------------
+   🔍 [TEST] Keep API
+   ✅ [SUCCESS] http://keep-backend:8080/ is reachable and healthy.
+   ----------------------------------------
+   🔍 [TEST] Traefik Routing (using Nginx)
+   ✅ [SUCCESS] http://traefik:80 is routing requests correctly.
+   ----------------------------------------
+   🔍 [TEST] Alloy
+   ✅ [SUCCESS] http://alloy:12345/-/healthy is reachable and healthy.
+   ----------------------------------------
+   🔍 [TEST] Blackbox Exporter
+   ✅ [SUCCESS] http://blackbox-exporter:9115/-/healthy is reachable and healthy.
+   ----------------------------------------
+   🔍 [TEST] Karma Dashboard
+   ✅ [SUCCESS] http://karma:8080/health is reachable and healthy.
+   ----------------------------------------
+   🔍 [TEST] Keep Frontend
+   ✅ [SUCCESS] http://keep-frontend:3000/api/healthcheck is reachable and healthy.
+   ----------------------------------------
+   🔍 [TEST] Loki
+   ✅ [SUCCESS] http://loki:3100/ready is reachable and healthy.
+   ----------------------------------------
+   🔍 [TEST] MinIO
+   ✅ [SUCCESS] http://minio:9000/minio/health/live is reachable and healthy.
+   ----------------------------------------
+   🔍 [TEST] Nginx
+   ✅ [SUCCESS] http://nginx:80 is reachable.
+   ----------------------------------------
+   🔍 [TEST] Node Exporter
+   ✅ [SUCCESS] http://host.containers.internal:9100 is reachable.
+   ----------------------------------------
+   🔍 [TEST] OpenTelemetry Collector
+   ✅ [SUCCESS] http://otel-collector:8888/metrics is reachable.
+   ----------------------------------------
+   🔍 [TEST] Podman Exporter
+   ✅ [SUCCESS] http://podman-exporter:9882/metrics is reachable.
+   ----------------------------------------
+   🔍 [TEST] Pyroscope
+   ✅ [SUCCESS] http://pyroscope:4040/ready is reachable and healthy.
+   ----------------------------------------
+   🔍 [TEST] Tempo
+   ✅ [SUCCESS] http://tempo:3200/ready is reachable and healthy.
+   ----------------------------------------
+   🔍 [TEST] Webhook Tester
+   ✅ [SUCCESS] http://webhook-tester:8080 is reachable.
 
-========================================
-🌐 Starting Reverse Proxy Tests (via HTTPS/443)
-========================================
-----------------------------------------
-🔍 [TEST] Proxy: Alloy
-✅ [SUCCESS] https://alloy.ted.home/-/healthy is reachable.
-----------------------------------------
-🔍 [TEST] Proxy: Alertmanager
-✅ [SUCCESS] https://alertmanager.ted.home/-/healthy is reachable.
-----------------------------------------
-🔍 [TEST] Proxy: Grafana
-✅ [SUCCESS] https://grafana.ted.home/api/health is reachable.
-----------------------------------------
-🔍 [TEST] Proxy: Karma
-✅ [SUCCESS] https://karma.ted.home/health is reachable.
-----------------------------------------
-🔍 [TEST] Proxy: KeepHQ (Frontend)
-✅ [SUCCESS] https://keep.ted.home/api/healthcheck is reachable.
-----------------------------------------
-🔍 [TEST] Proxy: MinIO Console
-✅ [SUCCESS] https://minio.ted.home/ is reachable.
-----------------------------------------
-🔍 [TEST] Proxy: Traefik Dashboard
-✅ [SUCCESS] https://traefik.ted.home/dashboard/ is reachable.
-----------------------------------------
-🔍 [TEST] Proxy: Webhook Tester
-✅ [SUCCESS] https://webhook-tester.ted.home/ is reachable.
+   ========================================
+   🌐 Starting Reverse Proxy Tests (via HTTPS/443)
+   ========================================
+   ----------------------------------------
+   🔍 [TEST] Proxy: Alloy
+   ✅ [SUCCESS] https://alloy.localhost/-/healthy is reachable.
+   ----------------------------------------
+   🔍 [TEST] Proxy: Alertmanager
+   ✅ [SUCCESS] https://alertmanager.localhost/-/healthy is reachable.
+   ----------------------------------------
+   🔍 [TEST] Proxy: Grafana
+   ✅ [SUCCESS] https://grafana.localhost/api/health is reachable.
+   ----------------------------------------
+   🔍 [TEST] Proxy: Karma
+   ✅ [SUCCESS] https://karma.localhost/health is reachable.
+   ----------------------------------------
+   🔍 [TEST] Proxy: KeepHQ (Frontend)
+   ✅ [SUCCESS] https://keep.localhost/api/healthcheck is reachable.
+   ----------------------------------------
+   🔍 [TEST] Proxy: MinIO Console
+   ✅ [SUCCESS] https://minio.localhost/ is reachable.
+   ----------------------------------------
+   🔍 [TEST] Proxy: Traefik Dashboard
+   ✅ [SUCCESS] https://traefik.localhost/dashboard/ is reachable.
+   ----------------------------------------
+   🔍 [TEST] Proxy: Webhook Tester
+   ✅ [SUCCESS] https://webhook-tester.localhost/ is reachable.
 
-========================================
-🔗 Starting End-to-End Tracing Pipeline Test
-========================================
-🔍 [TEST] Flow: Traefik -> Grafana -> OTel -> Tempo -> Prometheus
-   [INFO] Injected Traceparent: 00-569e0c28eb99477197f39b009168b76b-c48e6ad44ae84b22-01
-   [INFO] Waiting for the tracing pipeline to buffer and flush (max 30s)...
-  ✔  Continue!          
-   ✅ [SUCCESS] Tempo successfully received and stored the exact Trace ID!
-   [INFO] Verifying tracing metrics flow in Prometheus...
-   ✅ [SUCCESS] Prometheus confirms that tracing metrics are actively flowing!
+   ========================================
+   🔗 Starting End-to-End Tempo Tracing Pipeline Test
+   ========================================
+   🔍 [TEST] Flow: Traefik -> Grafana -> OTel -> Tempo -> Prometheus
+      [INFO] Injected Traceparent: 00-b9b8cc6ab6b843d78638c58e1b4f9d0f-59cc819b0ed64b55-01
+      [INFO] Waiting for the tracing pipeline to buffer and flush (max 30s)...
+   ✔  Continue!          
+      ✅ [SUCCESS] Tempo successfully received and stored the exact Trace ID!
+      [INFO] Verifying tracing metrics flow in Prometheus...
+      ✅ [SUCCESS] Prometheus confirms that tracing metrics are actively flowing!
 
-========================================
-📜 Starting End-to-End Logging Pipeline Test
-========================================
-🔍 [TEST] Flow: Script -> Loki API (Push) -> MinIO (Storage) -> Loki API (Query)
-   [INFO] Injected Log Message: e2e-test-log-entry-48a76b36-c1b2-474b-804c-cb6bbbba48df
-   [INFO] Successfully pushed log to Loki API.
-   [INFO] Waiting for Loki to index the log (max 50s)...
-  ✔  Continue!          
-   ✅ [SUCCESS] Loki successfully ingested, indexed, and returned the test log!
+   ========================================
+   📜 Starting End-to-End Loki Logging Pipeline Test
+   ========================================
+   🔍 [TEST] Flow: Script -> Loki API (Push) -> MinIO (Storage) -> Loki API (Query)
+      [INFO] Injected Log Message: e2e-test-log-entry-8490416f-e91a-43cd-bf29-cfc5f534ae5c
+      [INFO] Successfully pushed log to Loki API.
+      [INFO] Waiting for Loki to index the log (max 50s)...
+   ✔  Continue!          
+      ✅ [SUCCESS] Loki successfully ingested, indexed, and returned the test log!
 
-========================================
-🪵 Starting Alloy Auto-Discovery Test
-========================================
-🔍 [TEST] Flow: Container Logs -> Alloy -> Loki
-   [INFO] Verifying if Alloy is actively scraping containers and sending them to Loki...
-   ✅ [SUCCESS] Alloy is actively scraping container logs and shipping them to Loki!
+   ========================================
+   🪵 Starting Alloy Auto-Discovery Test
+   ========================================
+   🔍 [TEST] Flow: Container Logs -> Alloy -> Loki
+      [INFO] Verifying if Alloy is actively scraping containers and sending them to Loki...
+      ✅ [SUCCESS] Alloy is actively scraping container logs and shipping them to Loki!
 
-========================================
-🚨 Starting End-to-End Alerting Pipeline Tests
-========================================
-🔍 [TEST] Flow: Prometheus (Rules Engine) -> Alertmanager
-   [INFO] Checking if Alertmanager is receiving the 'Watchdog' alert from Prometheus...
-   ✅ [SUCCESS] Alertmanager is receiving alerts from Prometheus!
-----------------------------------------
-🔍 [TEST] Flow: Loki (Ruler) -> Alertmanager
-   [INFO] Checking if Alertmanager is receiving the 'LokiWatchdog' alert from Loki...
-   ✅ [SUCCESS] Alertmanager is receiving alerts from Loki!
-----------------------------------------
-🔍 [TEST] Flow: Alertmanager -> Karma Dashboard
-   [INFO] Checking if Karma is actively parsing and visualizing alerts from Alertmanager...
-   ✅ [SUCCESS] Karma is successfully receiving and grouping alerts from Alertmanager (Total: 4)!
+   ========================================
+   🚨 Starting End-to-End Alerting Pipeline Tests
+   ========================================
+   🔍 [TEST] Flow: Prometheus (Rules Engine) -> Alertmanager
+      [INFO] Checking if Alertmanager is receiving the 'Watchdog' alert from Prometheus...
+      ✅ [SUCCESS] Alertmanager is receiving alerts from Prometheus!
+   ----------------------------------------
+   🔍 [TEST] Flow: Loki (Ruler) -> Alertmanager
+      [INFO] Checking if Alertmanager is receiving the 'LokiWatchdog' alert from Loki...
+      ✅ [SUCCESS] Alertmanager is receiving alerts from Loki!
+   ----------------------------------------
+   🔍 [TEST] Flow: Alertmanager -> Karma Dashboard
+      [INFO] Checking if Karma is actively parsing and visualizing alerts from Alertmanager...
+      ✅ [SUCCESS] Karma is successfully receiving and grouping alerts from Alertmanager (Total: 2)!
 
-========================================
-📊 Starting PromQL Data Integrity Test
-========================================
-🔍 [TEST] Flow: Exporters -> Prometheus TSDB -> PromQL Evaluation
-   [INFO] Evaluating PromQL: up{job="node-exporter"}
-   ✅ [SUCCESS] PromQL successfully evaluated the metric (value: 1).
-----------------------------------------
-🔍 [TEST] Flow: Verify all Prometheus targets are UP (via PromQL)
-   [INFO] Evaluating PromQL: up == 0
-   ✅ [SUCCESS] No targets are reporting '0'. All targets are UP in the TSDB!
-----------------------------------------
-   [INFO] Verifying Blackbox Exporter End-to-End flow...
-   ✅ [SUCCESS] Prometheus confirms Blackbox Exporter is successfully executing HTTP probes!
-----------------------------------------
-   [INFO] Verifying Podman Exporter End-to-End flow (Rootless Socket)...
-   ✅ [SUCCESS] Prometheus confirms Podman Exporter is actively reading container metrics from the rootless socket!
-----------------------------------------
-   [INFO] Verifying Traefik Metrics End-to-End flow...
-   ✅ [SUCCESS] Prometheus confirms Traefik is actively exposing internal metrics!
+   ========================================
+   📊 Starting PromQL Data Integrity Test
+   ========================================
+   🔍 [TEST] Flow: Exporters -> Prometheus TSDB -> PromQL Evaluation
+      [INFO] Evaluating PromQL: up{job="node-exporter"}
+      ✅ [SUCCESS] PromQL successfully evaluated the metric (value: 1).
+   ----------------------------------------
+   🔍 [TEST] Flow: Verify all Prometheus targets are UP (via PromQL)
+      [INFO] Evaluating PromQL: up == 0
+      ✅ [SUCCESS] No targets are reporting '0'. All targets are UP in the TSDB!
+   ----------------------------------------
+      [INFO] Verifying Blackbox Exporter End-to-End flow...
+      ✅ [SUCCESS] Prometheus confirms Blackbox Exporter is successfully executing HTTP probes!
+   ----------------------------------------
+      [INFO] Verifying Podman Exporter End-to-End flow (Rootless Socket)...
+      ✅ [SUCCESS] Prometheus confirms Podman Exporter is actively reading container metrics from the rootless socket!
+   ----------------------------------------
+      [INFO] Verifying Traefik Metrics End-to-End flow...
+      ✅ [SUCCESS] Prometheus confirms Traefik is actively exposing internal metrics!
 
-========================================
-🪣 Starting Storage Verification Test (MinIO)
-========================================
-🔍 [TEST] Flow: minio-init -> MinIO Buckets
-   [INFO] Checking if Loki and Tempo buckets exist in MinIO...
-   ✅ [SUCCESS] Bucket 'loki-data' exists.
-   ✅ [SUCCESS] Bucket 'tempo-data' exists.
-========================================
-🎉 [COMPLETE] All tests completed successfully! Stack is stable.
+   ========================================
+   🔥 Starting End-to-End Pyroscope Profiling Pipeline Test
+   ========================================
+   🔍 [TEST] Flow: Alloy (Scraper) -> Pyroscope
+      [INFO] Verifying profiling metrics flow in Prometheus...
+      ✅ [SUCCESS] Prometheus confirms that Alloy is actively scraping and sending profiles to Pyroscope!
+
+   ========================================
+   🪣 Starting Storage Verification Test (MinIO)
+   ========================================
+   🔍 [TEST] Flow: minio-init -> MinIO Buckets
+      [INFO] Checking if Loki and Tempo buckets exist in MinIO...
+      ✅ [SUCCESS] Bucket 'loki-data' exists.
+      ✅ [SUCCESS] Bucket 'tempo-data' exists.
+      ✅ [SUCCESS] Bucket 'pyroscope-data' exists.
+   ========================================
+   🎉 [COMPLETE] All tests completed successfully! Stack is stable.
 ```
 
 ## 5. Automation (Cron Setup)
@@ -390,16 +400,16 @@ crontab -e
 ```
 Add the following configuration (adjust the paths to match your actual environment):
 ```bash
-# Export necessary variables for cron
-GITHUB_COM_TOKEN="your_personal_access_token"
-RENOVATE_GIT_AUTHOR="Your Name <your.email@example.com>"
-REPO="tedsluis/monitoring" # Adjust to your repository format: owner/repo
-# Run the renovate and poller every 8 hours (adjust the paths below to your choice)
-0 0,8,16 * * * cd /home/tedsluis/git/monitoring && (git checkout main || true) && git branch | grep 'renovate/' | xargs --no-run-if-empty git branch -D && ./renovate.sh >> /home/tedsluis/git/monitoring/logs/renovate-cron-$(date +\%Y\%m\%d-\%H\%M\%S).log 2>&1
-0 1,7,17 * * * cd /home/tedsluis/git/monitoring && ./poll-renovate-prs.sh >> /home/tedsluis/git/monitoring/logs/poll-renovate-prs-cron-$(date +\%Y\%m\%d-\%H\%M\%S).log 2>&1
+   # Export necessary variables for cron
+   GITHUB_COM_TOKEN="your_personal_access_token"
+   RENOVATE_GIT_AUTHOR="Your Name <your.email@example.com>"
+   REPO="tedsluis/monitoring" # Adjust to your repository format: owner/repo
+   # Run the renovate and poller every 8 hours (adjust the paths below to your choice)
+   0 0,8,16 * * * cd /home/tedsluis/git/monitoring && (git checkout main || true) && git branch | grep 'renovate/' | xargs --no-run-if-empty git branch -D && ./renovate.sh >> /home/tedsluis/git/monitoring/logs/renovate-cron-$(date +\%Y\%m\%d-\%H\%M\%S).log 2>&1
+   0 1,7,17 * * * cd /home/tedsluis/git/monitoring && ./poll-renovate-prs.sh >> /home/tedsluis/git/monitoring/logs/poll-renovate-prs-cron-$(date +\%Y\%m\%d-\%H\%M\%S).log 2>&1
 
-# Clean up old downloaded Podman images weekly on Sunday night at 03:00
-0 3 * * 0 podman image prune -a -f
+   # Clean up old downloaded Podman images weekly on Sunday night at 03:00
+   0 3 * * 0 podman image prune -a -f
 ```
 
 ## 6. Reliability & Rollback Guarantees
