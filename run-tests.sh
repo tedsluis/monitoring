@@ -267,7 +267,7 @@ echo "✅ [SUCCESS] https://webhook-tester.${DOMAIN:-localhost}/ is reachable."
 
 echo ""
 echo "========================================"
-echo "🔗 Starting End-to-End Tracing Pipeline Test"
+echo "🔗 Starting End-to-End Tempo Tracing Pipeline Test"
 echo "========================================"
 echo "🔍 [TEST] Flow: Traefik -> Grafana -> OTel -> Tempo -> Prometheus"
 
@@ -321,7 +321,7 @@ fi
 
 echo ""
 echo "========================================"
-echo "📜 Starting End-to-End Logging Pipeline Test"
+echo "📜 Starting End-to-End Loki Logging Pipeline Test"
 echo "========================================"
 echo "🔍 [TEST] Flow: Script -> Loki API (Push) -> MinIO (Storage) -> Loki API (Query)"
 
@@ -588,6 +588,41 @@ if [ "$HAS_TRAEFIK_DATA" -gt 0 ]; then
     echo "   ✅ [SUCCESS] Prometheus confirms Traefik is actively exposing internal metrics!"
 else
     echo "   ⚠️  [WARN] No Traefik request metrics found in Prometheus yet. This usually populates after a few API calls."
+fi
+
+echo ""
+echo "========================================"
+echo "🔥 Starting End-to-End Pyroscope Profiling Pipeline Test"
+echo "========================================"
+echo "🔍 [TEST] Flow: Alloy (Scraper) -> Pyroscope"
+echo "   [INFO] Verifying profiling metrics flow in Prometheus..."
+
+# We check Prometheus to verify if Alloy has successfully sent profile data to Pyroscope.
+# The metric 'pyroscope_write_sent_bytes_total' registers the total amount of sent compressed bytes.
+PROM_QUERY='sum(rate(pyroscope_write_sent_bytes_total[5m])) > 0'
+
+PROFILE_FOUND=false
+for i in {1..12}; do
+    PROM_RESP=$($CURL_CMD -sG --data-urlencode "query=${PROM_QUERY}" http://prometheus:9090/api/v1/query || echo '{"data":{"result":[]}}')
+    HAS_RESULTS=$(echo "$PROM_RESP" | jq -r '.data.result | length' 2>/dev/null || echo "0")
+
+    if [ "$HAS_RESULTS" -gt 0 ]; then
+        PROFILE_FOUND=true
+        echo "   ✅ [SUCCESS] Prometheus confirms that Alloy is actively scraping and sending profiles to Pyroscope!"
+        break
+    fi
+    echo "   [INFO] Profiling metrics not yet visible in Prometheus. Waiting for scrape cycles (retrying)..."
+    sleep 10 &
+    BG_PID=$!
+    spinner "$BG_PID"
+    wait "$BG_PID"
+done
+
+if [ "$PROFILE_FOUND" = false ]; then
+    echo "   ❌ [ERROR] Alloy does not seem to be sending profiles to Pyroscope."
+    echo "   [DEBUG] Dumping Prometheus API Response:"
+    echo "$PROM_RESP" | jq . || echo "$PROM_RESP"
+    exit 1
 fi
 
 echo ""
