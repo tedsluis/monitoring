@@ -41,7 +41,7 @@ services:
   # Alloy
   # ---------------------------------------------------------
   alloy:
-    image: docker.io/grafana/alloy:v1.15.1@sha256:1f40cf52adda8fab3e058f9347a5d165624ecb9fbc1527769cb744748961940d
+    image: docker.io/grafana/alloy:v1.16.0@sha256:6e00cf7c5a692ff5f24844529416ed017d76fce922f8199004e73d5eca46b6b8
     container_name: alloy
     # Alloy needs to run as root to be able to read the journal logs from the host. In a production environment, you should use a more secure way to grant these permissions, such as using capabilities or a custom security profile.
     user: "0:0"
@@ -587,7 +587,7 @@ services:
   # Tempo
   # ---------------------------------------------------------
   tempo:
-    image: docker.io/grafana/tempo:2.10.4@sha256:a6616c9d224770c883a67b50e4941e99c5df81b076ef05f516bb7cce5a96cec0
+    image: docker.io/grafana/tempo:2.10.5@sha256:ee21727732c7a7199cb71c3eee9153bbf23f9b0b87619f0555a0cf21a67f1a33
     container_name: tempo
     command: 
       - "-config.file=/etc/tempo.yaml"
