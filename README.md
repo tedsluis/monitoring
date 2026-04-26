@@ -15,7 +15,8 @@ Diagram
 5. Installation & Startup
 6. Additional scripts
 7. Usage & Exploration (Screenshots)
-8. Teardown & Cleanup
+8. Troubleshooting
+9. Teardown & Cleanup
 
 ## 1. Educational Benefits
 
@@ -1225,9 +1226,7 @@ Go to: https://traefik.localhost
 
 ## 8. Troubleshooting
 
-
-<details>
-   <summary>1. Changes to files like alertmanager.yaml, index.html, loki-config.yaml, pyroscope.yaml, tempo.yaml, traefik-dynamic.yaml or traefik.yaml have no effect after restarting the stack.</summary></br>
+### 8.1 Changes to files like alertmanager.yaml, index.html, loki-config.yaml, pyroscope.yaml, tempo.yaml, traefik-dynamic.yaml or traefik.yaml have no effect after restarting the stack.
 
 **Problem:** You modified a configuration file (e.g., alertmanager.yaml, index.html) directly in the service directory, rebuilt or restarted the stack with podman compose down && podman compose up -d, but your changes are not visible.
 
@@ -1245,9 +1244,7 @@ Restart the stack so the containers pick up the new files:
 podman compose down
 podman compose up -d
 ```
-</details>
-<details>
-   <summary>2. Stack does not work properly because podman-compose is used instead of podman compose.</summary></br>
+### 8.2 Stack does not work properly because podman-compose is used instead of podman compose.
 
 **Problem:** You started the stack with the `podman-compose` command, but services are misconfigured (e.g. domain names missing, wrong paths).
 
@@ -1267,9 +1264,8 @@ Re-run the installer and start the stack with the correct command:
 podman compose down
 podman compose up -d
 ```
-</details>
-<details>
-   <summary>3. Browser requests are routed through an HTTP proxy and never reach the monitoring stack.</summary></br>
+
+### 8.3 Browser requests are routed through an HTTP proxy and never reach the monitoring stack.
 
 **Problem:** You are behind a corporate or personal HTTP proxy. When you visit `https://my-domain` the request is forwarded to the proxy instead of staying local, causing connection failures or timeouts.
 
@@ -1283,9 +1279,8 @@ Settings → Network Settings → “No proxy for” → add .localhost, localho
 **Chrome/Edge:**
 These browsers usually respect the system proxy settings. Add an exception in your operating system’s proxy configuration for .localhost and localhost.
 After the change, restart your browser to ensure the new settings take effect.
-</details>
-<details>
-   <summary>4. Monitoring stack behaves incorrectly when an HTTP internet proxy is configured in the shell.</summary></br>
+
+### 8.4 Monitoring stack behaves incorrectly when an HTTP internet proxy is configured in the shell.
 
 **Problem:** Even though the browser bypasses the proxy, components like Grafana Alloy, the OpenTelemetry Collector, or the installer script cannot connect to internal services or the outside world correctly.
 
@@ -1307,9 +1302,7 @@ Re-run the installer and restart the stack to allow all components to pick up th
 podman compose down
 podman compose up -d
 ```
-</details>
-<details>
-   <summary>5. Browser shows certificate errors after changing the DOMAIN variable.</summary></br>
+### 8.5 Browser shows certificate errors after changing the DOMAIN variable.
 
 **Problem:** You updated the DOMAIN value in .env, ran `./install.sh` and restarted the stack, but your browser still displays a certificate warning for the new domain.
 
@@ -1324,9 +1317,8 @@ As a last resort, force Traefik to recreate its certificates:
 ./install.sh
 ```
 ...and restart all your browser sessions!
-</details>
-<details>
-   <summary>6. export $(grep -v '^#' .env | xargs) fails or silently exports wrong values.</summary></br>
+
+### 8.6 export $(grep -v '^#' .env | xargs) fails or silently exports wrong values.
 
 **Problem:** Running the export command produces an error like xargs: unmatched double quote or variables are set incorrectly (e.g., truncated values, missing characters).
 
@@ -1362,8 +1354,71 @@ export $(grep -v '^#' .env | xargs)
 ./install.sh
 podman compose down && podman compose up -d
 ```
-</details>
 
+### 8.7 The `./run-tests.sh` script reports failures, or `podman ps -a` shows containers with "Exited" status
+
+**Problem**: The test script outputs errors (e.g. `FAIL: Expected metric ... not found`) or services are unreachable. Running `podman ps -a` reveals one or more containers in the "Exited" state instead of "Up".
+  
+**Cause**: A container terminated unexpectedly. This can be caused by misconfigured templates, missing environment variables, port conflicts, MinIO bucket creation not finished, volume permission issues, or a dependency loop.
+  
+**Solution**:
+1.  **Identify the failing container(s)**:
+```bash
+   podman ps -a --filter "status=exited"
+```
+2. **Check the specific container logs** – this is the most important diagnostic step:
+
+```bash
+   podman logs <container-name>
+```
+      For continuous monitoring while starting:
+
+```bash
+   podman compose logs -f
+```
+3. **Inspect the exit code for a quick hint:**
+
+```bash
+   podman inspect <container-name> --format='{{.State.ExitCode}}'
+```
+4. **Common causes and their fixes:**
+
+   **Environment variables not loaded from**`.env`:
+   Symptom: logs show missing or default values.
+   Fix: re-export the variables (`export $(grep -v '^#' .env | xargs)`) and run `./install.sh` and `podman compose down && podman compose up -d`.
+
+   **Port conflict:**
+   Symptom: log entry like bind: address already in use.
+   Fix: check occupied ports with `ss -tulpn`, stop the conflicting process, or change the port in `.env` and re-run the installer.
+
+   **MinIO bucket creation not yet completed:**
+   Symptom: Loki, Tempo or Pyroscope crash because they cannot find their bucket.
+   Fix: wait for the minio-init container to finish, then restart the dependent services (`podman restart loki tempo pyroscope`).
+
+   **Volume permission errors:**
+   Symptom: permission denied on a mounted file inside the container.
+   Fix: verify that the host files are readable by your user (the containers run as your UID in rootless Podman). Check SELinux context with `ls -Z`. Temporarily disable SELinux for debugging (sudo setenforce 0) and restore later.
+
+   **Template not regenerated after editing:**
+   Symptom: container uses outdated configuration.
+   Fix: make changes in the `./templates/` directory, run `./install.sh`, and restart the stack.
+
+5. **After fixing the root cause, tear down and bring the stack back up cleanly:**
+
+```bash
+   podman compose down
+   podman compose up -d
+```
+      Re-run the test script to verify that everything is healthy:
+
+```bash
+   ./run-tests.sh
+```
+Tip: Use podman compose ps to see the current status of all containers at a glance. Combine with watch for real-time observation:
+
+```bash
+   watch -n 2 podman compose ps
+```
 
 ## 9. Teardown & Cleanup
 
