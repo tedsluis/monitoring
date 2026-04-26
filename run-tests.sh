@@ -206,8 +206,25 @@ echo "✅ [SUCCESS] http://podman-exporter:9882/metrics is reachable."
 
 echo "----------------------------------------"
 echo "🔍 [TEST] Pyroscope"
-$CURL_CMD -sSf -o /dev/null http://pyroscope:4040/ready || { echo "❌ [ERROR] http://pyroscope:4040/ready is not healthy"; exit 1; }
-echo "✅ [SUCCESS] http://pyroscope:4040/ready is reachable and healthy."
+PYROSCOPE_READY=false
+for i in {1..24}; do
+    # 2>/dev/null verbergt de ruwe curl error (zoals de 503 melding) om de output netjes te houden
+    if $CURL_CMD -sSf -o /dev/null http://pyroscope:4040/ready 2>/dev/null; then
+        PYROSCOPE_READY=true
+        echo "✅ [SUCCESS] http://pyroscope:4040/ready is reachable and healthy."
+        break
+    fi
+    echo "   [INFO] Pyroscope is still initializing. Retrying..."
+    sleep 5 &
+    BG_PID=$!
+    spinner "$BG_PID"
+    wait "$BG_PID"
+done
+
+if [ "$PYROSCOPE_READY" = false ]; then
+    echo "❌ [ERROR] http://pyroscope:4040/ready is not healthy after 30 seconds."
+    exit 1
+fi
 
 echo "----------------------------------------"
 echo "🔍 [TEST] Tempo"
