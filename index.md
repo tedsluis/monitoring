@@ -177,11 +177,14 @@ Overview of the installation and deployment:
    git clone https://github.com/tedsluis/monitoring.git
    cd monitoring
 
+
    # 2.show default variables
    cat .env.examples
    # ==========================================
    # Monitoring Stack Environment Variables
-   # Copy this file to '.env' and fill in our own values before running the stack.
+   # Copy this file to '.env' and fill in your own values before running the stack.
+   # Don't use any special characters in the values in this file, 
+   # as it may cause issues exporting them to environment variables.
    # ==========================================
 
    # Domain name (default: localhost)
@@ -191,7 +194,7 @@ Overview of the installation and deployment:
    GRAFANA_ADMIN_USER=admin
    GRAFANA_ADMIN_PASSWORD=admin
 
-   # MinIO Storage
+   # MinIO Storage. (Needs a password of at least 8 characters.)
    MINIO_ROOT_USER=minio
    MINIO_ROOT_PASSWORD=minio123
 
@@ -212,19 +215,24 @@ Overview of the installation and deployment:
    # Webhook Tester (UUID for your specific test-endpoint)
    WEBHOOK_TESTER_UUID=65ae26f0-131e-4390-8daa-bdaec17e77c2
 
+
    # 3. Copy the example environment file
    cp .env.example .env
+
 
    # 4. Edit the .env file and
    # fill in your secure passwords and custom DOMAIN (using an editor like vi, vim, code or nano).
    vi .env
 
+
    # 5. load environment variables from `.env` file
    export $(grep -v '^#' .env | xargs)
+
 
    # 6. Are you using an HTTP internet proxy? Add the necessary hostnames and IP addresses
    # to your no_proxy/NO_PROXY environment variables:
    source ./prepare_no_proxy.sh
+
 
    # 7. Execute the installation script
    ./install.sh 
@@ -281,10 +289,11 @@ Overview of the installation and deployment:
    Neither http_proxy, https_proxy, HTTP_PROXY nor HTTPS_PROXY is set. The no_proxy variable will not have any effect.
    Please set http_proxy, https_proxy, HTTP_PROXY and HTTPS_PROXY environment variables if you intend to use a proxy.
 
+
    # 8. Start the monitoring stack
    podman compose up -d
 ```
-**notes:**
+**Notes:**
 * The first time, the `minio-init` container will automatically create the required buckets (`loki-data`, `tempo-data` an `pyroscope-data`).
 * You can edit the `.env` file, rerun the `./install.sh` script and `podman compose down && podman compose up -d` every time you want to change the `DOMAIN` or update secrets in the templates.
 
@@ -1215,7 +1224,148 @@ Go to: https://traefik.localhost
 * https://doc.traefik.io/traefik/getting-started/
 * https://github.com/traefik/traefik
 
-## 8. Teardown & Cleanup
+## 8. Troubleshooting
+
+<details>
+   <summary>1. Changes to files like alertmanager.yaml, index.html, loki-config.yaml, pyroscope.yaml, tempo.yaml, traefik-dynamic.yaml or traefik.yaml have no effect after restarting the stack.</summary></br>
+
+**Problem:** You modified a configuration file (e.g., alertmanager.yaml, index.html) directly in the service directory, rebuilt or restarted the stack with podman compose down && podman compose up -d, but your changes are not visible.
+
+**Cause:** These files are not consumed directly by the containers. The real configuration files are generated from templates located in the `./templates/` directory when you run `./install.sh`. Modifying the output files is pointless because they will be overwritten on the next installation run.
+
+**Solution:**
+
+Make your edits in the corresponding template file inside the `./templates/` directory (e.g. ./templates/alertmanager.yaml).
+Run the installer to regenerate all configuration files from the templates:
+```bash
+./install.sh
+```
+Restart the stack so the containers pick up the new files:
+```bash
+podman compose down
+podman compose up -d
+```
+</details>
+<details>
+   <summary>2. Stack does not work properly because podman-compose is used instead of podman compose.</summary></br>
+
+**Problem:** You started the stack with the `podman-compose` command, but services are misconfigured (e.g. domain names missing, wrong paths).
+
+**Cause:** The `podman-compose` tool (the stand-alone Python package) does not automatically substitute environment variables into the `compose.yaml` file. The native `podman compose` (a subcommand of the podman client) does perform this substitution when you have exported the variables correctly.
+
+**Solution:**
+
+Always use the podman compose command (with a space, not a hyphen).
+If you previously used podman-compose, tear down the stack:
+```bash
+podman-compose down 2>/dev/null || true
+```
+Make sure your environment variables are loaded from .env (see the first troubleshooting item).
+Re-run the installer and start the stack with the correct command:
+```bash
+./install.sh
+podman compose down
+podman compose up -d
+```
+</details>
+<details>
+   <summary>3. Browser requests are routed through an HTTP proxy and never reach the monitoring stack.</summary></br>
+
+**Problem:** You are behind a corporate or personal HTTP proxy. When you visit `https://my-domain` the request is forwarded to the proxy instead of staying local, causing connection failures or timeouts.
+
+**Cause:** Your browser is configured to use a proxy for all traffic, including requests for `.localhost` domains.
+
+**Solution:** Configure your browser’s proxy settings to exclude `*.localhost` and `localhost` itself (or your custom domain). The exact method depends on the browser:
+
+**Firefox:**
+Settings → Network Settings → “No proxy for” → add .localhost, localhost
+
+**Chrome/Edge:**
+These browsers usually respect the system proxy settings. Add an exception in your operating system’s proxy configuration for .localhost and localhost.
+After the change, restart your browser to ensure the new settings take effect.
+</details>
+<details>
+   <summary>4. Monitoring stack behaves incorrectly when an HTTP internet proxy is configured in the shell.</summary></br>
+
+**Problem:** Even though the browser bypasses the proxy, components like Grafana Alloy, the OpenTelemetry Collector, or the installer script cannot connect to internal services or the outside world correctly.
+
+**Cause:** The `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` environment variables in your shell are not set or do not include the local monitoring domain. Internal traffic is being sent to the proxy, which either rejects it or cannot resolve the internal addresses.
+
+**Solution:**
+
+Use the provided helper script to prepare a correct NO_PROXY list:
+```bash
+source prepare_no_proxy.sh
+```
+Alternatively, manually ensure your environment contains the proper `NO_PROXY` value:
+```bash
+export NO_PROXY=".localhost,localhost,127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,*.local,*.internal,.svc,${NO_PROXY}"
+```
+Re-run the installer and restart the stack to allow all components to pick up the new proxy settings:
+```bash
+./install.sh
+podman compose down
+podman compose up -d
+```
+</details>
+<details>
+   <summary>5. Browser shows certificate errors after changing the DOMAIN variable.</summary></br>
+
+**Problem:** You updated the DOMAIN value in .env, ran `./install.sh` and restarted the stack, but your browser still displays a certificate warning for the new domain.
+
+**Cause:** The browser has not been restarted since the Traefik-generated certificate for the previous domain was cached, or the certificate for the new domain has not been regenerated yet.
+
+**Solution:**
+
+Restart your browser completely (close all windows and reopen).
+If the problem persists, Traefik might need a few seconds to obtain the new certificate. Wait a moment and reload the page.
+As a last resort, force Traefik to recreate its certificates:
+```bash
+./install.sh
+```
+...and restart all your browser sessions!
+</details>
+<details>
+   <summary>6. export $(grep -v '^#' .env | xargs) fails or silently exports wrong values.</summary></br>
+
+**Problem:** Running the export command produces an error like xargs: unmatched double quote or variables are set incorrectly (e.g., truncated values, missing characters).
+
+**Cause:** The `.env` file contains special characters such as spaces, quotes, $, &, or # in comments that confuse the xargs parser.
+
+**Solution:**
+
+Inspect your enviroment variables:
+```bash
+   env | grep -P '(DOMAIN|GRAFANA_ADMIN_USER|GRAFANA_ADMIN_PASSWORD|MINIO_ROOT_USER|MINIO_ROOT_PASSWORD|KEEP_DB_USER|KEEP_DB_PASSWORD|KEEP_DB_NAME|KEEP_API_KEY|NEXTAUTH_SECRET|OPENAI_API_KEY|WEBHOOK_TESTER_UUID)'
+
+   WEBHOOK_TESTER_UUID=65ae26f0-131e-4390-8daa-bdaec17e77c2
+   MINIO_ROOT_PASSWORD=minio123
+   GRAFANA_ADMIN_USER=admin
+   GRAFANA_ADMIN_PASSWORD=admin
+   OPENAI_API_KEY=dummy-key
+   DOMAIN=localhost
+   KEEP_DB_NAME=keep
+   MINIO_ROOT_USER=minio
+   KEEP_API_KEY=585af6cc-5c07-427f-966f-a263473ad402
+   NEXTAUTH_SECRET=change_me_to_a_secure_string
+   KEEP_DB_PASSWORD=keep
+   KEEP_DB_USER=keep
+```
+Missing any environment variables(s)?
+Or do they contain special charcters like below?
+```text
+GRAFANA_ADMIN_PASSWORD='My p@$$w0rd!'
+```
+Fix your `.env` file and:
+```bash
+export $(grep -v '^#' .env | xargs)
+./install.sh
+podman compose down && podman compose up -d
+```
+</details>
+
+
+## 9. Teardown & Cleanup
 
 This section explains how to remove everything.
 
