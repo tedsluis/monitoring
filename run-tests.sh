@@ -533,34 +533,86 @@ echo "📊 Starting PromQL Data Integrity Test"
 echo "========================================"
 
 echo "🔍 [TEST] Flow: Exporters -> Prometheus TSDB -> PromQL Evaluation"
-# Execute a PromQL query to ensure the database is actually receiving and parsing data (Node Exporter)
 PROMQL_TEST_QUERY='up{job="node-exporter"}'
 echo "   [INFO] Evaluating PromQL: $PROMQL_TEST_QUERY"
 
-PROMQL_TEST_RESP=$($CURL_CMD -sG --data-urlencode "query=${PROMQL_TEST_QUERY}" http://prometheus:9090/api/v1/query || echo '{"data":{"result":[]}}')
-PROMQL_VAL=$(echo "$PROMQL_TEST_RESP" | jq -r '.data.result[0].value[1]' 2>/dev/null || echo "null")
+# We use a retry loop because immediately after startup, 
+# the TSDB might be empty until the first scrape is completed.
+NODE_UP_FOUND=false
+for i in {1..6}; do
+    PROMQL_TEST_RESP=$($CURL_CMD -sG --data-urlencode "query=${PROMQL_TEST_QUERY}" http://prometheus:9090/api/v1/query || echo '{"data":{"result":[]}}')
+    PROMQL_VAL=$(echo "$PROMQL_TEST_RESP" | jq -r '.data.result[0].value[1] // "null"' 2>/dev/null)
 
-if [ "$PROMQL_VAL" == "1" ]; then
-    echo "   ✅ [SUCCESS] PromQL successfully evaluated the metric (value: 1)."
-else
-    echo "   ❌ [ERROR] PromQL evaluation failed. Expected '1', got: '$PROMQL_VAL'."
+    if [ "$PROMQL_VAL" == "1" ]; then
+        NODE_UP_FOUND=true
+        echo "   ✅ [SUCCESS] PromQL successfully evaluated the metric (value: 1)."
+        break
+    fi
+    echo "   [INFO] Metric not yet available (value is '$PROMQL_VAL'). Waiting for scrape cycle (retrying)..."
+    sleep 5 &
+    BG_PID=$!
+    spinner "$BG_PID"
+    wait "$BG_PID"
+done
+
+if [ "$NODE_UP_FOUND" = false ]; then
+    echo "   ❌ [ERROR] PromQL evaluation failed. Expected '1' within 30s, got: '$PROMQL_VAL'."
     exit 1
 fi
 
 echo "----------------------------------------"
-echo "🔍 [TEST] Flow: Verify all Prometheus targets are UP (via PromQL)"
-echo "   [INFO] Evaluating PromQL: up == 0"
+echo "🔍 [TEST] Flow: Verify all Prometheus targets are UP and present in TSDB"
 
-# Ask Prometheus specifically for targets that are DOWN (value == 0)
-DOWN_RESP=$($CURL_CMD -sG --data-urlencode "query=up == 0" http://prometheus:9090/api/v1/query || echo '{"data":{"result":[]}}')
+# Ensure targets haven't disappeared (equivalent to an 'absent()' check for the entire stack).
+# We expect at least 10 targets in this stack based on prometheus.yml jobs.
+MIN_EXPECTED_TARGETS=37
+echo "   [INFO] Evaluating PromQL: count(up) >= $MIN_EXPECTED_TARGETS"
 
-# Count how many results we get back
-DOWN_COUNT=$(echo "$DOWN_RESP" | jq -r '.data.result | length' 2>/dev/null || echo "1")
+TARGETS_FOUND=false
+for i in {1..6}; do
+    COUNT_RESP=$($CURL_CMD -sG --data-urlencode "query=count(up)" http://prometheus:9090/api/v1/query || echo '{"data":{"result":[]}}')
+    TARGET_COUNT=$(echo "$COUNT_RESP" | jq -r '.data.result[0].value[1] // 0' 2>/dev/null)
 
-if [ "$DOWN_COUNT" == "0" ]; then
-    echo "   ✅ [SUCCESS] No targets are reporting '0'. All targets are UP in the TSDB!"
-else
-    echo "   ❌ [ERROR] There are $DOWN_COUNT target(s) DOWN ('0') in the TSDB!"
+    if [ "$TARGET_COUNT" -ge "$MIN_EXPECTED_TARGETS" ]; then
+        TARGETS_FOUND=true
+        echo "   ✅ [SUCCESS] TSDB contains $TARGET_COUNT targets (Expected >= $MIN_EXPECTED_TARGETS). No missing jobs!"
+        break
+    fi
+    echo "   [INFO] Only found $TARGET_COUNT targets so far. Waiting for Service Discovery (retrying)..."
+    sleep 5 &
+    BG_PID=$!
+    spinner "$BG_PID"
+    wait "$BG_PID"
+done
+
+if [ "$TARGETS_FOUND" = false ]; then
+    echo "   ❌ [ERROR] TSDB only contains $TARGET_COUNT targets! Expected at least $MIN_EXPECTED_TARGETS. Service Discovery might be failing."
+    exit 1
+fi
+
+# Use max_over_time to check for targets that have been continuously DOWN for 1 minute.
+# This prevents flapping/false positives from a single missed HTTP scrape.
+echo "   [INFO] Evaluating PromQL: max_over_time(up[1m]) == 0"
+
+ALL_TARGETS_UP=false
+for i in {1..6}; do
+    DOWN_RESP=$($CURL_CMD -sG --data-urlencode "query=max_over_time(up[1m]) == 0" http://prometheus:9090/api/v1/query || echo '{"data":{"result":[]}}')
+    DOWN_COUNT=$(echo "$DOWN_RESP" | jq -r '.data.result | length' 2>/dev/null || echo "1")
+
+    if [ "$DOWN_COUNT" == "0" ]; then
+        ALL_TARGETS_UP=true
+        echo "   ✅ [SUCCESS] No targets have been continuously DOWN in the last minute!"
+        break
+    fi
+    echo "   [INFO] Found $DOWN_COUNT target(s) continuously DOWN. Waiting to see if they recover (retrying)..."
+    sleep 5 &
+    BG_PID=$!
+    spinner "$BG_PID"
+    wait "$BG_PID"
+done
+
+if [ "$ALL_TARGETS_UP" = false ]; then
+    echo "   ❌ [ERROR] There are $DOWN_COUNT target(s) continuously DOWN ('0') in the TSDB!"
     echo "   [DEBUG] Failing targets:"
     # Print a clean list of the specific jobs and instances that are failing
     echo "$DOWN_RESP" | jq -r '.data.result[] | "   - \(.metric.job) (\(.metric.instance))"'
