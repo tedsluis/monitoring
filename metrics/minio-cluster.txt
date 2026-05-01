@@ -9,19 +9,19 @@ minio_audit_target_queue_length{server="127.0.0.1:9000",target_id="sys_console_0
 minio_audit_total_messages{server="127.0.0.1:9000",target_id="sys_console_0"} 0
 # HELP minio_cluster_bucket_total Total number of buckets in the cluster
 # TYPE minio_cluster_bucket_total gauge
-minio_cluster_bucket_total{server="127.0.0.1:9000"} 2
+minio_cluster_bucket_total{server="127.0.0.1:9000"} 3
 # HELP minio_cluster_capacity_raw_free_bytes Total free capacity online in the cluster
 # TYPE minio_cluster_capacity_raw_free_bytes gauge
-minio_cluster_capacity_raw_free_bytes{server="127.0.0.1:9000"} 3.0858807296e+11
+minio_cluster_capacity_raw_free_bytes{server="127.0.0.1:9000"} 3.0552520704e+11
 # HELP minio_cluster_capacity_raw_total_bytes Total capacity online in the cluster
 # TYPE minio_cluster_capacity_raw_total_bytes gauge
-minio_cluster_capacity_raw_total_bytes{server="127.0.0.1:9000"} 5.07812200448e+11
+minio_cluster_capacity_raw_total_bytes{server="127.0.0.1:9000"} 5.07896201216e+11
 # HELP minio_cluster_capacity_usable_free_bytes Total free usable capacity online in the cluster
 # TYPE minio_cluster_capacity_usable_free_bytes gauge
-minio_cluster_capacity_usable_free_bytes{server="127.0.0.1:9000"} 3.0858807296e+11
+minio_cluster_capacity_usable_free_bytes{server="127.0.0.1:9000"} 3.0552520704e+11
 # HELP minio_cluster_capacity_usable_total_bytes Total usable capacity online in the cluster
 # TYPE minio_cluster_capacity_usable_total_bytes gauge
-minio_cluster_capacity_usable_total_bytes{server="127.0.0.1:9000"} 5.07812200448e+11
+minio_cluster_capacity_usable_total_bytes{server="127.0.0.1:9000"} 5.07896201216e+11
 # HELP minio_cluster_drive_offline_total Total drives offline in this cluster
 # TYPE minio_cluster_drive_offline_total gauge
 minio_cluster_drive_offline_total{server="127.0.0.1:9000"} 0
@@ -57,17 +57,17 @@ minio_cluster_nodes_offline_total{server="127.0.0.1:9000"} 0
 minio_cluster_nodes_online_total{server="127.0.0.1:9000"} 1
 # HELP minio_cluster_objects_size_distribution Distribution of object sizes across a cluster
 # TYPE minio_cluster_objects_size_distribution gauge
-minio_cluster_objects_size_distribution{range="BETWEEN_1024B_AND_1_MB",server="127.0.0.1:9000"} 1968
-minio_cluster_objects_size_distribution{range="BETWEEN_1024_B_AND_64_KB",server="127.0.0.1:9000"} 1184
-minio_cluster_objects_size_distribution{range="BETWEEN_10_MB_AND_64_MB",server="127.0.0.1:9000"} 0
+minio_cluster_objects_size_distribution{range="BETWEEN_1024B_AND_1_MB",server="127.0.0.1:9000"} 20941
+minio_cluster_objects_size_distribution{range="BETWEEN_1024_B_AND_64_KB",server="127.0.0.1:9000"} 17007
+minio_cluster_objects_size_distribution{range="BETWEEN_10_MB_AND_64_MB",server="127.0.0.1:9000"} 1
 minio_cluster_objects_size_distribution{range="BETWEEN_128_MB_AND_512_MB",server="127.0.0.1:9000"} 0
-minio_cluster_objects_size_distribution{range="BETWEEN_1_MB_AND_10_MB",server="127.0.0.1:9000"} 598
-minio_cluster_objects_size_distribution{range="BETWEEN_256_KB_AND_512_KB",server="127.0.0.1:9000"} 215
-minio_cluster_objects_size_distribution{range="BETWEEN_512_KB_AND_1_MB",server="127.0.0.1:9000"} 214
-minio_cluster_objects_size_distribution{range="BETWEEN_64_KB_AND_256_KB",server="127.0.0.1:9000"} 355
+minio_cluster_objects_size_distribution{range="BETWEEN_1_MB_AND_10_MB",server="127.0.0.1:9000"} 384
+minio_cluster_objects_size_distribution{range="BETWEEN_256_KB_AND_512_KB",server="127.0.0.1:9000"} 881
+minio_cluster_objects_size_distribution{range="BETWEEN_512_KB_AND_1_MB",server="127.0.0.1:9000"} 262
+minio_cluster_objects_size_distribution{range="BETWEEN_64_KB_AND_256_KB",server="127.0.0.1:9000"} 2791
 minio_cluster_objects_size_distribution{range="BETWEEN_64_MB_AND_128_MB",server="127.0.0.1:9000"} 0
 minio_cluster_objects_size_distribution{range="GREATER_THAN_512_MB",server="127.0.0.1:9000"} 0
-minio_cluster_objects_size_distribution{range="LESS_THAN_1024_B",server="127.0.0.1:9000"} 374
+minio_cluster_objects_size_distribution{range="LESS_THAN_1024_B",server="127.0.0.1:9000"} 289
 # HELP minio_cluster_objects_version_distribution Distribution of object versions across a cluster
 # TYPE minio_cluster_objects_version_distribution gauge
 minio_cluster_objects_version_distribution{range="BETWEEN_1000_AND_10000",server="127.0.0.1:9000"} 0
@@ -76,16 +76,16 @@ minio_cluster_objects_version_distribution{range="BETWEEN_10_AND_100",server="12
 minio_cluster_objects_version_distribution{range="BETWEEN_2_AND_10",server="127.0.0.1:9000"} 0
 minio_cluster_objects_version_distribution{range="GREATER_THAN_10000",server="127.0.0.1:9000"} 0
 minio_cluster_objects_version_distribution{range="SINGLE_VERSION",server="127.0.0.1:9000"} 0
-minio_cluster_objects_version_distribution{range="UNVERSIONED",server="127.0.0.1:9000"} 2940
+minio_cluster_objects_version_distribution{range="UNVERSIONED",server="127.0.0.1:9000"} 21615
 # HELP minio_cluster_usage_deletemarker_total Total number of delete markers in a cluster
 # TYPE minio_cluster_usage_deletemarker_total gauge
 minio_cluster_usage_deletemarker_total{server="127.0.0.1:9000"} 0
 # HELP minio_cluster_usage_object_total Total number of objects in a cluster
 # TYPE minio_cluster_usage_object_total gauge
-minio_cluster_usage_object_total{server="127.0.0.1:9000"} 2940
+minio_cluster_usage_object_total{server="127.0.0.1:9000"} 21615
 # HELP minio_cluster_usage_total_bytes Total cluster usage in bytes
 # TYPE minio_cluster_usage_total_bytes gauge
-minio_cluster_usage_total_bytes{server="127.0.0.1:9000"} 1.121426587e+09
+minio_cluster_usage_total_bytes{server="127.0.0.1:9000"} 2.043774171e+09
 # HELP minio_cluster_usage_version_total Total number of versions (includes delete marker) in a cluster
 # TYPE minio_cluster_usage_version_total gauge
 minio_cluster_usage_version_total{server="127.0.0.1:9000"} 0
@@ -109,10 +109,10 @@ minio_cluster_write_quorum{server="127.0.0.1:9000"} 1
 minio_node_file_descriptor_limit_total{server="127.0.0.1:9000"} 524288
 # HELP minio_node_file_descriptor_open_total Total number of open file descriptors by the MinIO Server process
 # TYPE minio_node_file_descriptor_open_total gauge
-minio_node_file_descriptor_open_total{server="127.0.0.1:9000"} 13
+minio_node_file_descriptor_open_total{server="127.0.0.1:9000"} 59
 # HELP minio_node_go_routine_total Total number of go routines running
 # TYPE minio_node_go_routine_total gauge
-minio_node_go_routine_total{server="127.0.0.1:9000"} 483
+minio_node_go_routine_total{server="127.0.0.1:9000"} 529
 # HELP minio_node_ilm_expiry_missed_freeversions Number of free versions expiry missed due to busy system
 # TYPE minio_node_ilm_expiry_missed_freeversions counter
 minio_node_ilm_expiry_missed_freeversions{server="127.0.0.1:9000"} 0
@@ -139,52 +139,52 @@ minio_node_ilm_transition_missed_immediate_tasks{server="127.0.0.1:9000"} 0
 minio_node_ilm_transition_pending_tasks{server="127.0.0.1:9000"} 0
 # HELP minio_node_ilm_versions_scanned Total number of object versions checked for ilm actions since server uptime
 # TYPE minio_node_ilm_versions_scanned counter
-minio_node_ilm_versions_scanned{server="127.0.0.1:9000"} 0
+minio_node_ilm_versions_scanned{server="127.0.0.1:9000"} 21365
 # HELP minio_node_io_rchar_bytes Total bytes read by the process from the underlying storage system including cache, /proc/[pid]/io rchar
 # TYPE minio_node_io_rchar_bytes counter
-minio_node_io_rchar_bytes{server="127.0.0.1:9000"} 3.30238579e+08
+minio_node_io_rchar_bytes{server="127.0.0.1:9000"} 4.78115796e+08
 # HELP minio_node_io_read_bytes Total bytes read by the process from the underlying storage system, /proc/[pid]/io read_bytes
 # TYPE minio_node_io_read_bytes counter
-minio_node_io_read_bytes{server="127.0.0.1:9000"} 1.73395968e+08
+minio_node_io_read_bytes{server="127.0.0.1:9000"} 5.27347712e+08
 # HELP minio_node_io_wchar_bytes Total bytes written by the process to the underlying storage system including page cache, /proc/[pid]/io wchar
 # TYPE minio_node_io_wchar_bytes counter
-minio_node_io_wchar_bytes{server="127.0.0.1:9000"} 1.85003275e+08
+minio_node_io_wchar_bytes{server="127.0.0.1:9000"} 2.54146988e+08
 # HELP minio_node_io_write_bytes Total bytes written by the process to the underlying storage system, /proc/[pid]/io write_bytes
 # TYPE minio_node_io_write_bytes counter
-minio_node_io_write_bytes{server="127.0.0.1:9000"} 2.44768768e+08
+minio_node_io_write_bytes{server="127.0.0.1:9000"} 3.72752384e+08
 # HELP minio_node_process_cpu_total_seconds Total user and system CPU time spent in seconds
 # TYPE minio_node_process_cpu_total_seconds counter
-minio_node_process_cpu_total_seconds{server="127.0.0.1:9000"} 51.98
+minio_node_process_cpu_total_seconds{server="127.0.0.1:9000"} 51.81
 # HELP minio_node_process_resident_memory_bytes Resident memory size in bytes
 # TYPE minio_node_process_resident_memory_bytes gauge
-minio_node_process_resident_memory_bytes{server="127.0.0.1:9000"} 1.42409728e+08
+minio_node_process_resident_memory_bytes{server="127.0.0.1:9000"} 3.42904832e+08
 # HELP minio_node_process_starttime_seconds Start time for MinIO process per node, time in seconds since Unix epoc
 # TYPE minio_node_process_starttime_seconds gauge
-minio_node_process_starttime_seconds{server="127.0.0.1:9000"} 1.77549348315e+09
+minio_node_process_starttime_seconds{server="127.0.0.1:9000"} 1.77764152349e+09
 # HELP minio_node_process_uptime_seconds Uptime for MinIO process per node in seconds
 # TYPE minio_node_process_uptime_seconds gauge
-minio_node_process_uptime_seconds{server="127.0.0.1:9000"} 5677.687563553
+minio_node_process_uptime_seconds{server="127.0.0.1:9000"} 15680.543725512
 # HELP minio_node_scanner_bucket_scans_finished Total number of bucket scans finished since server uptime
 # TYPE minio_node_scanner_bucket_scans_finished counter
-minio_node_scanner_bucket_scans_finished{server="127.0.0.1:9000"} 188
+minio_node_scanner_bucket_scans_finished{server="127.0.0.1:9000"} 42
 # HELP minio_node_scanner_bucket_scans_started Total number of bucket scans started since server uptime
 # TYPE minio_node_scanner_bucket_scans_started counter
-minio_node_scanner_bucket_scans_started{server="127.0.0.1:9000"} 188
+minio_node_scanner_bucket_scans_started{server="127.0.0.1:9000"} 42
 # HELP minio_node_scanner_directories_scanned Total number of directories scanned since server uptime
 # TYPE minio_node_scanner_directories_scanned counter
-minio_node_scanner_directories_scanned{server="127.0.0.1:9000"} 28352
+minio_node_scanner_directories_scanned{server="127.0.0.1:9000"} 44399
 # HELP minio_node_scanner_objects_scanned Total number of unique objects scanned since server uptime
 # TYPE minio_node_scanner_objects_scanned counter
-minio_node_scanner_objects_scanned{server="127.0.0.1:9000"} 17332
+minio_node_scanner_objects_scanned{server="127.0.0.1:9000"} 21365
 # HELP minio_node_scanner_versions_scanned Total number of object versions scanned since server uptime
 # TYPE minio_node_scanner_versions_scanned counter
 minio_node_scanner_versions_scanned{server="127.0.0.1:9000"} 0
 # HELP minio_node_syscall_read_total Total read SysCalls to the kernel. /proc/[pid]/io syscr
 # TYPE minio_node_syscall_read_total counter
-minio_node_syscall_read_total{server="127.0.0.1:9000"} 108993
+minio_node_syscall_read_total{server="127.0.0.1:9000"} 115502
 # HELP minio_node_syscall_write_total Total write SysCalls to the kernel. /proc/[pid]/io syscw
 # TYPE minio_node_syscall_write_total counter
-minio_node_syscall_write_total{server="127.0.0.1:9000"} 62916
+minio_node_syscall_write_total{server="127.0.0.1:9000"} 66633
 # HELP minio_notify_current_send_in_progress Number of concurrent async Send calls active to all targets (deprecated, please use 'minio_notify_target_current_send_in_progress' instead)
 # TYPE minio_notify_current_send_in_progress gauge
 minio_notify_current_send_in_progress{server="127.0.0.1:9000"} 0
@@ -199,17 +199,19 @@ minio_notify_events_sent_total{server="127.0.0.1:9000"} 0
 minio_notify_events_skipped_total{server="127.0.0.1:9000"} 0
 # HELP minio_s3_requests_4xx_errors_total Total number of S3 requests with (4xx) errors
 # TYPE minio_s3_requests_4xx_errors_total counter
-minio_s3_requests_4xx_errors_total{api="getbucketlocation",server="127.0.0.1:9000"} 5
-minio_s3_requests_4xx_errors_total{api="getobject",server="127.0.0.1:9000"} 93
-minio_s3_requests_4xx_errors_total{api="putbucket",server="127.0.0.1:9000"} 10
+minio_s3_requests_4xx_errors_total{api="getbucketlocation",server="127.0.0.1:9000"} 6
+minio_s3_requests_4xx_errors_total{api="getobject",server="127.0.0.1:9000"} 103
+minio_s3_requests_4xx_errors_total{api="headobject",server="127.0.0.1:9000"} 9
+minio_s3_requests_4xx_errors_total{api="putbucket",server="127.0.0.1:9000"} 18
 # HELP minio_s3_requests_errors_total Total number of S3 requests with (4xx and 5xx) errors
 # TYPE minio_s3_requests_errors_total counter
-minio_s3_requests_errors_total{api="getbucketlocation",server="127.0.0.1:9000"} 5
-minio_s3_requests_errors_total{api="getobject",server="127.0.0.1:9000"} 93
-minio_s3_requests_errors_total{api="putbucket",server="127.0.0.1:9000"} 10
+minio_s3_requests_errors_total{api="getbucketlocation",server="127.0.0.1:9000"} 6
+minio_s3_requests_errors_total{api="getobject",server="127.0.0.1:9000"} 103
+minio_s3_requests_errors_total{api="headobject",server="127.0.0.1:9000"} 9
+minio_s3_requests_errors_total{api="putbucket",server="127.0.0.1:9000"} 18
 # HELP minio_s3_requests_incoming_total Total number of incoming S3 requests
 # TYPE minio_s3_requests_incoming_total gauge
-minio_s3_requests_incoming_total{server="127.0.0.1:9000"} 0
+minio_s3_requests_incoming_total{server="127.0.0.1:9000"} 28
 # HELP minio_s3_requests_inflight_total Total number of S3 requests currently in flight
 # TYPE minio_s3_requests_inflight_total gauge
 minio_s3_requests_inflight_total{api="completemultipartupload",server="127.0.0.1:9000"} 0
@@ -217,6 +219,7 @@ minio_s3_requests_inflight_total{api="copyobject",server="127.0.0.1:9000"} 0
 minio_s3_requests_inflight_total{api="deleteobject",server="127.0.0.1:9000"} 0
 minio_s3_requests_inflight_total{api="getbucketlocation",server="127.0.0.1:9000"} 0
 minio_s3_requests_inflight_total{api="getobject",server="127.0.0.1:9000"} 0
+minio_s3_requests_inflight_total{api="headobject",server="127.0.0.1:9000"} 0
 minio_s3_requests_inflight_total{api="listobjectsv1",server="127.0.0.1:9000"} 0
 minio_s3_requests_inflight_total{api="listobjectsv2",server="127.0.0.1:9000"} 0
 minio_s3_requests_inflight_total{api="newmultipartupload",server="127.0.0.1:9000"} 0
@@ -237,133 +240,143 @@ minio_s3_requests_rejected_invalid_total{server="127.0.0.1:9000"} 0
 minio_s3_requests_rejected_timestamp_total{server="127.0.0.1:9000"} 0
 # HELP minio_s3_requests_total Total number of S3 requests
 # TYPE minio_s3_requests_total counter
-minio_s3_requests_total{api="completemultipartupload",server="127.0.0.1:9000"} 28
-minio_s3_requests_total{api="copyobject",server="127.0.0.1:9000"} 60
-minio_s3_requests_total{api="deleteobject",server="127.0.0.1:9000"} 297
-minio_s3_requests_total{api="getbucketlocation",server="127.0.0.1:9000"} 35
-minio_s3_requests_total{api="getobject",server="127.0.0.1:9000"} 370
-minio_s3_requests_total{api="listobjectsv1",server="127.0.0.1:9000"} 78
-minio_s3_requests_total{api="listobjectsv2",server="127.0.0.1:9000"} 213
-minio_s3_requests_total{api="newmultipartupload",server="127.0.0.1:9000"} 28
-minio_s3_requests_total{api="putbucket",server="127.0.0.1:9000"} 10
-minio_s3_requests_total{api="putobject",server="127.0.0.1:9000"} 350
-minio_s3_requests_total{api="putobjectpart",server="127.0.0.1:9000"} 28
+minio_s3_requests_total{api="completemultipartupload",server="127.0.0.1:9000"} 4
+minio_s3_requests_total{api="copyobject",server="127.0.0.1:9000"} 10
+minio_s3_requests_total{api="deleteobject",server="127.0.0.1:9000"} 1169
+minio_s3_requests_total{api="getbucketlocation",server="127.0.0.1:9000"} 62
+minio_s3_requests_total{api="getobject",server="127.0.0.1:9000"} 2068
+minio_s3_requests_total{api="headobject",server="127.0.0.1:9000"} 9
+minio_s3_requests_total{api="listobjectsv1",server="127.0.0.1:9000"} 52
+minio_s3_requests_total{api="listobjectsv2",server="127.0.0.1:9000"} 134
+minio_s3_requests_total{api="newmultipartupload",server="127.0.0.1:9000"} 4
+minio_s3_requests_total{api="putbucket",server="127.0.0.1:9000"} 18
+minio_s3_requests_total{api="putobject",server="127.0.0.1:9000"} 1926
+minio_s3_requests_total{api="putobjectpart",server="127.0.0.1:9000"} 4
 # HELP minio_s3_requests_ttfb_seconds_distribution Distribution of time to first byte across API calls
 # TYPE minio_s3_requests_ttfb_seconds_distribution gauge
-minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="+Inf",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="0.050",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="0.100",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="0.250",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="0.500",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="1.000",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="10.000",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="2.500",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="5.000",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="+Inf",server="127.0.0.1:9000"} 60
-minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="0.050",server="127.0.0.1:9000"} 60
-minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="0.100",server="127.0.0.1:9000"} 60
-minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="0.250",server="127.0.0.1:9000"} 60
-minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="0.500",server="127.0.0.1:9000"} 60
-minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="1.000",server="127.0.0.1:9000"} 60
-minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="10.000",server="127.0.0.1:9000"} 60
-minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="2.500",server="127.0.0.1:9000"} 60
-minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="5.000",server="127.0.0.1:9000"} 60
-minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="+Inf",server="127.0.0.1:9000"} 297
-minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="0.050",server="127.0.0.1:9000"} 297
-minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="0.100",server="127.0.0.1:9000"} 297
-minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="0.250",server="127.0.0.1:9000"} 297
-minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="0.500",server="127.0.0.1:9000"} 297
-minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="1.000",server="127.0.0.1:9000"} 297
-minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="10.000",server="127.0.0.1:9000"} 297
-minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="2.500",server="127.0.0.1:9000"} 297
-minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="5.000",server="127.0.0.1:9000"} 297
-minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="+Inf",server="127.0.0.1:9000"} 35
-minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="0.050",server="127.0.0.1:9000"} 35
-minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="0.100",server="127.0.0.1:9000"} 35
-minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="0.250",server="127.0.0.1:9000"} 35
-minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="0.500",server="127.0.0.1:9000"} 35
-minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="1.000",server="127.0.0.1:9000"} 35
-minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="10.000",server="127.0.0.1:9000"} 35
-minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="2.500",server="127.0.0.1:9000"} 35
-minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="5.000",server="127.0.0.1:9000"} 35
-minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="+Inf",server="127.0.0.1:9000"} 370
-minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="0.050",server="127.0.0.1:9000"} 370
-minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="0.100",server="127.0.0.1:9000"} 370
-minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="0.250",server="127.0.0.1:9000"} 370
-minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="0.500",server="127.0.0.1:9000"} 370
-minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="1.000",server="127.0.0.1:9000"} 370
-minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="10.000",server="127.0.0.1:9000"} 370
-minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="2.500",server="127.0.0.1:9000"} 370
-minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="5.000",server="127.0.0.1:9000"} 370
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="+Inf",server="127.0.0.1:9000"} 78
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="0.050",server="127.0.0.1:9000"} 78
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="0.100",server="127.0.0.1:9000"} 78
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="0.250",server="127.0.0.1:9000"} 78
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="0.500",server="127.0.0.1:9000"} 78
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="1.000",server="127.0.0.1:9000"} 78
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="10.000",server="127.0.0.1:9000"} 78
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="2.500",server="127.0.0.1:9000"} 78
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="5.000",server="127.0.0.1:9000"} 78
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="+Inf",server="127.0.0.1:9000"} 213
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="0.050",server="127.0.0.1:9000"} 202
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="0.100",server="127.0.0.1:9000"} 209
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="0.250",server="127.0.0.1:9000"} 213
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="0.500",server="127.0.0.1:9000"} 213
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="1.000",server="127.0.0.1:9000"} 213
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="10.000",server="127.0.0.1:9000"} 213
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="2.500",server="127.0.0.1:9000"} 213
-minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="5.000",server="127.0.0.1:9000"} 213
-minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="+Inf",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="0.050",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="0.100",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="0.250",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="0.500",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="1.000",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="10.000",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="2.500",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="5.000",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="+Inf",server="127.0.0.1:9000"} 10
-minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="0.050",server="127.0.0.1:9000"} 10
-minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="0.100",server="127.0.0.1:9000"} 10
-minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="0.250",server="127.0.0.1:9000"} 10
-minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="0.500",server="127.0.0.1:9000"} 10
-minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="1.000",server="127.0.0.1:9000"} 10
-minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="10.000",server="127.0.0.1:9000"} 10
-minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="2.500",server="127.0.0.1:9000"} 10
-minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="5.000",server="127.0.0.1:9000"} 10
-minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="+Inf",server="127.0.0.1:9000"} 350
-minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="0.050",server="127.0.0.1:9000"} 350
-minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="0.100",server="127.0.0.1:9000"} 350
-minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="0.250",server="127.0.0.1:9000"} 350
-minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="0.500",server="127.0.0.1:9000"} 350
-minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="1.000",server="127.0.0.1:9000"} 350
-minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="10.000",server="127.0.0.1:9000"} 350
-minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="2.500",server="127.0.0.1:9000"} 350
-minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="5.000",server="127.0.0.1:9000"} 350
-minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="+Inf",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="0.050",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="0.100",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="0.250",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="0.500",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="1.000",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="10.000",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="2.500",server="127.0.0.1:9000"} 28
-minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="5.000",server="127.0.0.1:9000"} 28
+minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="+Inf",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="0.050",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="0.100",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="0.250",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="0.500",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="1.000",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="10.000",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="2.500",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="completemultipartupload",le="5.000",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="+Inf",server="127.0.0.1:9000"} 10
+minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="0.050",server="127.0.0.1:9000"} 10
+minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="0.100",server="127.0.0.1:9000"} 10
+minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="0.250",server="127.0.0.1:9000"} 10
+minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="0.500",server="127.0.0.1:9000"} 10
+minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="1.000",server="127.0.0.1:9000"} 10
+minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="10.000",server="127.0.0.1:9000"} 10
+minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="2.500",server="127.0.0.1:9000"} 10
+minio_s3_requests_ttfb_seconds_distribution{api="copyobject",le="5.000",server="127.0.0.1:9000"} 10
+minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="+Inf",server="127.0.0.1:9000"} 1169
+minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="0.050",server="127.0.0.1:9000"} 1134
+minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="0.100",server="127.0.0.1:9000"} 1169
+minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="0.250",server="127.0.0.1:9000"} 1169
+minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="0.500",server="127.0.0.1:9000"} 1169
+minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="1.000",server="127.0.0.1:9000"} 1169
+minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="10.000",server="127.0.0.1:9000"} 1169
+minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="2.500",server="127.0.0.1:9000"} 1169
+minio_s3_requests_ttfb_seconds_distribution{api="deleteobject",le="5.000",server="127.0.0.1:9000"} 1169
+minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="+Inf",server="127.0.0.1:9000"} 62
+minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="0.050",server="127.0.0.1:9000"} 62
+minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="0.100",server="127.0.0.1:9000"} 62
+minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="0.250",server="127.0.0.1:9000"} 62
+minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="0.500",server="127.0.0.1:9000"} 62
+minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="1.000",server="127.0.0.1:9000"} 62
+minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="10.000",server="127.0.0.1:9000"} 62
+minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="2.500",server="127.0.0.1:9000"} 62
+minio_s3_requests_ttfb_seconds_distribution{api="getbucketlocation",le="5.000",server="127.0.0.1:9000"} 62
+minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="+Inf",server="127.0.0.1:9000"} 2068
+minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="0.050",server="127.0.0.1:9000"} 2061
+minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="0.100",server="127.0.0.1:9000"} 2068
+minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="0.250",server="127.0.0.1:9000"} 2068
+minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="0.500",server="127.0.0.1:9000"} 2068
+minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="1.000",server="127.0.0.1:9000"} 2068
+minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="10.000",server="127.0.0.1:9000"} 2068
+minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="2.500",server="127.0.0.1:9000"} 2068
+minio_s3_requests_ttfb_seconds_distribution{api="getobject",le="5.000",server="127.0.0.1:9000"} 2068
+minio_s3_requests_ttfb_seconds_distribution{api="headobject",le="+Inf",server="127.0.0.1:9000"} 9
+minio_s3_requests_ttfb_seconds_distribution{api="headobject",le="0.050",server="127.0.0.1:9000"} 9
+minio_s3_requests_ttfb_seconds_distribution{api="headobject",le="0.100",server="127.0.0.1:9000"} 9
+minio_s3_requests_ttfb_seconds_distribution{api="headobject",le="0.250",server="127.0.0.1:9000"} 9
+minio_s3_requests_ttfb_seconds_distribution{api="headobject",le="0.500",server="127.0.0.1:9000"} 9
+minio_s3_requests_ttfb_seconds_distribution{api="headobject",le="1.000",server="127.0.0.1:9000"} 9
+minio_s3_requests_ttfb_seconds_distribution{api="headobject",le="10.000",server="127.0.0.1:9000"} 9
+minio_s3_requests_ttfb_seconds_distribution{api="headobject",le="2.500",server="127.0.0.1:9000"} 9
+minio_s3_requests_ttfb_seconds_distribution{api="headobject",le="5.000",server="127.0.0.1:9000"} 9
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="+Inf",server="127.0.0.1:9000"} 52
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="0.050",server="127.0.0.1:9000"} 52
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="0.100",server="127.0.0.1:9000"} 52
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="0.250",server="127.0.0.1:9000"} 52
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="0.500",server="127.0.0.1:9000"} 52
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="1.000",server="127.0.0.1:9000"} 52
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="10.000",server="127.0.0.1:9000"} 52
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="2.500",server="127.0.0.1:9000"} 52
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv1",le="5.000",server="127.0.0.1:9000"} 52
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="+Inf",server="127.0.0.1:9000"} 134
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="0.050",server="127.0.0.1:9000"} 125
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="0.100",server="127.0.0.1:9000"} 126
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="0.250",server="127.0.0.1:9000"} 134
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="0.500",server="127.0.0.1:9000"} 134
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="1.000",server="127.0.0.1:9000"} 134
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="10.000",server="127.0.0.1:9000"} 134
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="2.500",server="127.0.0.1:9000"} 134
+minio_s3_requests_ttfb_seconds_distribution{api="listobjectsv2",le="5.000",server="127.0.0.1:9000"} 134
+minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="+Inf",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="0.050",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="0.100",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="0.250",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="0.500",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="1.000",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="10.000",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="2.500",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="newmultipartupload",le="5.000",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="+Inf",server="127.0.0.1:9000"} 18
+minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="0.050",server="127.0.0.1:9000"} 18
+minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="0.100",server="127.0.0.1:9000"} 18
+minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="0.250",server="127.0.0.1:9000"} 18
+minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="0.500",server="127.0.0.1:9000"} 18
+minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="1.000",server="127.0.0.1:9000"} 18
+minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="10.000",server="127.0.0.1:9000"} 18
+minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="2.500",server="127.0.0.1:9000"} 18
+minio_s3_requests_ttfb_seconds_distribution{api="putbucket",le="5.000",server="127.0.0.1:9000"} 18
+minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="+Inf",server="127.0.0.1:9000"} 1926
+minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="0.050",server="127.0.0.1:9000"} 1924
+minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="0.100",server="127.0.0.1:9000"} 1925
+minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="0.250",server="127.0.0.1:9000"} 1926
+minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="0.500",server="127.0.0.1:9000"} 1926
+minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="1.000",server="127.0.0.1:9000"} 1926
+minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="10.000",server="127.0.0.1:9000"} 1926
+minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="2.500",server="127.0.0.1:9000"} 1926
+minio_s3_requests_ttfb_seconds_distribution{api="putobject",le="5.000",server="127.0.0.1:9000"} 1926
+minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="+Inf",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="0.050",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="0.100",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="0.250",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="0.500",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="1.000",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="10.000",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="2.500",server="127.0.0.1:9000"} 4
+minio_s3_requests_ttfb_seconds_distribution{api="putobjectpart",le="5.000",server="127.0.0.1:9000"} 4
 # HELP minio_s3_requests_waiting_total Total number of S3 requests in the waiting queue
 # TYPE minio_s3_requests_waiting_total gauge
 minio_s3_requests_waiting_total{server="127.0.0.1:9000"} 0
 # HELP minio_s3_traffic_received_bytes Total number of s3 bytes received
 # TYPE minio_s3_traffic_received_bytes counter
-minio_s3_traffic_received_bytes{server="127.0.0.1:9000"} 8.7160354e+07
+minio_s3_traffic_received_bytes{server="127.0.0.1:9000"} 1.33861574e+08
 # HELP minio_s3_traffic_sent_bytes Total number of s3 bytes sent
 # TYPE minio_s3_traffic_sent_bytes counter
-minio_s3_traffic_sent_bytes{server="127.0.0.1:9000"} 4.8013774e+07
+minio_s3_traffic_sent_bytes{server="127.0.0.1:9000"} 1.04897926e+08
 # HELP minio_software_commit_info Git commit hash for the MinIO release
 # TYPE minio_software_commit_info gauge
-minio_software_commit_info{commit="07c3a429bfed433e49018cb0f78a52145d4bedeb",server="127.0.0.1:9000"} 0
+minio_software_commit_info{commit="f48dbe777d0e066d2e74d5e671a8ca21c2ec1664",server="127.0.0.1:9000"} 0
 # HELP minio_software_version_info MinIO Release tag for the server
 # TYPE minio_software_version_info gauge
-minio_software_version_info{server="127.0.0.1:9000",version="2025-09-07T16:13:09Z"} 0
+minio_software_version_info{server="127.0.0.1:9000",version="2026-04-17T00:00:00Z"} 0
 # HELP minio_usage_last_activity_nano_seconds Time elapsed (in nano seconds) since last scan activity
 # TYPE minio_usage_last_activity_nano_seconds gauge
-minio_usage_last_activity_nano_seconds{server="127.0.0.1:9000"} 5.0524606114e+10
+minio_usage_last_activity_nano_seconds{server="127.0.0.1:9000"} 1.1010163714e+10

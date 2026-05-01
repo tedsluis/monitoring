@@ -32,7 +32,7 @@
       "labels": ["major-update", "requires-testing"]
     },
     {
-      "matchDepNames": ["docker.io/minio/minio", "docker.io/minio/mc"],
+      "matchDepNames": ["docker.io/pgsty/minio", "docker.io/pgsty/mc"],
       "enabled": false
     },
     {
