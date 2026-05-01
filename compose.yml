@@ -323,10 +323,10 @@ services:
       - "traefik.http.services.loki.loadbalancer.server.port=3100"
 
  # ---------------------------------------------------------
-  # Minio (S3 Compatible Storage)
+  # Minio (S3 Compatible Storage, fork by pgsty)
   # ---------------------------------------------------------
   minio:
-    image: docker.io/minio/minio:latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+    image: docker.io/pgsty/minio:RELEASE.2026-04-17T00-00-00Z
     container_name: minio
     user: "0:0"
     networks:
@@ -339,6 +339,8 @@ services:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - MINIO_PROMETHEUS_AUTH_TYPE=public
+      - MINIO_PROMETHEUS_URL=http://prometheus:9090
+      - MINIO_PROMETHEUS_JOB_ID=minio-job
     command: server /data --console-address ":9001"
     volumes:
       - minio-data:/data:Z
@@ -366,10 +368,10 @@ services:
       - "traefik.http.middlewares.minio-scraper-trick.headers.customrequestheaders.User-Agent=Prometheus/1.0"
 
   # ---------------------------------------------------------
-  # MinIO Init
+  # MinIO Init (fork by pgsty)
   # ---------------------------------------------------------
   minio-init:
-    image: docker.io/minio/mc@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727
+    image: docker.io/pgsty/mc:RELEASE.2026-04-17T00-00-00Z
     container_name: minio-init
     environment:
       - HTTP_PROXY=

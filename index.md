@@ -28,7 +28,7 @@ Why use this stack? This environment is built to teach you:
 - **The four Pillars of Observability**: How to seamlessly connect Metrics (Prometheus), Logs (Loki), Traces (Tempo) and Profiles (Pyroscope).
 - **Contextual Drill-down**: How to configure Grafana datasources so you can jump directly from a spike in a metric to the specific log line, then to the exact application trace and finally to the specific line of code causing the bottleneck via a Flame Graph.
 - **Modern Collection**: Using Grafana Alloy and OpenTelemetry Collector as modern, vendor-neutral data pipelines.
-- **S3-Compatible Storage**: How Loki and Tempo use MinIO object storage for scalable, long-term data retention instead of local disks.
+- **S3-Compatible Storage**: How Loki and Tempo use MinIO object storage (fork by [pgsty](https://github.com/pgsty/minio/)) for scalable, long-term data retention instead of local disks.
 - **Advanced Alerting Routing**: The flow of an alert from Prometheus -> Alertmanager -> KeepHQ / Karma / Webhook-tester.
 - **Secure Local Networking**: Running a complex stack via Traefik Reverse Proxy with TLS/SSL on your own custom domain using rootless Podman.
 - **Automated Validation**: How to programmatically verify the health of all individual components and validate the end-to-end data flows across the entire observability pipeline.
@@ -68,25 +68,25 @@ Applications can expose pprof endpoints -> Grafana Alloy scrapes these CPU and M
 
 ## 3. Service Port Map
 
-| Service         | Internal Port | Public URL                          | Description                              |
-|-----------------|---------------|-------------------------------------|------------------------------------------|
-| Nginx           | 80            | https://localhost                   | Landing page portal                      |
-| Traefik         | 443 / 8082    | https://traefik.localhost           | Reverse proxy & Ingress routing          |
-| Grafana         | 3000          | https://grafana.localhost           | Main visualization & Dashboard UI        |
-| Prometheus      | 9090          | https://prometheus.localhost        | Time-series database                     |
-| Loki            | 3100          | https://loki.localhost              | Log aggregation engine                   |
-| Tempo           | 3200          | https://tempo.localhost             | Distributed Tracing backend              |
-| Pyroscope       | 4040          | https://pyroscope.localhost         | Continuous Profiling backend (flamegraph)|
-| MinIO           | 9000 / 9001   | https://minio.localhost             | S3 Object Storage for Loki & Tempo       |
-| Alloy           | 12345         | https://alloy.localhost             | Log collection pipeline                  |
-| OTel Collector  | 4317 / 8888   | https://otel-collector.localhost    | Trace collection pipeline                |
-| Alertmanager    | 9093          | https://alertmanager.localhost      | Alert routing and deduplication          |
-| Karma           | 8080          | https://karma.localhost             | Alert visualization dashboard            |
-| KeepHQ          | 3000 / 8080   | https://keep.localhost              | Open-source AIOps and alert management   |
-| Webhook Tester  | 8080          | https://webhook-tester.localhost    | Endpoint for inspecting webhook payloads |
-| node-exporter   | 9100          | https://node-exporter.localhost     | Host metrics                             |
-| podman-exporter | 9882          | https://podman-exporter.localhost   | Container metrics                        |
-| Blackbox        | 9115          | https://blackbox-exporter.localhost | HTTP/TCP endpoint probe                  |
+| Service            | Internal Port | Public URL                          | Description                              |
+|--------------------|---------------|-------------------------------------|------------------------------------------|
+| Nginx              | 80            | https://localhost                   | Landing page portal                      |
+| Traefik            | 443 / 8082    | https://traefik.localhost           | Reverse proxy & Ingress routing          |
+| Grafana            | 3000          | https://grafana.localhost           | Main visualization & Dashboard UI        |
+| Prometheus         | 9090          | https://prometheus.localhost        | Time-series database                     |
+| Loki               | 3100          | https://loki.localhost              | Log aggregation engine                   |
+| Tempo              | 3200          | https://tempo.localhost             | Distributed Tracing backend              |
+| Pyroscope          | 4040          | https://pyroscope.localhost         | Continuous Profiling backend (flamegraph)|
+| MinIO fork by pgsty| 9000 / 9001   | https://minio.localhost             | S3 Object Storage for Loki & Tempo       |
+| Alloy              | 12345         | https://alloy.localhost             | Log collection pipeline                  |
+| OTel Collector     | 4317 / 8888   | https://otel-collector.localhost    | Trace collection pipeline                |
+| Alertmanager       | 9093          | https://alertmanager.localhost      | Alert routing and deduplication          |
+| Karma              | 8080          | https://karma.localhost             | Alert visualization dashboard            |
+| KeepHQ             | 3000 / 8080   | https://keep.localhost              | Open-source AIOps and alert management   |
+| Webhook Tester     | 8080          | https://webhook-tester.localhost    | Endpoint for inspecting webhook payloads |
+| node-exporter      | 9100          | https://node-exporter.localhost     | Host metrics                             |
+| podman-exporter    | 9882          | https://podman-exporter.localhost   | Container metrics                        |
+| Blackbox           | 9115          | https://blackbox-exporter.localhost | HTTP/TCP endpoint probe                  |
 
 **note:** Instead of `localhost` you can configure your own `DOMAIN` using the `.env` file.
 
@@ -313,7 +313,7 @@ CONTAINER ID  IMAGE                                                             
 4385be7aa616  docker.io/grafana/alloy@sha256:1f40cf52adda8fab3e058f9347a5d165624ecb9fbc1527769cb744748961940d                          run --server.http...  24 hours ago    Up 24 hours                                                                                alloy
 e39d9970fdc9  quay.io/prometheus/blackbox-exporter@sha256:e753ff9f3fc458d02cca5eddab5a77e1c175eee484a8925ac7d524f04366c2fc             --config.file=/co...  24 hours ago    Up 24 hours              9115/tcp                                                          blackbox-exporter
 479da2e5f9fa  docker.io/library/postgres@sha256:52098013b4b64a746626437d38afc03cabff6cdeb4d3d92e2342aa95f0ce56ea                       postgres              24 hours ago    Up 24 hours (healthy)    5432/tcp                                                          keep-db
-f19ac9b0fc24  docker.io/minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e                            server /data --co...  24 hours ago    Up 24 hours (healthy)    9000/tcp                                                          minio
+f19ac9b0fc24  docker.io/pgsty/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e                            server /data --co...  24 hours ago    Up 24 hours (healthy)    9000/tcp                                                          minio
 acafb4c0f6ca  docker.io/library/nginx@sha256:5616878291a2eed594aee8db4dade5878cf7edcb475e59193904b198d9b830de                          nginx -g daemon o...  24 hours ago    Up 24 hours (healthy)    80/tcp                                                            nginx
 545194db4adb  quay.io/prometheus/node-exporter@sha256:337ff1d356b68d39cef853e8c6345de11ce7556bb34cda8bd205bcf2ed30b565                 --path.rootfs=/ho...  24 hours ago    Up 24 hours (healthy)    9100/tcp                                                          node-exporter
 d475858f4b28  quay.io/navidys/prometheus-podman-exporter@sha256:2ebb9e09101d8cc1e28e3f306b56a722450918e628208435201ed39bd62403cb                             24 hours ago    Up 24 hours (healthy)    9882/tcp                                                          podman-exporter
@@ -321,7 +321,7 @@ d475858f4b28  quay.io/navidys/prometheus-podman-exporter@sha256:2ebb9e09101d8cc1
 bf15c54adfd7  docker.io/tarampampam/webhook-tester@sha256:85818267b450d3d386cad6510c561e09b974183ed2832c373bc83b125fc1b221             start                 24 hours ago    Up 24 hours                                                                                webhook-tester
 1a80fa997e58  ghcr.io/prymitive/karma@sha256:cae0afb8d083756a7a44413480847fa59c072659d909734924a10640e1de600d                                                24 hours ago    Up 24 hours              8080/tcp                                                          karma
 e56abf8f23b1  us-central1-docker.pkg.dev/keephq/keep/keep-api@sha256:0e95b90210f2caeaf6a654daec274cfe43101cf1c4cdbc9cd1fec1a99e791af6  gunicorn keep.api...  24 hours ago    Up 24 hours (healthy)                                                                      keep-backend
-226eb18ecf08  docker.io/minio/mc@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727                                                     24 hours ago    Exited (0) 24 hours ago                                                                    minio-init
+226eb18ecf08  docker.io/pgsty/mc@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727                                                     24 hours ago    Exited (0) 24 hours ago                                                                    minio-init
 1c1061ab48b2  us-central1-docker.pkg.dev/keephq/keep/keep-ui@sha256:2041f65c7bbd64c2a800a4d11eedf0e99b89debfd6b88f0bbb109443eb6bcc23                         24 hours ago    Up 24 hours (healthy)    3000/tcp                                                          keep-frontend
 9d15366f4ab2  docker.io/grafana/loki@sha256:73e905b51a7f917f7a1075e4be68759df30226e03dcb3cd2213b989cc0dc8eb4                           -config.file=/etc...  24 hours ago    Up 24 hours              3100/tcp                                                          loki
 bae17c2ad577  docker.io/grafana/pyroscope:1.13.0                                                                                       -config.file=/etc...  24 hours ago    Up 24 hours              4040/tcp                                                          pyroscope
@@ -1059,7 +1059,7 @@ By injecting these configurations via Infrastructure as Code, KeepHQ is instantl
 
 ### 7.12 Storage (MinIO)
 
-MinIO is a high-performance, S3-compatible object storage server. In this observability stack, it serves as the persistent, long-term storage backend for both Grafana Loki (logs) and Grafana Tempo (traces).
+MinIO is a high-performance, S3-compatible object storage server. In this observability stack, it serves as the persistent, long-term storage backend for both Grafana Loki (logs) and Grafana Tempo (traces). The https://github.com/minio/minio/ project is no longer maintained, so we use the fork https://github.com/pgsty/minio/, see https://vonng.com/en/db/minio-resurrect/ for more info.
 
 Go to https://minio.localhost
 
@@ -1475,4 +1475,3 @@ This section explains how to remove everything.
 Notes:
 - If your browser trusted the local CA, restart the browser to ensure trust store changes take effect.
 - The compose network is usually removed by `podman compose down`, but the explicit removal ensures a clean state.
-

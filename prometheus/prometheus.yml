@@ -155,7 +155,7 @@ scrape_configs:
       - targets: ['otel-collector:8888']
 
   # MinIO has different metrics endpoints, so we define multiple jobs for each metric type.
-  - job_name: 'minio'
+  - job_name: 'minio-job'
     metrics_path: /minio/v2/metrics/cluster
     scheme: http
     static_configs:

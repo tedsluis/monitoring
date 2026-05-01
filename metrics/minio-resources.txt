@@ -1,84 +1,84 @@
 # HELP minio_node_cpu_avg_idle CPU idle time
 # TYPE minio_node_cpu_avg_idle gauge
-minio_node_cpu_avg_idle{server="127.0.0.1:9000"} 84.79
+minio_node_cpu_avg_idle{server="127.0.0.1:9000"} 91.13
 # HELP minio_node_cpu_avg_idle_avg CPU idle time (avg)
 # TYPE minio_node_cpu_avg_idle_avg gauge
-minio_node_cpu_avg_idle_avg{server="127.0.0.1:9000"} 84.79
+minio_node_cpu_avg_idle_avg{server="127.0.0.1:9000"} 91.19
 # HELP minio_node_cpu_avg_idle_max CPU idle time (max)
 # TYPE minio_node_cpu_avg_idle_max gauge
-minio_node_cpu_avg_idle_max{server="127.0.0.1:9000"} 84.8
+minio_node_cpu_avg_idle_max{server="127.0.0.1:9000"} 91.3
 # HELP minio_node_cpu_avg_iowait CPU ioWait time
 # TYPE minio_node_cpu_avg_iowait gauge
-minio_node_cpu_avg_iowait{server="127.0.0.1:9000"} 0.31
+minio_node_cpu_avg_iowait{server="127.0.0.1:9000"} 0.23
 # HELP minio_node_cpu_avg_iowait_avg CPU ioWait time (avg)
 # TYPE minio_node_cpu_avg_iowait_avg gauge
-minio_node_cpu_avg_iowait_avg{server="127.0.0.1:9000"} 0.31
+minio_node_cpu_avg_iowait_avg{server="127.0.0.1:9000"} 0.23
 # HELP minio_node_cpu_avg_iowait_max CPU ioWait time (max)
 # TYPE minio_node_cpu_avg_iowait_max gauge
-minio_node_cpu_avg_iowait_max{server="127.0.0.1:9000"} 0.31
+minio_node_cpu_avg_iowait_max{server="127.0.0.1:9000"} 0.23
 # HELP minio_node_cpu_avg_load1 CPU load average 1min
 # TYPE minio_node_cpu_avg_load1 gauge
-minio_node_cpu_avg_load1{server="127.0.0.1:9000"} 1.99
+minio_node_cpu_avg_load1{server="127.0.0.1:9000"} 0.82
 # HELP minio_node_cpu_avg_load15 CPU load average 15min
 # TYPE minio_node_cpu_avg_load15 gauge
-minio_node_cpu_avg_load15{server="127.0.0.1:9000"} 1.59
+minio_node_cpu_avg_load15{server="127.0.0.1:9000"} 2.02
 # HELP minio_node_cpu_avg_load15_avg CPU load average 15min (avg)
 # TYPE minio_node_cpu_avg_load15_avg gauge
-minio_node_cpu_avg_load15_avg{server="127.0.0.1:9000"} 1.93
+minio_node_cpu_avg_load15_avg{server="127.0.0.1:9000"} 2.24
 # HELP minio_node_cpu_avg_load15_max CPU load average 15min (max)
 # TYPE minio_node_cpu_avg_load15_max gauge
-minio_node_cpu_avg_load15_max{server="127.0.0.1:9000"} 3.44
+minio_node_cpu_avg_load15_max{server="127.0.0.1:9000"} 2.48
 # HELP minio_node_cpu_avg_load15_perc CPU load average 15min (percentage)
 # TYPE minio_node_cpu_avg_load15_perc gauge
-minio_node_cpu_avg_load15_perc{server="127.0.0.1:9000"} 19.88
+minio_node_cpu_avg_load15_perc{server="127.0.0.1:9000"} 25.25
 # HELP minio_node_cpu_avg_load15_perc_avg CPU load average 15min (percentage) (avg)
 # TYPE minio_node_cpu_avg_load15_perc_avg gauge
-minio_node_cpu_avg_load15_perc_avg{server="127.0.0.1:9000"} 24.08
+minio_node_cpu_avg_load15_perc_avg{server="127.0.0.1:9000"} 28.04
 # HELP minio_node_cpu_avg_load15_perc_max CPU load average 15min (percentage) (max)
 # TYPE minio_node_cpu_avg_load15_perc_max gauge
-minio_node_cpu_avg_load15_perc_max{server="127.0.0.1:9000"} 43
+minio_node_cpu_avg_load15_perc_max{server="127.0.0.1:9000"} 31
 # HELP minio_node_cpu_avg_load1_avg CPU load average 1min (avg)
 # TYPE minio_node_cpu_avg_load1_avg gauge
-minio_node_cpu_avg_load1_avg{server="127.0.0.1:9000"} 1.66
+minio_node_cpu_avg_load1_avg{server="127.0.0.1:9000"} 2.27
 # HELP minio_node_cpu_avg_load1_max CPU load average 1min (max)
 # TYPE minio_node_cpu_avg_load1_max gauge
-minio_node_cpu_avg_load1_max{server="127.0.0.1:9000"} 5.84
-# HELP minio_node_cpu_avg_load1_perc CPU load average 1min (perentage)
+minio_node_cpu_avg_load1_max{server="127.0.0.1:9000"} 5.02
+# HELP minio_node_cpu_avg_load1_perc CPU load average 1min (percentage)
 # TYPE minio_node_cpu_avg_load1_perc gauge
-minio_node_cpu_avg_load1_perc{server="127.0.0.1:9000"} 24.88
-# HELP minio_node_cpu_avg_load1_perc_avg CPU load average 1min (perentage) (avg)
+minio_node_cpu_avg_load1_perc{server="127.0.0.1:9000"} 10.25
+# HELP minio_node_cpu_avg_load1_perc_avg CPU load average 1min (percentage) (avg)
 # TYPE minio_node_cpu_avg_load1_perc_avg gauge
-minio_node_cpu_avg_load1_perc_avg{server="127.0.0.1:9000"} 20.71
-# HELP minio_node_cpu_avg_load1_perc_max CPU load average 1min (perentage) (max)
+minio_node_cpu_avg_load1_perc_avg{server="127.0.0.1:9000"} 28.36
+# HELP minio_node_cpu_avg_load1_perc_max CPU load average 1min (percentage) (max)
 # TYPE minio_node_cpu_avg_load1_perc_max gauge
-minio_node_cpu_avg_load1_perc_max{server="127.0.0.1:9000"} 73
+minio_node_cpu_avg_load1_perc_max{server="127.0.0.1:9000"} 62.75
 # HELP minio_node_cpu_avg_load5 CPU load average 5min
 # TYPE minio_node_cpu_avg_load5 gauge
-minio_node_cpu_avg_load5{server="127.0.0.1:9000"} 1.72
+minio_node_cpu_avg_load5{server="127.0.0.1:9000"} 1.62
 # HELP minio_node_cpu_avg_load5_avg CPU load average 5min (avg)
 # TYPE minio_node_cpu_avg_load5_avg gauge
-minio_node_cpu_avg_load5_avg{server="127.0.0.1:9000"} 1.75
+minio_node_cpu_avg_load5_avg{server="127.0.0.1:9000"} 2.37
 # HELP minio_node_cpu_avg_load5_max CPU load average 5min (max)
 # TYPE minio_node_cpu_avg_load5_max gauge
-minio_node_cpu_avg_load5_max{server="127.0.0.1:9000"} 3.6
+minio_node_cpu_avg_load5_max{server="127.0.0.1:9000"} 3.35
 # HELP minio_node_cpu_avg_load5_perc CPU load average 5min (percentage)
 # TYPE minio_node_cpu_avg_load5_perc gauge
-minio_node_cpu_avg_load5_perc{server="127.0.0.1:9000"} 21.5
+minio_node_cpu_avg_load5_perc{server="127.0.0.1:9000"} 20.25
 # HELP minio_node_cpu_avg_load5_perc_avg CPU load average 5min (percentage) (avg)
 # TYPE minio_node_cpu_avg_load5_perc_avg gauge
-minio_node_cpu_avg_load5_perc_avg{server="127.0.0.1:9000"} 21.82
+minio_node_cpu_avg_load5_perc_avg{server="127.0.0.1:9000"} 29.68
 # HELP minio_node_cpu_avg_load5_perc_max CPU load average 5min (percentage) (max)
 # TYPE minio_node_cpu_avg_load5_perc_max gauge
-minio_node_cpu_avg_load5_perc_max{server="127.0.0.1:9000"} 45
+minio_node_cpu_avg_load5_perc_max{server="127.0.0.1:9000"} 41.88
 # HELP minio_node_cpu_avg_nice CPU nice time
 # TYPE minio_node_cpu_avg_nice gauge
-minio_node_cpu_avg_nice{server="127.0.0.1:9000"} 0.05
+minio_node_cpu_avg_nice{server="127.0.0.1:9000"} 0.06
 # HELP minio_node_cpu_avg_nice_avg CPU nice time (avg)
 # TYPE minio_node_cpu_avg_nice_avg gauge
-minio_node_cpu_avg_nice_avg{server="127.0.0.1:9000"} 0.05
+minio_node_cpu_avg_nice_avg{server="127.0.0.1:9000"} 0.06
 # HELP minio_node_cpu_avg_nice_max CPU nice time (max)
 # TYPE minio_node_cpu_avg_nice_max gauge
-minio_node_cpu_avg_nice_max{server="127.0.0.1:9000"} 0.05
+minio_node_cpu_avg_nice_max{server="127.0.0.1:9000"} 0.06
 # HELP minio_node_cpu_avg_steal CPU steal time
 # TYPE minio_node_cpu_avg_steal gauge
 minio_node_cpu_avg_steal{server="127.0.0.1:9000"} 0
@@ -90,22 +90,22 @@ minio_node_cpu_avg_steal_avg{server="127.0.0.1:9000"} 0
 minio_node_cpu_avg_steal_max{server="127.0.0.1:9000"} 0
 # HELP minio_node_cpu_avg_system CPU system time
 # TYPE minio_node_cpu_avg_system gauge
-minio_node_cpu_avg_system{server="127.0.0.1:9000"} 3.4
+minio_node_cpu_avg_system{server="127.0.0.1:9000"} 2.05
 # HELP minio_node_cpu_avg_system_avg CPU system time (avg)
 # TYPE minio_node_cpu_avg_system_avg gauge
-minio_node_cpu_avg_system_avg{server="127.0.0.1:9000"} 3.4
+minio_node_cpu_avg_system_avg{server="127.0.0.1:9000"} 2.03
 # HELP minio_node_cpu_avg_system_max CPU system time (max)
 # TYPE minio_node_cpu_avg_system_max gauge
-minio_node_cpu_avg_system_max{server="127.0.0.1:9000"} 3.41
+minio_node_cpu_avg_system_max{server="127.0.0.1:9000"} 2.05
 # HELP minio_node_cpu_avg_user CPU user time
 # TYPE minio_node_cpu_avg_user gauge
-minio_node_cpu_avg_user{server="127.0.0.1:9000"} 11.46
+minio_node_cpu_avg_user{server="127.0.0.1:9000"} 6.53
 # HELP minio_node_cpu_avg_user_avg CPU user time (avg)
 # TYPE minio_node_cpu_avg_user_avg gauge
-minio_node_cpu_avg_user_avg{server="127.0.0.1:9000"} 11.45
+minio_node_cpu_avg_user_avg{server="127.0.0.1:9000"} 6.49
 # HELP minio_node_cpu_avg_user_max CPU user time (max)
 # TYPE minio_node_cpu_avg_user_max gauge
-minio_node_cpu_avg_user_max{server="127.0.0.1:9000"} 11.46
+minio_node_cpu_avg_user_max{server="127.0.0.1:9000"} 6.53
 # HELP minio_node_drive_perc_util Percentage of time the disk was busy
 # TYPE minio_node_drive_perc_util gauge
 minio_node_drive_perc_util{drive="/data",server="127.0.0.1:9000"} 0
@@ -120,13 +120,13 @@ minio_node_drive_reads_kb_per_sec{drive="/data",server="127.0.0.1:9000"} 0
 minio_node_drive_reads_per_sec{drive="/data",server="127.0.0.1:9000"} 0
 # HELP minio_node_drive_total_bytes Total bytes on a drive
 # TYPE minio_node_drive_total_bytes gauge
-minio_node_drive_total_bytes{drive="/data",server="127.0.0.1:9000"} 5.07811872768e+11
+minio_node_drive_total_bytes{drive="/data",server="127.0.0.1:9000"} 5.07896201216e+11
 # HELP minio_node_drive_total_inodes Total inodes on a drive
 # TYPE minio_node_drive_total_inodes gauge
 minio_node_drive_total_inodes{drive="/data",server="127.0.0.1:9000"} 0
 # HELP minio_node_drive_used_bytes Used bytes on a drive
 # TYPE minio_node_drive_used_bytes gauge
-minio_node_drive_used_bytes{drive="/data",server="127.0.0.1:9000"} 1.99221362688e+11
+minio_node_drive_used_bytes{drive="/data",server="127.0.0.1:9000"} 2.02370994176e+11
 # HELP minio_node_drive_used_inodes Total inodes used on a drive
 # TYPE minio_node_drive_used_inodes gauge
 minio_node_drive_used_inodes{drive="/data",server="127.0.0.1:9000"} 0
@@ -141,13 +141,13 @@ minio_node_drive_writes_kb_per_sec{drive="/data",server="127.0.0.1:9000"} 0
 minio_node_drive_writes_per_sec{drive="/data",server="127.0.0.1:9000"} 0
 # HELP minio_node_if_rx_bytes Bytes received on the interface in 60s
 # TYPE minio_node_if_rx_bytes gauge
-minio_node_if_rx_bytes{interface="lo",server="127.0.0.1:9000"} 5005
+minio_node_if_rx_bytes{interface="lo",server="127.0.0.1:9000"} 6006
 # HELP minio_node_if_rx_bytes_avg Bytes received on the interface in 60s (avg)
 # TYPE minio_node_if_rx_bytes_avg gauge
-minio_node_if_rx_bytes_avg{interface="lo",server="127.0.0.1:9000"} 5429.13
+minio_node_if_rx_bytes_avg{interface="lo",server="127.0.0.1:9000"} 5846.13
 # HELP minio_node_if_rx_bytes_max Bytes received on the interface in 60s (max)
 # TYPE minio_node_if_rx_bytes_max gauge
-minio_node_if_rx_bytes_max{interface="lo",server="127.0.0.1:9000"} 11111
+minio_node_if_rx_bytes_max{interface="lo",server="127.0.0.1:9000"} 21626
 # HELP minio_node_if_rx_errors Receive errors in 60s
 # TYPE minio_node_if_rx_errors gauge
 minio_node_if_rx_errors{interface="lo",server="127.0.0.1:9000"} 0
@@ -159,13 +159,13 @@ minio_node_if_rx_errors_avg{interface="lo",server="127.0.0.1:9000"} 0
 minio_node_if_rx_errors_max{interface="lo",server="127.0.0.1:9000"} 0
 # HELP minio_node_if_tx_bytes Bytes transmitted in 60s
 # TYPE minio_node_if_tx_bytes gauge
-minio_node_if_tx_bytes{interface="lo",server="127.0.0.1:9000"} 5005
+minio_node_if_tx_bytes{interface="lo",server="127.0.0.1:9000"} 6006
 # HELP minio_node_if_tx_bytes_avg Bytes transmitted in 60s (avg)
 # TYPE minio_node_if_tx_bytes_avg gauge
-minio_node_if_tx_bytes_avg{interface="lo",server="127.0.0.1:9000"} 5429.13
+minio_node_if_tx_bytes_avg{interface="lo",server="127.0.0.1:9000"} 5846.13
 # HELP minio_node_if_tx_bytes_max Bytes transmitted in 60s (max)
 # TYPE minio_node_if_tx_bytes_max gauge
-minio_node_if_tx_bytes_max{interface="lo",server="127.0.0.1:9000"} 11111
+minio_node_if_tx_bytes_max{interface="lo",server="127.0.0.1:9000"} 21626
 # HELP minio_node_if_tx_errors Transmit errors in 60s
 # TYPE minio_node_if_tx_errors gauge
 minio_node_if_tx_errors{interface="lo",server="127.0.0.1:9000"} 0
@@ -177,73 +177,73 @@ minio_node_if_tx_errors_avg{interface="lo",server="127.0.0.1:9000"} 0
 minio_node_if_tx_errors_max{interface="lo",server="127.0.0.1:9000"} 0
 # HELP minio_node_mem_available Available memory on the node
 # TYPE minio_node_mem_available gauge
-minio_node_mem_available{server="127.0.0.1:9000"} 6.401339392e+09
+minio_node_mem_available{server="127.0.0.1:9000"} 5.752795136e+09
 # HELP minio_node_mem_available_avg Available memory on the node (avg)
 # TYPE minio_node_mem_available_avg gauge
-minio_node_mem_available_avg{server="127.0.0.1:9000"} 6.84927638961e+09
+minio_node_mem_available_avg{server="127.0.0.1:9000"} 6.0552388608e+09
 # HELP minio_node_mem_available_max Available memory on the node (max)
 # TYPE minio_node_mem_available_max gauge
-minio_node_mem_available_max{server="127.0.0.1:9000"} 8.185167872e+09
+minio_node_mem_available_max{server="127.0.0.1:9000"} 6.419357696e+09
 # HELP minio_node_mem_buffers Buffers memory on the node
 # TYPE minio_node_mem_buffers gauge
-minio_node_mem_buffers{server="127.0.0.1:9000"} 585728
+minio_node_mem_buffers{server="127.0.0.1:9000"} 712704
 # HELP minio_node_mem_buffers_avg Buffers memory on the node (avg)
 # TYPE minio_node_mem_buffers_avg gauge
-minio_node_mem_buffers_avg{server="127.0.0.1:9000"} 585728
+minio_node_mem_buffers_avg{server="127.0.0.1:9000"} 712977.07
 # HELP minio_node_mem_buffers_max Buffers memory on the node (max)
 # TYPE minio_node_mem_buffers_max gauge
-minio_node_mem_buffers_max{server="127.0.0.1:9000"} 585728
+minio_node_mem_buffers_max{server="127.0.0.1:9000"} 716800
 # HELP minio_node_mem_cache Cache memory on the node
 # TYPE minio_node_mem_cache gauge
-minio_node_mem_cache{server="127.0.0.1:9000"} 7.02490624e+09
+minio_node_mem_cache{server="127.0.0.1:9000"} 6.640750592e+09
 # HELP minio_node_mem_cache_avg Cache memory on the node (avg)
 # TYPE minio_node_mem_cache_avg gauge
-minio_node_mem_cache_avg{server="127.0.0.1:9000"} 7.40057856528e+09
+minio_node_mem_cache_avg{server="127.0.0.1:9000"} 6.88577959253e+09
 # HELP minio_node_mem_cache_max Cache memory on the node (max)
 # TYPE minio_node_mem_cache_max gauge
-minio_node_mem_cache_max{server="127.0.0.1:9000"} 7.819001856e+09
+minio_node_mem_cache_max{server="127.0.0.1:9000"} 7.11866368e+09
 # HELP minio_node_mem_free Free memory on the node
 # TYPE minio_node_mem_free gauge
-minio_node_mem_free{server="127.0.0.1:9000"} 4.03402752e+08
+minio_node_mem_free{server="127.0.0.1:9000"} 1.91787008e+08
 # HELP minio_node_mem_free_avg Free memory on the node (avg)
 # TYPE minio_node_mem_free_avg gauge
-minio_node_mem_free_avg{server="127.0.0.1:9000"} 4.0705009221e+08
+minio_node_mem_free_avg{server="127.0.0.1:9000"} 3.3017883307e+08
 # HELP minio_node_mem_free_max Free memory on the node (max)
 # TYPE minio_node_mem_free_max gauge
-minio_node_mem_free_max{server="127.0.0.1:9000"} 1.528782848e+09
+minio_node_mem_free_max{server="127.0.0.1:9000"} 1.442742272e+09
 # HELP minio_node_mem_shared Shared memory on the node
 # TYPE minio_node_mem_shared gauge
-minio_node_mem_shared{server="127.0.0.1:9000"} 9.86943488e+08
+minio_node_mem_shared{server="127.0.0.1:9000"} 9.02565888e+08
 # HELP minio_node_mem_shared_avg Shared memory on the node (avg)
 # TYPE minio_node_mem_shared_avg gauge
-minio_node_mem_shared_avg{server="127.0.0.1:9000"} 8.0204865452e+08
+minio_node_mem_shared_avg{server="127.0.0.1:9000"} 9.3662303573e+08
 # HELP minio_node_mem_shared_max Shared memory on the node (max)
 # TYPE minio_node_mem_shared_max gauge
-minio_node_mem_shared_max{server="127.0.0.1:9000"} 1.118932992e+09
+minio_node_mem_shared_max{server="127.0.0.1:9000"} 1.409642496e+09
 # HELP minio_node_mem_total Total memory on the node
 # TYPE minio_node_mem_total gauge
-minio_node_mem_total{server="127.0.0.1:9000"} 1.6469598208e+10
+minio_node_mem_total{server="127.0.0.1:9000"} 1.646956544e+10
 # HELP minio_node_mem_total_avg Total memory on the node (avg)
 # TYPE minio_node_mem_total_avg gauge
-minio_node_mem_total_avg{server="127.0.0.1:9000"} 1.6469598208e+10
+minio_node_mem_total_avg{server="127.0.0.1:9000"} 1.646956544e+10
 # HELP minio_node_mem_total_max Total memory on the node (max)
 # TYPE minio_node_mem_total_max gauge
-minio_node_mem_total_max{server="127.0.0.1:9000"} 1.6469598208e+10
+minio_node_mem_total_max{server="127.0.0.1:9000"} 1.646956544e+10
 # HELP minio_node_mem_used Used memory on the node
 # TYPE minio_node_mem_used gauge
-minio_node_mem_used{server="127.0.0.1:9000"} 9.040703488e+09
+minio_node_mem_used{server="127.0.0.1:9000"} 9.636315136e+09
 # HELP minio_node_mem_used_avg Used memory on the node (avg)
 # TYPE minio_node_mem_used_avg gauge
-minio_node_mem_used_avg{server="127.0.0.1:9000"} 8.66138382252e+09
+minio_node_mem_used_avg{server="127.0.0.1:9000"} 9.25289403733e+09
 # HELP minio_node_mem_used_max Used memory on the node (max)
 # TYPE minio_node_mem_used_max gauge
-minio_node_mem_used_max{server="127.0.0.1:9000"} 9.061056512e+09
+minio_node_mem_used_max{server="127.0.0.1:9000"} 9.636315136e+09
 # HELP minio_node_mem_used_perc Used memory percentage on the node
 # TYPE minio_node_mem_used_perc gauge
-minio_node_mem_used_perc{server="127.0.0.1:9000"} 54.89
+minio_node_mem_used_perc{server="127.0.0.1:9000"} 58.51
 # HELP minio_node_mem_used_perc_avg Used memory percentage on the node (avg)
 # TYPE minio_node_mem_used_perc_avg gauge
-minio_node_mem_used_perc_avg{server="127.0.0.1:9000"} 52.59
+minio_node_mem_used_perc_avg{server="127.0.0.1:9000"} 56.18
 # HELP minio_node_mem_used_perc_max Used memory percentage on the node (max)
 # TYPE minio_node_mem_used_perc_max gauge
-minio_node_mem_used_perc_max{server="127.0.0.1:9000"} 55.02
+minio_node_mem_used_perc_max{server="127.0.0.1:9000"} 58.51
