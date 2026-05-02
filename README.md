@@ -1056,7 +1056,9 @@ By injecting these configurations via Infrastructure as Code, KeepHQ is instantl
 
 ### 7.12 Storage (MinIO)
 
-MinIO is a high-performance, S3-compatible object storage server. In this observability stack, it serves as the persistent, long-term storage backend for both Grafana Loki (logs) and Grafana Tempo (traces). The https://github.com/minio/minio/ project is no longer maintained, so we use the fork https://github.com/pgsty/minio/, see https://vonng.com/en/db/minio-resurrect/ for more info.
+MinIO is a high-performance, S3-compatible object storage server. In this observability stack, it serves as the persistent, long-term storage backend for both Grafana Loki (logs) and Grafana Tempo (traces). 
+
+**Note:** The https://github.com/minio/minio/ project is no longer maintained, so we use the fork https://github.com/pgsty/minio/, see https://vonng.com/en/db/minio-resurrect/ for more info.
 
 Go to https://minio.localhost
 
@@ -1073,6 +1075,9 @@ Go to https://minio.localhost
 
 *See the screenshot below for an impression of the MinIO UI - object browser:*
 ![minio-object-browser](./images/minio-object-browser.png)
+
+*See the screenshot below for an impression of the MinIO UI - metrics info:*
+![minio-object-browser](./images/minio-info.png)
 
 *See the screenshot below for an impression of the MinIO overview dashboard:*
 ![minio](./images/minio-dashboard.png)

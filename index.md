@@ -116,7 +116,7 @@ Applications can expose pprof endpoints -> Grafana Alloy scrapes these CPU and M
    * Grafana Alloy: Scrapes pprof endpoints from running containers and sends them to Pyroscope.
 
 **5. Storage & Infrastructure**
-   * MinIO: S3-compatible storage providing scalable object storage for Tempo, Loki and Pyroscope data.
+   * MinIO (fork by [pgsty](https://github.com/pgsty/minio/)): S3-compatible storage providing scalable object storage for Tempo, Loki and Pyroscope data.
    * PostgreSQL: Relational database backend for KeepHQ.
    * Traefik: Reverse proxy that acts as the entry point, handling routing and TLS termination for all `*.${DOMAIN}` domains.
 
@@ -1059,7 +1059,9 @@ By injecting these configurations via Infrastructure as Code, KeepHQ is instantl
 
 ### 7.12 Storage (MinIO)
 
-MinIO is a high-performance, S3-compatible object storage server. In this observability stack, it serves as the persistent, long-term storage backend for both Grafana Loki (logs) and Grafana Tempo (traces). The https://github.com/minio/minio/ project is no longer maintained, so we use the fork https://github.com/pgsty/minio/, see https://vonng.com/en/db/minio-resurrect/ for more info.
+MinIO is a high-performance, S3-compatible object storage server. In this observability stack, it serves as the persistent, long-term storage backend for both Grafana Loki (logs) and Grafana Tempo (traces). 
+
+**Note:** The https://github.com/minio/minio/ project is no longer maintained, so we use the fork https://github.com/pgsty/minio/, see https://vonng.com/en/db/minio-resurrect/ for more info.
 
 Go to https://minio.localhost
 
@@ -1076,6 +1078,9 @@ Go to https://minio.localhost
 
 *See the screenshot below for an impression of the MinIO UI - object browser:*
 ![minio-object-browser](./images/minio-object-browser.png)
+
+*See the screenshot below for an impression of the MinIO UI - metrics info:*
+![minio-object-browser](./images/minio-info.png)
 
 *See the screenshot below for an impression of the MinIO overview dashboard:*
 ![minio](./images/minio-dashboard.png)
@@ -1475,3 +1480,4 @@ This section explains how to remove everything.
 Notes:
 - If your browser trusted the local CA, restart the browser to ensure trust store changes take effect.
 - The compose network is usually removed by `podman compose down`, but the explicit removal ensures a clean state.
+
