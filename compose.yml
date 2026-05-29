@@ -456,7 +456,7 @@ services:
   # OpenTelemetry Collector
   # ---------------------------------------------------------
   otel-collector:
-    image: docker.io/otel/opentelemetry-collector-contrib:0.151.0@sha256:d57bfe8eee2378f31cb1193239fbcac521d54a5a071fca2bfc106916a32b892d
+    image: docker.io/otel/opentelemetry-collector-contrib:0.153.0@sha256:93aad750175cbf1a973ae1c5886c3371f4d800f61be25cdd26870b8441ffe9fa
     container_name: otel-collector
     command: ["--config=/etc/otel-config.yaml"]
     networks:
