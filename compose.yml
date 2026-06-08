@@ -622,7 +622,7 @@ services:
   # Traefik (Reverse Proxy & Ingress)
   # ---------------------------------------------------------
   traefik:
-    image: docker.io/library/traefik:v3.7.1@sha256:6b9cbca6fac42ab0075f5437d8dc1685cfd188626d8d515839ea94f8b6271c42
+    image: docker.io/library/traefik:v3.7.3@sha256:25cd7b175a493ea66a40329e23a649b59eda38b7e2a570493bf63fc4d74fd1c1
     container_name: traefik
     healthcheck:
       test: ["CMD-SHELL", "http_proxy= HTTP_PROXY= wget -q --tries=1 --spider http://127.0.0.1:8082/ping || exit 1"]
