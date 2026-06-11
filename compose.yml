@@ -41,7 +41,7 @@ services:
   # Alloy
   # ---------------------------------------------------------
   alloy:
-    image: docker.io/grafana/alloy:v1.16.2@sha256:32913cbfac652d15fa84d256a74e5ee3f71575961bb19d34796ce3838bfba693
+    image: docker.io/grafana/alloy:v1.16.3@sha256:84b76d56c5943025515438fd45cbb5995386a0260d072c9b671dfd7f539f9c01
     container_name: alloy
     # Alloy needs to run as root to be able to read the journal logs from the host. In a production environment, you should use a more secure way to grant these permissions, such as using capabilities or a custom security profile.
     user: "0:0"
