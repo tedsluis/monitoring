@@ -589,7 +589,7 @@ services:
   # Tempo
   # ---------------------------------------------------------
   tempo:
-    image: docker.io/grafana/tempo:2.10.6@sha256:6ea351a2186822a044d5e326ed4c7a43d019378e4c033c271b89584216db03e7
+    image: docker.io/grafana/tempo:2.10.7@sha256:032b3acb51ed02c4b801473d54bb63e9e9f13738d215126d9843c30283794f4b
     container_name: tempo
     command: 
       - "-config.file=/etc/tempo.yaml"
