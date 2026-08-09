@@ -41,7 +41,7 @@ services:
   # Alloy
   # ---------------------------------------------------------
   alloy:
-    image: docker.io/grafana/alloy:v1.18.0@sha256:491b0578c04983fd54fe99b587b6fab4404dc46d0dc16677bd6b00cc1140b308
+    image: docker.io/grafana/alloy:v1.18.1@sha256:0f4434c92b3e6cdac38bb129b344e1790c246f7b6e2eaffcc16a5fa363240e33
     container_name: alloy
     # Alloy needs to run as root to be able to read the journal logs from the host. In a production environment, you should use a more secure way to grant these permissions, such as using capabilities or a custom security profile.
     user: "0:0"
@@ -295,7 +295,7 @@ services:
   # Loki
   # ---------------------------------------------------------
   loki:
-    image: docker.io/grafana/loki:3.7.5@sha256:f968164e718f9cbe9f5b0f967f3bb6f9cad5d95cf7ffcaf968cce06c941aed62
+    image: docker.io/grafana/loki:3.7.6@sha256:efd47c67f9bac88ca29bcf8cb997d9ab29d1848bd0aff579282295542a745952
     container_name: loki
     environment:
       - HTTP_PROXY=
